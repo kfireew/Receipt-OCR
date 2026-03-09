@@ -1,0 +1,9 @@
+python-doctr[torch]>=0.8.1
+pytesseract>=0.3.10
+opencv-python>=4.9.0.0
+Pillow>=10.0.0
+numpy>=1.26.0
+python-bidi>=0.4.2
+PyYAML>=6.0.0
+scikit-image>=0.22.0
+pytest>=8.0.0
