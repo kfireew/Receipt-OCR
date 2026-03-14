@@ -1,0 +1,20 @@
+# Debug and temporary files
+debug/
+*.log
+*.pred.json
+*.pred.OLD.json
+debug_*
+raw_lines_dump.txt
+_dump_lines.py
+
+# Python related
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDEs
+.vscode/
+.idea/
+
+# Dependencies
+vendor/
