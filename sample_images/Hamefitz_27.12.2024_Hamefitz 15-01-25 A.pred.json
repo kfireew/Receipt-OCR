@@ -3,7 +3,7 @@
     "fields": [
       {
         "name": "InvoiceNo",
-        "value": "33404"
+        "value": "02156003030317"
       },
       {
         "name": "Date",
@@ -11,15 +11,15 @@
       },
       {
         "name": "Total",
-        "value": "77707.00"
+        "value": "209.00"
       },
       {
         "name": "VendorName",
-        "value": "קחפה (6המפיץ סיטונאות מזון"
+        "value": "זווו המפיץ : סיעונאות מזון כתובת חברה: היוצר 2 באר יעקב,08-9959389 טלפון חברה: עוסק מורשה: 557652476 מדווחת באיחוד עוסקים ח.צ. 520022732 אצאצ מקור אאא"
       },
       {
         "name": "VendorNameS",
-        "value": "קחפה (6המפיץ סיטונאות מזון"
+        "value": "זווו המפיץ : סיעונאות מזון כתובת חברה: היוצר 2 באר יעקב,08-9959389 טלפון חברה: עוסק מורשה: 557652476 מדווחת באיחוד עוסקים ח.צ. 520022732 אצאצ מקור אאא"
       }
     ],
     "groups": [
@@ -44,6 +44,28 @@
               {
                 "name": "LineTotal",
                 "value": "8.00"
+              }
+            ],
+            "groups": []
+          },
+          {
+            "name": "Table",
+            "fields": [
+              {
+                "name": "Price",
+                "value": "33404.00"
+              },
+              {
+                "name": "Quantity",
+                "value": "1.00"
+              },
+              {
+                "name": "CatalogNo",
+                "value": "516675634"
+              },
+              {
+                "name": "LineTotal",
+                "value": "33404.00"
               }
             ],
             "groups": []
@@ -89,7 +111,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "6.00"
+                "value": "0.00"
               },
               {
                 "name": "Quantity",
@@ -97,7 +119,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "6.00"
+                "value": "0.00"
               }
             ],
             "groups": []
@@ -116,6 +138,42 @@
               {
                 "name": "LineTotal",
                 "value": "66.15"
+              }
+            ],
+            "groups": []
+          },
+          {
+            "name": "Table",
+            "fields": [
+              {
+                "name": "Price",
+                "value": "2.33"
+              },
+              {
+                "name": "Quantity",
+                "value": "3.00"
+              },
+              {
+                "name": "LineTotal",
+                "value": "7.00"
+              }
+            ],
+            "groups": []
+          },
+          {
+            "name": "Table",
+            "fields": [
+              {
+                "name": "Price",
+                "value": "5.00"
+              },
+              {
+                "name": "Quantity",
+                "value": "1.00"
+              },
+              {
+                "name": "LineTotal",
+                "value": "5.00"
               }
             ],
             "groups": []
@@ -132,12 +190,30 @@
                 "value": "3.00"
               },
               {
+                "name": "LineTotal",
+                "value": "8.00"
+              }
+            ],
+            "groups": []
+          },
+          {
+            "name": "Table",
+            "fields": [
+              {
+                "name": "Price",
+                "value": "17.20"
+              },
+              {
+                "name": "Quantity",
+                "value": "4.00"
+              },
+              {
                 "name": "CatalogNo",
-                "value": "5001594612"
+                "value": "7290112494221"
               },
               {
                 "name": "LineTotal",
-                "value": "8.00"
+                "value": "68.79"
               }
             ],
             "groups": []
@@ -169,6 +245,24 @@
               },
               {
                 "name": "Quantity",
+                "value": "2.00"
+              },
+              {
+                "name": "LineTotal",
+                "value": "2.00"
+              }
+            ],
+            "groups": []
+          },
+          {
+            "name": "Table",
+            "fields": [
+              {
+                "name": "Price",
+                "value": "0.00"
+              },
+              {
+                "name": "Quantity",
                 "value": "6.00"
               },
               {
@@ -177,7 +271,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "6.00"
+                "value": "0.00"
               }
             ],
             "groups": []
@@ -187,11 +281,11 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "9.00"
+                "value": "1.29"
               },
               {
                 "name": "Quantity",
-                "value": "1.00"
+                "value": "7.00"
               },
               {
                 "name": "LineTotal",
@@ -205,11 +299,11 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "9.62"
+                "value": "12.00"
               },
               {
                 "name": "Quantity",
-                "value": "8.00"
+                "value": "1.00"
               },
               {
                 "name": "CatalogNo",
@@ -217,7 +311,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "77.00"
+                "value": "12.00"
               }
             ],
             "groups": []
@@ -227,29 +321,11 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "0.60"
+                "value": "103.17"
               },
               {
                 "name": "Quantity",
-                "value": "1.00"
-              },
-              {
-                "name": "LineTotal",
-                "value": "0.60"
-              }
-            ],
-            "groups": []
-          },
-          {
-            "name": "Table",
-            "fields": [
-              {
-                "name": "Price",
-                "value": "722.19"
-              },
-              {
-                "name": "Quantity",
-                "value": "1.00"
+                "value": "7.00"
               },
               {
                 "name": "LineTotal",
@@ -263,69 +339,15 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "5.00"
+                "value": "9.50"
               },
               {
                 "name": "Quantity",
-                "value": "1.00"
+                "value": "2.00"
               },
               {
                 "name": "LineTotal",
-                "value": "5.00"
-              }
-            ],
-            "groups": []
-          },
-          {
-            "name": "Table",
-            "fields": [
-              {
-                "name": "Price",
-                "value": "1.00"
-              },
-              {
-                "name": "Quantity",
-                "value": "8.00"
-              },
-              {
-                "name": "LineTotal",
-                "value": "8.00"
-              }
-            ],
-            "groups": []
-          },
-          {
-            "name": "Table",
-            "fields": [
-              {
-                "name": "Price",
-                "value": "168.99"
-              },
-              {
-                "name": "Quantity",
-                "value": "5.00"
-              },
-              {
-                "name": "LineTotal",
-                "value": "844.96"
-              }
-            ],
-            "groups": []
-          },
-          {
-            "name": "Table",
-            "fields": [
-              {
-                "name": "Price",
-                "value": "1.00"
-              },
-              {
-                "name": "Quantity",
-                "value": "1.00"
-              },
-              {
-                "name": "LineTotal",
-                "value": "1.00"
+                "value": "19.00"
               }
             ],
             "groups": []
@@ -344,6 +366,78 @@
               {
                 "name": "LineTotal",
                 "value": "5.00"
+              }
+            ],
+            "groups": []
+          },
+          {
+            "name": "Table",
+            "fields": [
+              {
+                "name": "Price",
+                "value": "0.00"
+              },
+              {
+                "name": "Quantity",
+                "value": "1.00"
+              },
+              {
+                "name": "LineTotal",
+                "value": "0.00"
+              }
+            ],
+            "groups": []
+          },
+          {
+            "name": "Table",
+            "fields": [
+              {
+                "name": "Price",
+                "value": "1.00"
+              },
+              {
+                "name": "Quantity",
+                "value": "1.00"
+              },
+              {
+                "name": "LineTotal",
+                "value": "1.00"
+              }
+            ],
+            "groups": []
+          },
+          {
+            "name": "Table",
+            "fields": [
+              {
+                "name": "Price",
+                "value": "21124.00"
+              },
+              {
+                "name": "Quantity",
+                "value": "4.00"
+              },
+              {
+                "name": "LineTotal",
+                "value": "84496.00"
+              }
+            ],
+            "groups": []
+          },
+          {
+            "name": "Table",
+            "fields": [
+              {
+                "name": "Price",
+                "value": "1.00"
+              },
+              {
+                "name": "Quantity",
+                "value": "1.00"
+              },
+              {
+                "name": "LineTotal",
+                "value": "1.00"
               }
             ],
             "groups": []
@@ -371,7 +465,29 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "2605.00"
+                "value": "70.00"
+              },
+              {
+                "name": "Quantity",
+                "value": "1.00"
+              },
+              {
+                "name": "CatalogNo",
+                "value": "000000000"
+              },
+              {
+                "name": "LineTotal",
+                "value": "70.00"
+              }
+            ],
+            "groups": []
+          },
+          {
+            "name": "Table",
+            "fields": [
+              {
+                "name": "Price",
+                "value": "2625.00"
               },
               {
                 "name": "Quantity",
@@ -383,7 +499,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "2605.00"
+                "value": "2625.00"
               }
             ],
             "groups": []

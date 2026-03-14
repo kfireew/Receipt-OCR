@@ -193,16 +193,15 @@ def main(argv: Optional[list[str]] = None) -> int:
             print(f"[DRY RUN] {pdf.name} -> GT: {gt_json.name}, PRED: {pred_json.name}")
         return 0
 
-    # Import and call the local receipt_ocr CLI directly so we are sure
-    # we are exercising the code in this repository (with instrumentation),
-    # not an unrelated installed package.
-    from receipt_ocr.cli import main as receipt_main
+    # exercise the code in this repository.
+    from cli.main import main as receipt_main
 
     start_time_all = time.time()
     total_processing_time = 0.0
     field_match_count = 0
     field_total_count = 0
 
+    file_results = []
     for pdf, gt_json, pred_json in pairs:
         print(f"Processing {pdf.name} (ground truth: {gt_json.name})")
         receipt_argv = [
@@ -218,38 +217,54 @@ def main(argv: Optional[list[str]] = None) -> int:
         exit_code = receipt_main(receipt_argv)
         t1 = time.time()
         
+        proc_time = t1 - t0
         if exit_code != 0:
             print(f"Failed processing {pdf.name}")
             continue
             
-        total_processing_time += (t1 - t0)
+        total_processing_time += proc_time
         
         # Evaluate accuracy
         gt = _load_gt(gt_json)
-        pred = _load_gt(pred_json) # pred is already in the exact same schema
+        pred = _load_gt(pred_json)
+        
+        file_match = 0
+        file_total = 0
         
         # Compare header fields
         for key in ["invoice_no", "date", "total"]:
             if gt[key] is not None:
-                field_total_count += 1
+                file_total += 1
                 if _fuzzy_match_value(pred.get(key), gt[key]):
-                    field_match_count += 1
+                    file_match += 1
                 
-        # Compare items (using bag-of-words exact match for items to handle unordered)
-        # We'll calculate a score based on lines correctly matched
+        # Compare items
         for gt_item in gt["items"]:
-            # For each expected item, score if found in prediction
-            # we look for matching catalog_no, or matching line_total
+            file_total += len(gt_item)
             best_match_score = 0
-            field_total_count += len(gt_item)
             for pred_item in pred["items"]:
                 matching_keys = sum(1 for k,v in gt_item.items() if _fuzzy_match_value(pred_item.get(k), v))
                 best_match_score = max(best_match_score, matching_keys)
-            
-            field_match_count += best_match_score
+            file_match += best_match_score
+
+        accuracy = (file_match / file_total * 100) if file_total > 0 else 100
+        file_results.append({
+            "file": pdf.name,
+            "accuracy": f"{accuracy:.2f}%",
+            "time": f"{proc_time:.2f}s"
+        })
+        
+        field_match_count += file_match
+        field_total_count += file_total
 
     avg_time = total_processing_time / len(pairs) if pairs else 0.0
     success_rate = (field_match_count / field_total_count * 100) if field_total_count > 0 else 0.0
+
+    print("\n--- PER-FILE RESULTS ---")
+    print(f"{'File':<60} | {'Accuracy':<10} | {'Time':<10}")
+    print("-" * 85)
+    for res in file_results:
+        print(f"{res['file']:<60} | {res['accuracy']:<10} | {res['time']:<10}")
 
     # Simple summary of produced files.
     summary = {
@@ -259,7 +274,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         "average_processing_time_sec": round(avg_time, 2),
         "success_rate_percent": round(success_rate, 2),
     }
-    print("\n--- RESULTS ---")
+    print("\n--- SUMMARY ---")
     print(json.dumps(summary, ensure_ascii=False, indent=2))
 
     return 0

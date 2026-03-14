@@ -3,7 +3,7 @@
     "fields": [
       {
         "name": "InvoiceNo",
-        "value": "5297888"
+        "value": "297888"
       },
       {
         "name": "Date",
@@ -11,15 +11,15 @@
       },
       {
         "name": "Total",
-        "value": "7.00"
+        "value": "19044.00"
       },
       {
         "name": "VendorName",
-        "value": "₪ / ו ה 7 וכ"
+        "value": "1 . שק םוט .- 5 - :הבו הבו -5 ן י.ד. יי,ד, י.ד. ',ד. 9 ע?דה עידהת עידה ידה 6 יבוא באוש וו שיווק ו כ ממתקים בסיטונאות - 2 :0 ₪ 0 א 0 ב בע\"מ א.ת. מערב קדימה, ת.ד. 9147, תל מונד 4064129 א בצ 5 לט : \"הו = ם =] משרד טל: טל;: טל: 09-7440326 פקס: 09-7464510 = = מצלתמאעו מצלהמאשט מציהיממעטו וה תוניי ומת יי ור ד ו 8 0 512808726 קושל"
       },
       {
         "name": "VendorNameS",
-        "value": "₪ / ו ה 7 וכ"
+        "value": "1 . שק םוט .- 5 - :הבו הבו -5 ן י.ד. יי,ד, י.ד. ',ד. 9 ע?דה עידהת עידה ידה 6 יבוא באוש וו שיווק ו כ ממתקים בסיטונאות - 2 :0 ₪ 0 א 0 ב בע\"מ א.ת. מערב קדימה, ת.ד. 9147, תל מונד 4064129 א בצ 5 לט : \"הו = ם =] משרד טל: טל;: טל: 09-7440326 פקס: 09-7464510 = = מצלתמאעו מצלהמאשט מציהיממעטו וה תוניי ומת יי ור ד ו 8 0 512808726 קושל"
       }
     ],
     "groups": [
@@ -31,15 +31,15 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "6.00"
+                "value": "0.00"
               },
               {
                 "name": "Quantity",
-                "value": "1.00"
+                "value": "9.00"
               },
               {
                 "name": "LineTotal",
-                "value": "6.00"
+                "value": "0.00"
               }
             ],
             "groups": []
@@ -49,25 +49,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "9.00"
-              },
-              {
-                "name": "Quantity",
-                "value": "1.00"
-              },
-              {
-                "name": "LineTotal",
-                "value": "9.00"
-              }
-            ],
-            "groups": []
-          },
-          {
-            "name": "Table",
-            "fields": [
-              {
-                "name": "Price",
-                "value": "64129.00"
+                "value": "5.00"
               },
               {
                 "name": "Quantity",
@@ -79,7 +61,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "64129.00"
+                "value": "5.00"
               }
             ],
             "groups": []
@@ -115,6 +97,68 @@
               },
               {
                 "name": "Quantity",
+                "value": "8.00"
+              },
+              {
+                "name": "CatalogNo",
+                "value": "512808726"
+              },
+              {
+                "name": "LineTotal",
+                "value": "0.00"
+              }
+            ],
+            "groups": []
+          },
+          {
+            "name": "Table",
+            "fields": [
+              {
+                "name": "Price",
+                "value": "4.33"
+              },
+              {
+                "name": "Quantity",
+                "value": "3.00"
+              },
+              {
+                "name": "LineTotal",
+                "value": "13.00"
+              }
+            ],
+            "groups": []
+          },
+          {
+            "name": "Table",
+            "fields": [
+              {
+                "name": "Price",
+                "value": "54.00"
+              },
+              {
+                "name": "Quantity",
+                "value": "1.00"
+              },
+              {
+                "name": "CatalogNo",
+                "value": "4401394"
+              },
+              {
+                "name": "LineTotal",
+                "value": "54.00"
+              }
+            ],
+            "groups": []
+          },
+          {
+            "name": "Table",
+            "fields": [
+              {
+                "name": "Price",
+                "value": "0.00"
+              },
+              {
+                "name": "Quantity",
                 "value": "1.00"
               },
               {
@@ -129,25 +173,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "27.67"
-              },
-              {
-                "name": "Quantity",
-                "value": "3.00"
-              },
-              {
-                "name": "LineTotal",
-                "value": "83.00"
-              }
-            ],
-            "groups": []
-          },
-          {
-            "name": "Table",
-            "fields": [
-              {
-                "name": "Price",
-                "value": "5.00"
+                "value": "4.00"
               },
               {
                 "name": "Quantity",
@@ -155,7 +181,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "5.00"
+                "value": "4.00"
               }
             ],
             "groups": []
@@ -165,25 +191,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "7.00"
-              },
-              {
-                "name": "Quantity",
-                "value": "1.00"
-              },
-              {
-                "name": "LineTotal",
-                "value": "7.00"
-              }
-            ],
-            "groups": []
-          },
-          {
-            "name": "Table",
-            "fields": [
-              {
-                "name": "Price",
-                "value": "7.00"
+                "value": "290.52"
               },
               {
                 "name": "Quantity",
@@ -191,11 +199,11 @@
               },
               {
                 "name": "CatalogNo",
-                "value": "19608"
+                "value": "15240"
               },
               {
                 "name": "LineTotal",
-                "value": "7.00"
+                "value": "290.52"
               }
             ],
             "groups": []
@@ -227,7 +235,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "3.00"
+                "value": "7300.00"
               },
               {
                 "name": "Quantity",
@@ -235,11 +243,11 @@
               },
               {
                 "name": "CatalogNo",
-                "value": "22202"
+                "value": "00202"
               },
               {
                 "name": "LineTotal",
-                "value": "9.00"
+                "value": "21900.00"
               }
             ],
             "groups": []
@@ -257,7 +265,7 @@
               },
               {
                 "name": "CatalogNo",
-                "value": "18970"
+                "value": "19699"
               },
               {
                 "name": "LineTotal",
@@ -271,7 +279,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "3792.00"
+                "value": "23.76"
               },
               {
                 "name": "Quantity",
@@ -283,7 +291,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "18960.00"
+                "value": "118.80"
               }
             ],
             "groups": []
@@ -337,29 +345,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "1343.25"
-              },
-              {
-                "name": "Quantity",
-                "value": "8.00"
-              },
-              {
-                "name": "CatalogNo",
-                "value": "18584"
-              },
-              {
-                "name": "LineTotal",
-                "value": "10746.00"
-              }
-            ],
-            "groups": []
-          },
-          {
-            "name": "Table",
-            "fields": [
-              {
-                "name": "Price",
-                "value": "2912.78"
+                "value": "29.13"
               },
               {
                 "name": "Quantity",
@@ -371,7 +357,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "26215.00"
+                "value": "262.15"
               }
             ],
             "groups": []
@@ -381,7 +367,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "104.76"
+                "value": "10476.00"
               },
               {
                 "name": "Quantity",
@@ -393,7 +379,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "104.76"
+                "value": "10476.00"
               }
             ],
             "groups": []
@@ -403,7 +389,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "10499.00"
+                "value": "104.99"
               },
               {
                 "name": "Quantity",
@@ -415,7 +401,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "10499.00"
+                "value": "104.99"
               }
             ],
             "groups": []
@@ -425,7 +411,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "6376.00"
+                "value": "63.76"
               },
               {
                 "name": "Quantity",
@@ -437,7 +423,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "12752.00"
+                "value": "127.52"
               }
             ],
             "groups": []
@@ -447,25 +433,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "15903.00"
-              },
-              {
-                "name": "Quantity",
-                "value": "1.00"
-              },
-              {
-                "name": "LineTotal",
-                "value": "15903.00"
-              }
-            ],
-            "groups": []
-          },
-          {
-            "name": "Table",
-            "fields": [
-              {
-                "name": "Price",
-                "value": "2685.00"
+                "value": "5301.00"
               },
               {
                 "name": "Quantity",
@@ -473,11 +441,11 @@
               },
               {
                 "name": "CatalogNo",
-                "value": "15903"
+                "value": "00307"
               },
               {
                 "name": "LineTotal",
-                "value": "8055.00"
+                "value": "15903.00"
               }
             ],
             "groups": []
@@ -487,7 +455,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "0.30"
+                "value": "3975.75"
               },
               {
                 "name": "Quantity",
@@ -499,7 +467,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "1.20"
+                "value": "15903.00"
               }
             ],
             "groups": []
@@ -509,7 +477,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "2555.60"
+                "value": "25557.60"
               },
               {
                 "name": "Quantity",
@@ -521,7 +489,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "12778.00"
+                "value": "127788.00"
               }
             ],
             "groups": []
@@ -531,7 +499,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "405.00"
+                "value": "963.50"
               },
               {
                 "name": "Quantity",
@@ -543,7 +511,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "2430.00"
+                "value": "5781.00"
               }
             ],
             "groups": []
@@ -553,7 +521,51 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "1841.44"
+                "value": "23.68"
+              },
+              {
+                "name": "Quantity",
+                "value": "7.00"
+              },
+              {
+                "name": "CatalogNo",
+                "value": "22232"
+              },
+              {
+                "name": "LineTotal",
+                "value": "165.73"
+              }
+            ],
+            "groups": []
+          },
+          {
+            "name": "Table",
+            "fields": [
+              {
+                "name": "Price",
+                "value": "12.70"
+              },
+              {
+                "name": "Quantity",
+                "value": "8.00"
+              },
+              {
+                "name": "CatalogNo",
+                "value": "02715"
+              },
+              {
+                "name": "LineTotal",
+                "value": "101.56"
+              }
+            ],
+            "groups": []
+          },
+          {
+            "name": "Table",
+            "fields": [
+              {
+                "name": "Price",
+                "value": "2.22"
               },
               {
                 "name": "Quantity",
@@ -565,7 +577,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "16573.00"
+                "value": "20.00"
               }
             ],
             "groups": []
@@ -575,55 +587,11 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "10800.00"
+                "value": "10.00"
               },
               {
                 "name": "Quantity",
-                "value": "1.00"
-              },
-              {
-                "name": "CatalogNo",
-                "value": "10090"
-              },
-              {
-                "name": "LineTotal",
-                "value": "10800.00"
-              }
-            ],
-            "groups": []
-          },
-          {
-            "name": "Table",
-            "fields": [
-              {
-                "name": "Price",
-                "value": "10800.00"
-              },
-              {
-                "name": "Quantity",
-                "value": "1.00"
-              },
-              {
-                "name": "CatalogNo",
-                "value": "18742"
-              },
-              {
-                "name": "LineTotal",
-                "value": "10800.00"
-              }
-            ],
-            "groups": []
-          },
-          {
-            "name": "Table",
-            "fields": [
-              {
-                "name": "Price",
-                "value": "10800.00"
-              },
-              {
-                "name": "Quantity",
-                "value": "1.00"
+                "value": "2.00"
               },
               {
                 "name": "CatalogNo",
@@ -631,7 +599,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "10800.00"
+                "value": "20.00"
               }
             ],
             "groups": []
@@ -641,7 +609,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "3600.00"
+                "value": "4966.67"
               },
               {
                 "name": "Quantity",
@@ -653,7 +621,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "10800.00"
+                "value": "14900.00"
               }
             ],
             "groups": []
@@ -663,7 +631,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "2712.50"
+                "value": "6840.00"
               },
               {
                 "name": "Quantity",
@@ -675,7 +643,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "10850.00"
+                "value": "27360.00"
               }
             ],
             "groups": []
@@ -685,7 +653,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "392.00"
+                "value": "38.70"
               },
               {
                 "name": "Quantity",
@@ -697,7 +665,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "1960.00"
+                "value": "193.50"
               }
             ],
             "groups": []
@@ -773,7 +741,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "0.00"
+                "value": "5600.56"
               },
               {
                 "name": "Quantity",
@@ -785,6 +753,42 @@
               },
               {
                 "name": "LineTotal",
+                "value": "50405.00"
+              }
+            ],
+            "groups": []
+          },
+          {
+            "name": "Table",
+            "fields": [
+              {
+                "name": "Price",
+                "value": "1.00"
+              },
+              {
+                "name": "Quantity",
+                "value": "4.00"
+              },
+              {
+                "name": "LineTotal",
+                "value": "4.00"
+              }
+            ],
+            "groups": []
+          },
+          {
+            "name": "Table",
+            "fields": [
+              {
+                "name": "Price",
+                "value": "0.00"
+              },
+              {
+                "name": "Quantity",
+                "value": "1.00"
+              },
+              {
+                "name": "LineTotal",
                 "value": "0.00"
               }
             ],
@@ -795,7 +799,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "4.00"
+                "value": "1.00"
               },
               {
                 "name": "Quantity",
@@ -803,7 +807,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "4.00"
+                "value": "1.00"
               }
             ],
             "groups": []
@@ -813,55 +817,19 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "1.67"
+                "value": "163.00"
               },
               {
                 "name": "Quantity",
-                "value": "3.00"
-              },
-              {
-                "name": "LineTotal",
-                "value": "5.00"
-              }
-            ],
-            "groups": []
-          },
-          {
-            "name": "Table",
-            "fields": [
-              {
-                "name": "Price",
-                "value": "0.29"
-              },
-              {
-                "name": "Quantity",
-                "value": "7.00"
-              },
-              {
-                "name": "LineTotal",
-                "value": "2.00"
-              }
-            ],
-            "groups": []
-          },
-          {
-            "name": "Table",
-            "fields": [
-              {
-                "name": "Price",
-                "value": "3.20"
-              },
-              {
-                "name": "Quantity",
-                "value": "5.00"
+                "value": "1.00"
               },
               {
                 "name": "CatalogNo",
-                "value": "61102"
+                "value": "11013"
               },
               {
                 "name": "LineTotal",
-                "value": "16.00"
+                "value": "163.00"
               }
             ],
             "groups": []
@@ -889,15 +857,15 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "101.00"
+                "value": "5.00"
               },
               {
                 "name": "Quantity",
-                "value": "2.00"
+                "value": "1.00"
               },
               {
                 "name": "LineTotal",
-                "value": "202.00"
+                "value": "5.00"
               }
             ],
             "groups": []
@@ -907,7 +875,7 @@
             "fields": [
               {
                 "name": "Price",
-                "value": "25.00"
+                "value": "10482.00"
               },
               {
                 "name": "Quantity",
@@ -915,43 +883,7 @@
               },
               {
                 "name": "LineTotal",
-                "value": "25.00"
-              }
-            ],
-            "groups": []
-          },
-          {
-            "name": "Table",
-            "fields": [
-              {
-                "name": "Price",
-                "value": "3762.00"
-              },
-              {
-                "name": "Quantity",
-                "value": "1.00"
-              },
-              {
-                "name": "LineTotal",
-                "value": "3762.00"
-              }
-            ],
-            "groups": []
-          },
-          {
-            "name": "Table",
-            "fields": [
-              {
-                "name": "Price",
-                "value": "1.00"
-              },
-              {
-                "name": "Quantity",
-                "value": "7.00"
-              },
-              {
-                "name": "LineTotal",
-                "value": "7.00"
+                "value": "10482.00"
               }
             ],
             "groups": []
@@ -970,24 +902,6 @@
               {
                 "name": "LineTotal",
                 "value": "50.00"
-              }
-            ],
-            "groups": []
-          },
-          {
-            "name": "Table",
-            "fields": [
-              {
-                "name": "Price",
-                "value": "5.00"
-              },
-              {
-                "name": "Quantity",
-                "value": "1.00"
-              },
-              {
-                "name": "LineTotal",
-                "value": "5.00"
               }
             ],
             "groups": []
