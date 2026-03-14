@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
+import fitz
 import cv2
 import numpy as np
 from PIL import Image
@@ -27,31 +28,29 @@ class PreprocessResult:
     debug_preprocessed_path: Optional[Path] = None
 
 
-def _load_image_any(path: Path) -> np.ndarray:
-    """
-    Load an image from a path.
-
-    For PDFs, loads the first page using Pillow (if supported by the local install).
-    Returns an OpenCV-style BGR numpy array.
-    """
+def _load_image_any(path: Path) -> List[np.ndarray]:
     suffix = path.suffix.lower()
-    if suffix in {".pdf"}:
-        # Lazy import to avoid hard dependency if PDFs are not used.
+
+    if suffix == ".pdf":
         try:
-            pil_img = Image.open(path)
-            pil_img = pil_img.convert("RGB")
-        except Exception as exc:  # pragma: no cover - very environment specific
-            raise RuntimeError(f"Failed to read first page of PDF: {path}") from exc
-        img = np.array(pil_img)
-        img_bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        return img_bgr
-
-    # Fallback: let OpenCV handle common raster formats.
-    img_bgr = cv2.imread(str(path), cv2.IMREAD_COLOR)
-    if img_bgr is None:
-        raise FileNotFoundError(f"Could not read image: {path}")
-    return img_bgr
-
+            doc = fitz.open(path)
+            images = []
+            for page_num in range(len(doc)):
+                pix = doc.load_page(page_num).get_pixmap(dpi=300)
+                img = np.frombuffer(pix.samples, dtype=np.uint8).reshape(pix.h, pix.w, pix.n)
+                img_bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+                images.append(img_bgr)
+            return images
+        except Exception as exc:
+            raise RuntimeError(f"Failed to read PDF: {path}") from exc
+    else:
+        try:
+            img = cv2.imread(str(path))
+            if img is None:
+                raise ValueError(f"OpenCV could not read '{path}'.")
+            return [img]
+        except Exception as exc:
+            raise RuntimeError(f"Failed to read image: {path}") from exc
 
 def _deskew(image_bgr: np.ndarray) -> np.ndarray:
     """Rudimentary deskew based on the minimum area rectangle of the foreground."""
@@ -127,47 +126,43 @@ def preprocess_image(
     cfg: Optional[PreprocessConfig] = None,
     debug_dir: Optional[Path] = None,
     debug_enabled: bool = False,
-) -> PreprocessResult:
+) -> List[PreprocessResult]:
     """
     Full preprocessing entry point used by the pipeline.
-
-    - Loads (image/PDF first page)
-    - Deskews
-    - Denoises and binarizes
-    - Resizes to configured target dimensions
-    - Optionally saves debug images
+    - Loads all pages of the document (PDF or image).
     """
     if cfg is None:
         cfg = PreprocessConfig()
 
     img_path = Path(image_path)
-    original_bgr = _load_image_any(img_path)
-    deskewed = _deskew(original_bgr)
-    bin_img = _denoise_and_binarize(deskewed, cfg)
+    bgr_images = _load_image_any(img_path)
+    results = []
 
-    resized, scale_y, scale_x = _resize_keep_aspect(
-        bin_img, cfg.target_height, cfg.target_width
-    )
+    for page_num, original_bgr in enumerate(bgr_images):
+        deskewed = _deskew(original_bgr)
+        bin_img = _denoise_and_binarize(deskewed, cfg)
+        resized, scale_y, scale_x = _resize_keep_aspect(bin_img, cfg.target_height, cfg.target_width)
 
-    debug_original_path: Optional[Path] = None
-    debug_preprocessed_path: Optional[Path] = None
+        debug_original_path: Optional[Path] = None
+        debug_preprocessed_path: Optional[Path] = None
 
-    if debug_enabled and debug_dir is not None:
-        debug_dir.mkdir(parents=True, exist_ok=True)
-        stem = img_path.stem
+        if debug_enabled and debug_dir is not None:
+            debug_dir.mkdir(parents=True, exist_ok=True)
+            stem = img_path.stem
+            debug_original_path = debug_dir / f"{stem}_page{page_num}_original.png"
+            debug_preprocessed_path = debug_dir / f"{stem}_page{page_num}_preprocessed.png"
+            cv2.imwrite(str(debug_original_path), original_bgr)
+            cv2.imwrite(str(debug_preprocessed_path), resized)
 
-        debug_original_path = debug_dir / f"{stem}_original.png"
-        debug_preprocessed_path = debug_dir / f"{stem}_preprocessed.png"
-
-        cv2.imwrite(str(debug_original_path), original_bgr)
-        cv2.imwrite(str(debug_preprocessed_path), resized)
-
-    return PreprocessResult(
-        original_bgr=original_bgr,
-        preprocessed=resized,
-        scale_x=scale_x,
-        scale_y=scale_y,
-        debug_original_path=debug_original_path,
-        debug_preprocessed_path=debug_preprocessed_path,
-    )
+        results.append(
+            PreprocessResult(
+                original_bgr=original_bgr,
+                preprocessed=resized,
+                scale_x=scale_x,
+                scale_y=scale_y,
+                debug_original_path=debug_original_path,
+                debug_preprocessed_path=debug_preprocessed_path,
+            )
+        )
+    return results
 

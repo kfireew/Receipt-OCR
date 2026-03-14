@@ -1,0 +1,37 @@
+{
+  "merchant": {
+    "value": null,
+    "confidence": null,
+    "line_index": null
+  },
+  "date": {
+    "value": null,
+    "confidence": null,
+    "line_index": null
+  },
+  "subtotal": {
+    "value": null,
+    "raw_text": null,
+    "confidence": null,
+    "line_index": null
+  },
+  "vat": {
+    "value": null,
+    "raw_text": null,
+    "confidence": null,
+    "line_index": null
+  },
+  "total": {
+    "value": null,
+    "raw_text": null,
+    "confidence": null,
+    "line_index": null
+  },
+  "currency": {
+    "value": null,
+    "confidence": null,
+    "line_index": null
+  },
+  "items": [],
+  "raw_lines": []
+}

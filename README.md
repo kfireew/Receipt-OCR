@@ -1,75 +1,85 @@
-# Hebrew Receipt OCR MVP
+# Receipt OCR & Parsing for Hebrew
 
-This project provides a small, modular Python pipeline that takes a Hebrew receipt image (photo/PDF), runs OCR, and outputs structured JSON (merchant, date, items, totals, etc.).
+A powerful, native end-to-end OCR and parsing pipeline built heavily initialized for Hebrew receipts outputting matching data fields into an ABBYY GDocument JSON structure format.
 
-## Features
+## System Flow
+The processing pipeline implements four clean stages:
+1. **Preprocess:** deskews bounding boxes, applies `cv2.adaptiveThreshold` for binarization, and crops image edges for maximum text isolation.
+2. **Detect & Recognize:** utilizes Tesseract's highly capable native detection mapped over all available pages of a Document to output detected bounding boxes and normalized bounding texts.
+3. **Line Grouping:** combines individual disjointed word boxes that fall into the same Y-axis thresholds into coherent `RawLine` objects.
+4. **Parse:** applies a sequence of heuristics and line-scanning REGEX patterns (`סה"כ`, `חשבונית מס`, Date formats) to scrape Merchant arrays, amounts, strings, and LineItem rows into a `ParsedReceipt` structure.
 
-- Image preprocessing (deskew, denoise, binarization, resize).
-- Text detection using docTR.
-- Text recognition using Tesseract with Hebrew language data.
-- Rule-based parsing of dates, totals, VAT, currency, and line items.
-- CLI entry point for easy use and scripting.
+## Repository Structure
+```text
+Receipt OCR/
+├── receipt_ocr/            # Core OCR & Parsing Library 
+│   ├── utils/              # Config loaders, confidence math, string manipulation
+│   ├── cli.py              # Main execution thread
+│   ├── ocr_preprocess.py   # Image normalization & Box generation 
+│   ├── parse_receipt.py    # Line grouping and Regex evaluation
+│   └── recognize_tesseract.py
+├── test_accuracy/          # Validation and Evaluation Module
+├── scripts/                # Loose toolkit apps for cropping and visual testing
+├── sample_images/          # PDF and Exact-JSON pairs for accuracy regression
+├── debug/                  # Holds .JSON and .LOG dumps from Tesseract failure
+├── gui.py                  # Drag & drop interactive desktop UI
+├── config.yml              # Parameter and path loader config
+└── requirements.txt
+```
 
-## Installation
+## Requirements
 
-1. Create and activate a virtual environment (recommended).
-2. Install system dependencies:
-   - Tesseract OCR with Hebrew language data.
-   - libpng, libjpeg, and other standard image libraries (usually installed with Tesseract/OpenCV).
-3. Install Python dependencies:
+1. **Tesseract OCR (Required)**
+You MUST download and install Tesseract natively on your system:
+- **Windows:** Download from UB-Mannheim (https://github.com/UB-Mannheim/tesseract/wiki)
+- Note: Tesseract is configured to run at `C:/Program Files/Tesseract-OCR/tesseract.exe`. If you install it elsewhere, update `executable_path` in `config.yml`.
+- Make sure to check the option to include **Hebrew language packages** during installation!
 
+2. **Python Dependencies**
+Install standard libraries directly into your system with:
 ```bash
 pip install -r requirements.txt
 ```
 
-4. If Tesseract is not on your `PATH`, set its location in `config.yml` under `tesseract.executable_path`.
+## Usage Menu
 
-## Usage
+### 1) The Desktop GUI (Recommended)
+We built a graphical interface for easy testing and evaluation. 
 
-Run the CLI on a receipt image:
-
+**To open the GUI:**
 ```bash
-python -m receipt_ocr.cli --image path/to/receipt.jpg --config config.yml --debug --output result.json
+python gui.py
 ```
 
-- **`--image`**: Path to a receipt image (or PDF). For PDFs, the first page is used.
-- **`--config`**: Optional path to a YAML config (defaults to `config.yml` in project root).
-- **`--debug`**: If provided, intermediate images/overlays are written to the configured debug directory.
-- **`--output`**: Optional path to save the resulting JSON (otherwise printed to stdout).
+**Features:**
+- **Browse:** Click "Browse Image/PDF" to select a receipt and see the parsed JSON output instantly.
+- **Drag & Drop:** If you installed `tkinterdnd2`, you can literally drag a PDF or Image file from your desktop directly into the text area to process it!
+- **Run Test Evaluation:** Click this button to run the complete accuracy test suite over the `sample_images` folder and see the success rate live.
 
-## Project Layout
-
-- `receipt_ocr/` — main Python package
-  - `ocr_preprocess.py` — image loading + preprocessing.
-  - `detect_doctr.py` — docTR-based text detection.
-  - `recognize_tesseract.py` — Tesseract-based recognition.
-  - `parse_receipt.py` — rule-based parsing and structuring.
-  - `cli.py` — command-line interface.
-  - `utils/` — bidi/normalization, confusion map, confidence utilities, I/O helpers.
-- `tests/` — unit and end-to-end tests.
-- `sample_images/` — placeholder images and JSON for local testing.
-- `debug/` — generated at runtime, contains intermediate debug images/overlays.
-
-## Docker
-
-You can run the pipeline in a container for reproducibility. After building the image (see `Dockerfile`), run:
-
+### 2) The Production CLI
+If you want to plug this pipeline into an existing structure naturally, you can output formatted `.JSON` to standard out seamlessly:
 ```bash
-docker run --rm -v /absolute/path/to/receipts:/data receipts-ocr \
-  python -m receipt_ocr.cli --image /data/your_receipt.jpg --config /app/config.yml --output /data/out.json
+python -m receipt_ocr.cli --image "sample_images/receipt.pdf" --config config.yml
+```
+Optional Arguments:
+- `--debug` displays images during line finding heuristics.
+- `--output <path>` sends the output GDocument JSON to your choice filepath.
+
+### 3) Accuracy Evaluation Testing
+The evaluation suite runs through all PDF/JSON pairs in the `sample_images` directory, runs the OCR pipeline, and compares the parsed fields (Invoice, Date, Total, and Line Items) against the ground truth using fuzzy string matching and numeric decimal tolerance.
+
+**To run the test suite:**
+```bash
+python -m test_accuracy.cli
 ```
 
-## Testing
+**Optional Arguments:**
+- `--images-dir <path>`: Specify a different folder containing PDFs and JSONs.
+- `--pattern <glob>`: Only test specific files (e.g. `*.pdf`).
+- `--dry-run`: Just print which files would be tested without running the heavy OCR.
 
-Run the unit and smoke tests with:
-
-```bash
-pytest
-```
-
-## Limitations & Future Work
-
-- Detection/recognition quality depends heavily on image quality and receipt layout.
-- The rule-based parser is tuned for common Hebrew supermarket-style receipts and may need adjustment for other formats.
-- docTR and Tesseract models are used with generic settings; custom fine-tuned models and better heuristics can significantly improve results.
-
+## Recommendations for Improving Accuracy
+To further push the accuracy score on Line Items and complex tables:
+1. **Column Mapping (Grid Parsing)**: Current parsing uses horizontal row boundaries. Since quantities and prices shift horizontally, parsing values by their `X` pixel coordinate column under specific table headers (e.g. "Price", "Qty") is recommended.
+2. **Numeric Whitelisting**: Tesseract occasionally misreads barcodes or prices as Hebrew characters. Passing an English-only, numeric-only config (`-c tessedit_char_whitelist=0123456789.`) specifically on the right half of the image will fix numeric drift.
+3. **Vendor Templating**: Pre-defining layout grids for known vendors (like *Strauss*, *Tayari*, *Tnuva*) rather than using one generic heuristic parser will drastically improve pinpoint accuracy.

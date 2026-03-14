@@ -5,7 +5,6 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from .detect_doctr import detect_text_boxes
 from .ocr_preprocess import PreprocessConfig, preprocess_image
 from .parse_receipt import parse_receipt
 from .recognize_tesseract import recognize_boxes
@@ -63,6 +62,46 @@ def main(argv: Optional[list[str]] = None) -> int:
     parser = _build_arg_parser()
     args = parser.parse_args(argv)
 
+    # region agent log
+    import json as _json_cli_entry
+    import time as _time_cli_entry
+    import sys as _sys_cli_entry
+    from pathlib import Path as _Path_cli_entry
+
+    try:
+        with open(
+            r"c:\Users\Kfir Ezer\Desktop\Receipt OCR\debug-4cbdb5.log",
+            "a",
+            encoding="utf-8",
+        ) as _f:
+            _f.write(
+                _json_cli_entry.dumps(
+                    {
+                        "sessionId": "4cbdb5",
+                        "runId": "pre-fix",
+                        "hypothesisId": "H_entrypoint_used",
+                        "location": "receipt_ocr/cli.py:main:entry",
+                        "message": "receipt_ocr.cli main entry called",
+                        "data": {
+                            "argv": argv,
+                            "parsed_image": args.image,
+                            "config": args.config,
+                            "cwd": str(_Path_cli_entry.cwd()),
+                            "python_executable": _sys_cli_entry.executable,
+                            "module_file": __file__,
+                            "sys_path_head": _sys_cli_entry.path[:5],
+                        },
+                        "timestamp": int(_time_cli_entry.time() * 1000),
+                    },
+                    default=str,
+                )
+                + "\n"
+            )
+    except Exception:
+        # Logging must never break the CLI
+        pass
+    # endregion
+
     cfg = load_config(args.config)
     debug_default = bool(get_nested(cfg, "debug.enabled_default", default=False))
     debug_enabled = bool(args.debug or debug_default)
@@ -85,39 +124,32 @@ def main(argv: Optional[list[str]] = None) -> int:
         parser.error(f"Image not found: {image_path}")
 
     # 1) Preprocess
-    pre = preprocess_image(
+    pres = preprocess_image(
         image_path=image_path,
         cfg=pp_cfg,
         debug_dir=debug_dir,
         debug_enabled=debug_enabled,
     )
 
-    # 2) Detect
-    detector_model_name = str(
-        get_nested(cfg, "doctr.detector_model", default="db_resnet50")
-    )
-    detected_boxes = detect_text_boxes(
-        preprocessed_image=pre.preprocessed,
-        detector_model_name=detector_model_name,
-        debug_dir=debug_dir,
-        debug_enabled=debug_enabled,
-        debug_basename=image_path.stem,
-    )
-
+    # 2) Detect (DocTR bypassed/optional, using native Tesseract in Recognize stage)
     # 3) Recognize
     tesseract_executable = get_nested(cfg, "tesseract.executable_path", default=None)
     confusion_map = _load_confusion_map_from_config(cfg)
 
-    recognized_boxes = recognize_boxes(
-        preprocessed_image=pre.preprocessed,
-        detected_boxes=detected_boxes,
-        tesseract_executable=tesseract_executable,
-        confusion_map=confusion_map,
-    )
+    all_recognized_boxes = []
+    for page_idx, pre in enumerate(pres):
+        recognized_boxes = recognize_boxes(
+            preprocessed_image=pre.preprocessed,
+            detected_boxes=[],
+            tesseract_executable=tesseract_executable,
+            confusion_map=confusion_map,
+            page_idx=page_idx,
+        )
+        all_recognized_boxes.extend(recognized_boxes)
 
     # 4) Parse into structured fields
-    parsed = parse_receipt(recognized_boxes)
-    result = parsed.to_dict()
+    parsed = parse_receipt(all_recognized_boxes)
+    result = parsed.to_gdocument_dict()
 
     if args.output:
         write_json(result, args.output)

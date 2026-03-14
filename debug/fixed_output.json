@@ -1,0 +1,1486 @@
+{
+  "merchant": {
+    "value": "זינגר סחר ושיווכק בע\"כז",
+    "confidence": 0.54,
+    "line_index": 0
+  },
+  "date": {
+    "value": null,
+    "confidence": null,
+    "line_index": null
+  },
+  "subtotal": {
+    "value": null,
+    "raw_text": null,
+    "confidence": null,
+    "line_index": null
+  },
+  "vat": {
+    "value": null,
+    "raw_text": null,
+    "confidence": null,
+    "line_index": null
+  },
+  "total": {
+    "value": null,
+    "raw_text": null,
+    "confidence": null,
+    "line_index": null
+  },
+  "currency": {
+    "value": null,
+    "confidence": null,
+    "line_index": null
+  },
+  "items": [
+    {
+      "description": "(",
+      "quantity": 1.0,
+      "unit_price": 1.0,
+      "line_total": 1.0,
+      "confidence": 0.495,
+      "line_index": 4
+    },
+    {
+      "description": ": |",
+      "quantity": 1.0,
+      "unit_price": 163020.0,
+      "line_total": 163020.0,
+      "confidence": 0.5366666666666666,
+      "line_index": 7
+    },
+    {
+      "description": "לכבוד : |",
+      "quantity": 4.0,
+      "unit_price": 10282.25,
+      "line_total": 41129.0,
+      "confidence": 0.694,
+      "line_index": 14
+    },
+    {
+      "description": "%  מפתה ‏ :",
+      "quantity": 2.0,
+      "unit_price": 1.0,
+      "line_total": 2.0,
+      "confidence": 0.61,
+      "line_index": 15
+    },
+    {
+      "description": "| :",
+      "quantity": 1.0,
+      "unit_price": 716124.0,
+      "line_total": 716124.0,
+      "confidence": 0.7166666666666667,
+      "line_index": 17
+    },
+    {
+      "description": ": .",
+      "quantity": 1.0,
+      "unit_price": 2.0,
+      "line_total": 2.0,
+      "confidence": 0.36666666666666664,
+      "line_index": 19
+    },
+    {
+      "description": "| הראל  סוכ",
+      "quantity": 1.0,
+      "unit_price": 10.0,
+      "line_total": 10.0,
+      "confidence": 0.8049999999999999,
+      "line_index": 20
+    },
+    {
+      "description": ". שם פריט",
+      "quantity": 1.0,
+      "unit_price": 100.0,
+      "line_total": 100.0,
+      "confidence": 0.69,
+      "line_index": 26
+    },
+    {
+      "description": ": מפתח פריט",
+      "quantity": 1.0,
+      "unit_price": 5.0,
+      "line_total": 5.0,
+      "confidence": 0.752,
+      "line_index": 27
+    },
+    {
+      "description": "מס הזמנה בר קוד  גרם",
+      "quantity": 1.0,
+      "unit_price": 0.0,
+      "line_total": 0.0,
+      "confidence": 0.89625,
+      "line_index": 28
+    },
+    {
+      "description": "גורמה גרנולה אגוזים",
+      "quantity": 2.0,
+      "unit_price": 545.0,
+      "line_total": 1090.0,
+      "confidence": 0.8342857142857143,
+      "line_index": 29
+    },
+    {
+      "description": "%\"(",
+      "quantity": 7.0,
+      "unit_price": 185.71428571428572,
+      "line_total": 1300.0,
+      "confidence": 0.81,
+      "line_index": 30
+    },
+    {
+      "description": "גרנולה פירות  גרם",
+      "quantity": 1.0,
+      "unit_price": 0.0,
+      "line_total": 0.0,
+      "confidence": 0.83125,
+      "line_index": 31
+    },
+    {
+      "description": ". גורמה   -",
+      "quantity": 1.0,
+      "unit_price": 0.0,
+      "line_total": 0.0,
+      "confidence": 0.866,
+      "line_index": 32
+    },
+    {
+      "description": "(\"",
+      "quantity": 1.0,
+      "unit_price": 0.0,
+      "line_total": 0.0,
+      "confidence": 0.7375,
+      "line_index": 33
+    },
+    {
+      "description": "%  גורמה טורטיה  סמ",
+      "quantity": 2.0,
+      "unit_price": 10.0,
+      "line_total": 20.0,
+      "confidence": 0.7966666666666666,
+      "line_index": 34
+    },
+    {
+      "description": ", יי",
+      "quantity": 7.0,
+      "unit_price": 1.0,
+      "line_total": 7.0,
+      "confidence": 0.6825,
+      "line_index": 35
+    },
+    {
+      "description": "גרם /",
+      "quantity": 4.0,
+      "unit_price": 180.0,
+      "line_total": 720.0,
+      "confidence": 0.8240000000000001,
+      "line_index": 36
+    },
+    {
+      "description": "טורטיה  ס\"מ",
+      "quantity": 1.0,
+      "unit_price": 420.0,
+      "line_total": 420.0,
+      "confidence": 0.944,
+      "line_index": 38
+    },
+    {
+      "description": "גרם / -",
+      "quantity": 1.0,
+      "unit_price": 0.0,
+      "line_total": 0.0,
+      "confidence": 0.79,
+      "line_index": 40
+    },
+    {
+      "description": "/ טורטיה חיטה מלאה",
+      "quantity": 1.0,
+      "unit_price": 0.0,
+      "line_total": 0.0,
+      "confidence": 0.702,
+      "line_index": 42
+    },
+    {
+      "description": "גרם / |",
+      "quantity": 5.0,
+      "unit_price": 6816.0,
+      "line_total": 34080.0,
+      "confidence": 0.84,
+      "line_index": 44
+    },
+    {
+      "description": "סמ",
+      "quantity": 1.0,
+      "unit_price": 1420.0,
+      "line_total": 1420.0,
+      "confidence": 0.785,
+      "line_index": 45
+    },
+    {
+      "description": "/  גרכשלפ ‏",
+      "quantity": 1.0,
+      "unit_price": 2400.0,
+      "line_total": 2400.0,
+      "confidence": 0.565,
+      "line_index": 46
+    },
+    {
+      "description": "(-  טחינה הר ברכה",
+      "quantity": 1.0,
+      "unit_price": 0.0,
+      "line_total": 0.0,
+      "confidence": 0.50625,
+      "line_index": 47
+    },
+    {
+      "description": "==   אדובדה  גרם",
+      "quantity": 8.0,
+      "unit_price": 19.75,
+      "line_total": 158.0,
+      "confidence": 0.6885714285714286,
+      "line_index": 49
+    },
+    {
+      "description": "=",
+      "quantity": 7.0,
+      "unit_price": 105785.28571428571,
+      "line_total": 740497.0,
+      "confidence": 0.645,
+      "line_index": 50
+    },
+    {
+      "description": "/ כשר-אין חזרות",
+      "quantity": 1.0,
+      "unit_price": 22120.0,
+      "line_total": 22120.0,
+      "confidence": 0.67,
+      "line_index": 51
+    },
+    {
+      "description": "\\",
+      "quantity": 4.0,
+      "unit_price": 197.5,
+      "line_total": 790.0,
+      "confidence": 0.5283333333333333,
+      "line_index": 52
+    },
+    {
+      "description": "=   ג  גרם",
+      "quantity": 1.0,
+      "unit_price": 9.0,
+      "line_total": 9.0,
+      "confidence": 0.5383333333333333,
+      "line_index": 53
+    },
+    {
+      "description": ".",
+      "quantity": 8.0,
+      "unit_price": 0.5,
+      "line_total": 4.0,
+      "confidence": 0.54,
+      "line_index": 54
+    },
+    {
+      "description": "|   \\ \\",
+      "quantity": 1.0,
+      "unit_price": 2200.0,
+      "line_total": 2200.0,
+      "confidence": 0.73375,
+      "line_index": 56
+    },
+    {
+      "description": "/ פרינגלס ברביקיו  גום כשר",
+      "quantity": 3.0,
+      "unit_price": 2.6666666666666665,
+      "line_total": 8.0,
+      "confidence": 0.6925,
+      "line_index": 57
+    },
+    {
+      "description": ": |",
+      "quantity": 1.0,
+      "unit_price": 8.0,
+      "line_total": 8.0,
+      "confidence": 0.48333333333333334,
+      "line_index": 60
+    },
+    {
+      "description": "/    /-",
+      "quantity": 1.0,
+      "unit_price": 10.0,
+      "line_total": 10.0,
+      "confidence": 0.61,
+      "line_index": 61
+    },
+    {
+      "description": "%   פרינגלס הבנרו  גרם |",
+      "quantity": 10.0,
+      "unit_price": 15.8,
+      "line_total": 158.0,
+      "confidence": 0.81125,
+      "line_index": 62
+    },
+    {
+      "description": "-ו",
+      "quantity": 3.0,
+      "unit_price": 2.3333333333333335,
+      "line_total": 7.0,
+      "confidence": 0.19333333333333333,
+      "line_index": 63
+    },
+    {
+      "description": "=   פפרינגלס חומץ ומלח  גרם |   ו  .  >=",
+      "quantity": 1.0,
+      "unit_price": 238.0,
+      "line_total": 238.0,
+      "confidence": 0.7325,
+      "line_index": 64
+    },
+    {
+      "description": "כשר /-אין החזרות.",
+      "quantity": 5.0,
+      "unit_price": 2.8,
+      "line_total": 14.0,
+      "confidence": 0.8375,
+      "line_index": 65
+    },
+    {
+      "description": "-   פרינגלס  צייזסטייק צייזסטיי  גרם |  /",
+      "quantity": 1.0,
+      "unit_price": 23800.0,
+      "line_total": 23800.0,
+      "confidence": 0.6637500000000001,
+      "line_index": 66
+    },
+    {
+      "description": "חזרות",
+      "quantity": 1.0,
+      "unit_price": 8.0,
+      "line_total": 8.0,
+      "confidence": 0.48,
+      "line_index": 67
+    },
+    {
+      "description": "<>    =  ית כתית מעולה  מל -",
+      "quantity": 1.0,
+      "unit_price": 14600.0,
+      "line_total": 14600.0,
+      "confidence": 0.7123529411764706,
+      "line_index": 68
+    },
+    {
+      "description": "מושב  ת.ד.",
+      "quantity": 1.0,
+      "unit_price": 8.0,
+      "line_total": 8.0,
+      "confidence": 0.67,
+      "line_index": 75
+    },
+    {
+      "description": "מיקוד",
+      "quantity": 1.0,
+      "unit_price": 756006.0,
+      "line_total": 756006.0,
+      "confidence": 0.39666666666666667,
+      "line_index": 76
+    },
+    {
+      "description": "פקס: ספטמ\"פ ,תעשו -ונעצשיה",
+      "quantity": 1.0,
+      "unit_price": 5.0,
+      "line_total": 5.0,
+      "confidence": 0.295,
+      "line_index": 78
+    },
+    {
+      "description": ". חן  | רדון",
+      "quantity": 1.0,
+      "unit_price": 9.0,
+      "line_total": 9.0,
+      "confidence": 0.51,
+      "line_index": 79
+    }
+  ],
+  "raw_lines": [
+    {
+      "index": 0,
+      "page": 0,
+      "bbox": [
+        149.0,
+        21.0,
+        604.0,
+        74.0
+      ],
+      "text_raw": "זינגר סחר ושיווכק בע\"כז",
+      "text_normalized": "זינגר סחר ושיווכק בע\"כז",
+      "confidence": 0.54
+    },
+    {
+      "index": 1,
+      "page": 0,
+      "bbox": [
+        96.0,
+        50.0,
+        1089.0,
+        105.0
+      ],
+      "text_raw": "ל אביהקם - שוקולדים, \"ו וכווצרי גורכזה",
+      "text_normalized": "ל אביהקם - שוקולדים, \"ו וכווצרי גורכזה",
+      "confidence": 0.47000000000000003
+    },
+    {
+      "index": 2,
+      "page": 0,
+      "bbox": [
+        453.0,
+        78.0,
+        997.0,
+        151.0
+      ],
+      "text_raw": "%?) ופירות. יבשים",
+      "text_normalized": "%?) ופירות. יבשים",
+      "confidence": 0.7466666666666667
+    },
+    {
+      "index": 3,
+      "page": 0,
+      "bbox": [
+        624.0,
+        92.0,
+        797.0,
+        116.0
+      ],
+      "text_raw": "שיווק פיצוחים",
+      "text_normalized": "שיווק פיצוחים",
+      "confidence": 0.92
+    },
+    {
+      "index": 4,
+      "page": 0,
+      "bbox": [
+        997.0,
+        107.0,
+        1092.0,
+        148.0
+      ],
+      "text_raw": "1 (",
+      "text_normalized": "1 (",
+      "confidence": 0.495
+    },
+    {
+      "index": 5,
+      "page": 0,
+      "bbox": [
+        66.0,
+        143.0,
+        245.0,
+        183.0
+      ],
+      "text_raw": "ע.מ | 513620328",
+      "text_normalized": "ע.מ | 513620328",
+      "confidence": 0.5366666666666666
+    },
+    {
+      "index": 6,
+      "page": 0,
+      "bbox": [
+        164.0,
+        195.0,
+        1088.0,
+        225.0
+      ],
+      "text_raw": "- מקור",
+      "text_normalized": "- מקור",
+      "confidence": 0.88
+    },
+    {
+      "index": 7,
+      "page": 0,
+      "bbox": [
+        317.0,
+        237.0,
+        1070.0,
+        291.0
+      ],
+      "text_raw": ": | 163020",
+      "text_normalized": ": | 163020",
+      "confidence": 0.5366666666666666
+    },
+    {
+      "index": 8,
+      "page": 0,
+      "bbox": [
+        497.0,
+        253.0,
+        522.0,
+        264.0
+      ],
+      "text_raw": "ה.",
+      "text_normalized": "ה.",
+      "confidence": 0.64
+    },
+    {
+      "index": 9,
+      "page": 0,
+      "bbox": [
+        497.0,
+        261.0,
+        791.0,
+        301.0
+      ],
+      "text_raw": "חשבונית מס מס':",
+      "text_normalized": "חשבונית מס מס':",
+      "confidence": 0.7766666666666667
+    },
+    {
+      "index": 10,
+      "page": 0,
+      "bbox": [
+        1061.0,
+        285.0,
+        1074.0,
+        287.0
+      ],
+      "text_raw": "שי",
+      "text_normalized": "שי",
+      "confidence": 0.61
+    },
+    {
+      "index": 11,
+      "page": 0,
+      "bbox": [
+        1062.0,
+        298.0,
+        1064.0,
+        300.0
+      ],
+      "text_raw": ":",
+      "text_normalized": ":",
+      "confidence": 0.49
+    },
+    {
+      "index": 12,
+      "page": 0,
+      "bbox": [
+        182.0,
+        313.0,
+        224.0,
+        328.0
+      ],
+      "text_raw": "157",
+      "text_normalized": "157",
+      "confidence": 0.66
+    },
+    {
+      "index": 13,
+      "page": 0,
+      "bbox": [
+        138.0,
+        327.0,
+        672.0,
+        370.0
+      ],
+      "text_raw": "ו והוז וו %-",
+      "text_normalized": "ו והוז וו %-",
+      "confidence": 0.2925
+    },
+    {
+      "index": 14,
+      "page": 0,
+      "bbox": [
+        171.0,
+        362.0,
+        1062.0,
+        397.0
+      ],
+      "text_raw": "4 לכבוד : | 41129",
+      "text_normalized": "4 לכבוד : | 41129",
+      "confidence": 0.694
+    },
+    {
+      "index": 15,
+      "page": 0,
+      "bbox": [
+        234.0,
+        369.0,
+        1078.0,
+        388.0
+      ],
+      "text_raw": "2% 516675634 מפתה ‏ :",
+      "text_normalized": "2% 516675634 מפתה ‏ :",
+      "confidence": 0.61
+    },
+    {
+      "index": 16,
+      "page": 0,
+      "bbox": [
+        251.0,
+        379.0,
+        491.0,
+        417.0
+      ],
+      "text_raw": "עמ |",
+      "text_normalized": "עמ |",
+      "confidence": 0.505
+    },
+    {
+      "index": 17,
+      "page": 0,
+      "bbox": [
+        162.0,
+        389.0,
+        1067.0,
+        407.0
+      ],
+      "text_raw": "| : 716124",
+      "text_normalized": "| : 716124",
+      "confidence": 0.7166666666666667
+    },
+    {
+      "index": 18,
+      "page": 0,
+      "bbox": [
+        269.0,
+        399.0,
+        951.0,
+        423.0
+      ],
+      "text_raw": "מינימרקט בקאנטרי מזהה",
+      "text_normalized": "מינימרקט בקאנטרי מזהה",
+      "confidence": 0.8766666666666667
+    },
+    {
+      "index": 19,
+      "page": 0,
+      "bbox": [
+        204.0,
+        420.0,
+        1068.0,
+        436.0
+      ],
+      "text_raw": "2 : .",
+      "text_normalized": "2 : .",
+      "confidence": 0.36666666666666664
+    },
+    {
+      "index": 20,
+      "page": 0,
+      "bbox": [
+        276.0,
+        427.0,
+        1063.0,
+        452.0
+      ],
+      "text_raw": "| הראל 10 סוכ",
+      "text_normalized": "| הראל 10 סוכ",
+      "confidence": 0.8049999999999999
+    },
+    {
+      "index": 21,
+      "page": 0,
+      "bbox": [
+        237.0,
+        462.0,
+        876.0,
+        480.0
+      ],
+      "text_raw": "ציון /",
+      "text_normalized": "ציון /",
+      "confidence": 0.74
+    },
+    {
+      "index": 22,
+      "page": 0,
+      "bbox": [
+        492.0,
+        465.0,
+        1069.0,
+        488.0
+      ],
+      "text_raw": ". מבשרת אספקה:",
+      "text_normalized": ". מבשרת אספקה:",
+      "confidence": 0.8200000000000001
+    },
+    {
+      "index": 23,
+      "page": 0,
+      "bbox": [
+        40.0,
+        476.0,
+        947.0,
+        519.0
+      ],
+      "text_raw": "טלפון:0544401394 זמן נטו סה\"כ",
+      "text_normalized": "טלפון:0544401394 זמן נטו סה\"כ",
+      "confidence": 0.8975
+    },
+    {
+      "index": 24,
+      "page": 0,
+      "bbox": [
+        126.0,
+        484.0,
+        234.0,
+        502.0
+      ],
+      "text_raw": "% הנחה מחיר",
+      "text_normalized": "% הנחה מחיר",
+      "confidence": 0.87
+    },
+    {
+      "index": 25,
+      "page": 0,
+      "bbox": [
+        283.0,
+        494.0,
+        389.0,
+        512.0
+      ],
+      "text_raw": "כמות מחיר",
+      "text_normalized": "כמות מחיר",
+      "confidence": 0.905
+    },
+    {
+      "index": 26,
+      "page": 0,
+      "bbox": [
+        22.0,
+        508.0,
+        1062.0,
+        533.0
+      ],
+      "text_raw": ". שם פריט 1090 100",
+      "text_normalized": ". שם פריט 1090 100",
+      "confidence": 0.69
+    },
+    {
+      "index": 27,
+      "page": 0,
+      "bbox": [
+        187.0,
+        521.0,
+        1063.0,
+        542.0
+      ],
+      "text_raw": ": מפתח פריט 1300 5",
+      "text_normalized": ": מפתח פריט 1300 5",
+      "confidence": 0.752
+    },
+    {
+      "index": 28,
+      "page": 0,
+      "bbox": [
+        21.0,
+        530.0,
+        1032.0,
+        552.0
+      ],
+      "text_raw": "מס הזמנה בר קוד 500 גרם 0 0",
+      "text_normalized": "מס הזמנה בר קוד 500 גרם 0 0",
+      "confidence": 0.89625
+    },
+    {
+      "index": 29,
+      "page": 0,
+      "bbox": [
+        114.0,
+        541.0,
+        1051.0,
+        571.0
+      ],
+      "text_raw": "2 0 גורמה גרנולה אגוזים 5 1090",
+      "text_normalized": "2 0 גורמה גרנולה אגוזים 5 1090",
+      "confidence": 0.8342857142857143
+    },
+    {
+      "index": 30,
+      "page": 0,
+      "bbox": [
+        272.0,
+        550.0,
+        923.0,
+        576.0
+      ],
+      "text_raw": "7%\"( 0 1300",
+      "text_normalized": "7%\"( 0 1300",
+      "confidence": 0.81
+    },
+    {
+      "index": 31,
+      "page": 0,
+      "bbox": [
+        29.0,
+        561.0,
+        994.0,
+        595.0
+      ],
+      "text_raw": "740497 6 גרנולה פירות 500 גרם 5909 0",
+      "text_normalized": "740497 6 גרנולה פירות 500 גרם 5909 0",
+      "confidence": 0.83125
+    },
+    {
+      "index": 32,
+      "page": 0,
+      "bbox": [
+        0.0,
+        569.0,
+        1068.0,
+        592.0
+      ],
+      "text_raw": ". גורמה 710 0 -",
+      "text_normalized": ". גורמה 710 0 -",
+      "confidence": 0.866
+    },
+    {
+      "index": 33,
+      "page": 0,
+      "bbox": [
+        340.0,
+        579.0,
+        993.0,
+        603.0
+      ],
+      "text_raw": "740497 6(\" 320 0",
+      "text_normalized": "740497 6(\" 320 0",
+      "confidence": 0.7375
+    },
+    {
+      "index": 34,
+      "page": 0,
+      "bbox": [
+        478.0,
+        588.0,
+        1060.0,
+        614.0
+      ],
+      "text_raw": "2% 7290002963684 גורמה טורטיה 20 סמ",
+      "text_normalized": "2% 7290002963684 גורמה טורטיה 20 סמ",
+      "confidence": 0.7966666666666666
+    },
+    {
+      "index": 35,
+      "page": 0,
+      "bbox": [
+        26.0,
+        603.0,
+        991.0,
+        627.0
+      ],
+      "text_raw": "7 7290002963684 , יי",
+      "text_normalized": "7 7290002963684 , יי",
+      "confidence": 0.6825
+    },
+    {
+      "index": 36,
+      "page": 0,
+      "bbox": [
+        120.0,
+        613.0,
+        1047.0,
+        633.0
+      ],
+      "text_raw": "4 גרם 1/12 4 720",
+      "text_normalized": "4 גרם 1/12 4 720",
+      "confidence": 0.8240000000000001
+    },
+    {
+      "index": 37,
+      "page": 0,
+      "bbox": [
+        277.0,
+        622.0,
+        382.0,
+        642.0
+      ],
+      "text_raw": "0 870",
+      "text_normalized": "0 870",
+      "confidence": 0.815
+    },
+    {
+      "index": 38,
+      "page": 0,
+      "bbox": [
+        433.0,
+        631.0,
+        766.0,
+        665.0
+      ],
+      "text_raw": "1 טורטיה 25 ס\"מ 420",
+      "text_normalized": "1 טורטיה 25 ס\"מ 420",
+      "confidence": 0.944
+    },
+    {
+      "index": 39,
+      "page": 0,
+      "bbox": [
+        585.0,
+        641.0,
+        917.0,
+        669.0
+      ],
+      "text_raw": "7290002963691 גורמה",
+      "text_normalized": "7290002963691 גורמה",
+      "confidence": 0.84
+    },
+    {
+      "index": 40,
+      "page": 0,
+      "bbox": [
+        15.0,
+        655.0,
+        1061.0,
+        677.0
+      ],
+      "text_raw": "14 7 גרם 1/12 -640 0",
+      "text_normalized": "14 7 גרם 1/12 -640 0",
+      "confidence": 0.79
+    },
+    {
+      "index": 41,
+      "page": 0,
+      "bbox": [
+        180.0,
+        664.0,
+        770.0,
+        709.0
+      ],
+      "text_raw": "0 2400 792 6",
+      "text_normalized": "0 2400 792 6",
+      "confidence": 0.5975
+    },
+    {
+      "index": 42,
+      "page": 0,
+      "bbox": [
+        411.0,
+        676.0,
+        1052.0,
+        699.0
+      ],
+      "text_raw": "/ טורטיה חיטה מלאה 0",
+      "text_normalized": "/ טורטיה חיטה מלאה 0",
+      "confidence": 0.702
+    },
+    {
+      "index": 43,
+      "page": 0,
+      "bbox": [
+        583.0,
+        688.0,
+        917.0,
+        713.0
+      ],
+      "text_raw": "7290002963707 גורמה",
+      "text_normalized": "7290002963707 גורמה",
+      "confidence": 0.8500000000000001
+    },
+    {
+      "index": 44,
+      "page": 0,
+      "bbox": [
+        13.0,
+        700.0,
+        1022.0,
+        735.0
+      ],
+      "text_raw": "5 740497 320 גרם 1/12 | 34080",
+      "text_normalized": "5 740497 320 גרם 1/12 | 34080",
+      "confidence": 0.84
+    },
+    {
+      "index": 45,
+      "page": 0,
+      "bbox": [
+        107.0,
+        709.0,
+        625.0,
+        734.0
+      ],
+      "text_raw": "סמ 1610 0 1420",
+      "text_normalized": "סמ 1610 0 1420",
+      "confidence": 0.785
+    },
+    {
+      "index": 46,
+      "page": 0,
+      "bbox": [
+        332.0,
+        720.0,
+        1042.0,
+        743.0
+      ],
+      "text_raw": "/ 0 גרכשלפ ‏ 2400",
+      "text_normalized": "/ 0 גרכשלפ ‏ 2400",
+      "confidence": 0.565
+    },
+    {
+      "index": 47,
+      "page": 0,
+      "bbox": [
+        32.0,
+        732.0,
+        1048.0,
+        753.0
+      ],
+      "text_raw": "0 (- 2 טחינה הר ברכה 000 000",
+      "text_normalized": "0 (- 2 טחינה הר ברכה 000 000",
+      "confidence": 0.50625
+    },
+    {
+      "index": 48,
+      "page": 0,
+      "bbox": [
+        187.0,
+        739.0,
+        1020.0,
+        763.0
+      ],
+      "text_raw": "704976 200 73 0 000 0",
+      "text_normalized": "704976 200 73 0 000 0",
+      "confidence": 0.755
+    },
+    {
+      "index": 49,
+      "page": 0,
+      "bbox": [
+        438.0,
+        752.0,
+        1047.0,
+        793.0
+      ],
+      "text_raw": "8 == 038000284458 7 אדובדה 158 גרם",
+      "text_normalized": "8 == 038000284458 7 אדובדה 158 גרם",
+      "confidence": 0.6885714285714286
+    },
+    {
+      "index": 50,
+      "page": 0,
+      "bbox": [
+        89.0,
+        764.0,
+        1018.0,
+        814.0
+      ],
+      "text_raw": "7 740497 038000284458 =",
+      "text_normalized": "7 740497 038000284458 =",
+      "confidence": 0.645
+    },
+    {
+      "index": 51,
+      "page": 0,
+      "bbox": [
+        11.0,
+        778.0,
+        1032.0,
+        802.0
+      ],
+      "text_raw": "/ כשר-אין חזרות 22120",
+      "text_normalized": "/ כשר-אין חזרות 22120",
+      "confidence": 0.67
+    },
+    {
+      "index": 52,
+      "page": 0,
+      "bbox": [
+        43.0,
+        787.0,
+        759.0,
+        810.0
+      ],
+      "text_raw": "4 0 1000 2100 790 \\",
+      "text_normalized": "4 0 1000 2100 790 \\",
+      "confidence": 0.5283333333333333
+    },
+    {
+      "index": 53,
+      "page": 0,
+      "bbox": [
+        440.0,
+        798.0,
+        781.0,
+        840.0
+      ],
+      "text_raw": "= 088000138416 7 ג 9 גרם",
+      "text_normalized": "= 088000138416 7 ג 9 גרם",
+      "confidence": 0.5383333333333333
+    },
+    {
+      "index": 54,
+      "page": 0,
+      "bbox": [
+        789.0,
+        808.0,
+        1047.0,
+        831.0
+      ],
+      "text_raw": ".8 97 4 038000138416",
+      "text_normalized": ".8 97 4 038000138416",
+      "confidence": 0.54
+    },
+    {
+      "index": 55,
+      "page": 0,
+      "bbox": [
+        474.0,
+        822.0,
+        617.0,
+        850.0
+      ],
+      "text_raw": ":שר -אין חזרות",
+      "text_normalized": ":שר -אין חזרות",
+      "confidence": 0.5666666666666667
+    },
+    {
+      "index": 56,
+      "page": 0,
+      "bbox": [
+        10.0,
+        834.0,
+        374.0,
+        867.0
+      ],
+      "text_raw": "2800 1000 | 2100 7.90 \\ \\ 2200",
+      "text_normalized": "2800 1000 | 2100 7.90 \\ \\ 2200",
+      "confidence": 0.73375
+    },
+    {
+      "index": 57,
+      "page": 0,
+      "bbox": [
+        400.0,
+        847.0,
+        911.0,
+        870.0
+      ],
+      "text_raw": "3 3 038000183713/ פרינגלס ברביקיו 8 גום כשר",
+      "text_normalized": "3 3 038000183713/ פרינגלס ברביקיו 8 גום כשר",
+      "confidence": 0.6925
+    },
+    {
+      "index": 58,
+      "page": 0,
+      "bbox": [
+        921.0,
+        856.0,
+        1017.0,
+        871.0
+      ],
+      "text_raw": "9 740497",
+      "text_normalized": "9 740497",
+      "confidence": 0.895
+    },
+    {
+      "index": 59,
+      "page": 0,
+      "bbox": [
+        270.0,
+        873.0,
+        547.0,
+        885.0
+      ],
+      "text_raw": "רו :",
+      "text_normalized": "רו :",
+      "confidence": 0.185
+    },
+    {
+      "index": 60,
+      "page": 0,
+      "bbox": [
+        11.0,
+        887.0,
+        1051.0,
+        916.0
+      ],
+      "text_raw": ": | 8",
+      "text_normalized": ": | 8",
+      "confidence": 0.48333333333333334
+    },
+    {
+      "index": 61,
+      "page": 0,
+      "bbox": [
+        72.0,
+        890.0,
+        441.0,
+        909.0
+      ],
+      "text_raw": "1/14 14.00 10.00 10 /-",
+      "text_normalized": "1/14 14.00 10.00 10 /-",
+      "confidence": 0.61
+    },
+    {
+      "index": 62,
+      "page": 0,
+      "bbox": [
+        281.0,
+        894.0,
+        1052.0,
+        923.0
+      ],
+      "text_raw": "10% 740497 038000284472 פרינגלס הבנרו 158 גרם |",
+      "text_normalized": "10% 740497 038000284472 פרינגלס הבנרו 158 גרם |",
+      "confidence": 0.81125
+    },
+    {
+      "index": 63,
+      "page": 0,
+      "bbox": [
+        55.0,
+        921.0,
+        1050.0,
+        944.0
+      ],
+      "text_raw": "3 5-ו 7",
+      "text_normalized": "3 5-ו 7",
+      "confidence": 0.19333333333333333
+    },
+    {
+      "index": 64,
+      "page": 0,
+      "bbox": [
+        10.0,
+        935.0,
+        1051.0,
+        973.0
+      ],
+      "text_raw": "11 740497 038000138607 = 00138607 0 פפרינגלס חומץ ומלח 158 גרם | 28.00 9.60 ו 146 . 0 >= 238.00",
+      "text_normalized": "11 740497 038000138607 = 00138607 0 פפרינגלס חומץ ומלח 158 גרם | 28.00 9.60 ו 146 . 0 >= 238.00",
+      "confidence": 0.7325
+    },
+    {
+      "index": 65,
+      "page": 0,
+      "bbox": [
+        461.0,
+        965.0,
+        1049.0,
+        983.0
+      ],
+      "text_raw": "5 כשר 1/14-אין החזרות.",
+      "text_normalized": "5 כשר 1/14-אין החזרות.",
+      "confidence": 0.8375
+    },
+    {
+      "index": 66,
+      "page": 0,
+      "bbox": [
+        13.0,
+        977.0,
+        1035.0,
+        1012.0
+      ],
+      "text_raw": "-12 740497 038000276477 פרינגלס 0 צייזסטייק צייזסטיי 158 גרם | 2800 00/ 0 1500 850 23800",
+      "text_normalized": "-12 740497 038000276477 פרינגלס 0 צייזסטייק צייזסטיי 158 גרם | 2800 00/ 0 1500 850 23800",
+      "confidence": 0.6637500000000001
+    },
+    {
+      "index": 67,
+      "page": 0,
+      "bbox": [
+        472.0,
+        1011.0,
+        606.0,
+        1054.0
+      ],
+      "text_raw": "8 חזרות",
+      "text_normalized": "8 חזרות",
+      "confidence": 0.48
+    },
+    {
+      "index": 68,
+      "page": 0,
+      "bbox": [
+        15.0,
+        1026.0,
+        1045.0,
+        1062.0
+      ],
+      "text_raw": "<> 13 740497 7290018770771 = 7290018770771 ית כתית מעולה 750 מל - 0 3200 1250 2800 14600",
+      "text_normalized": "<> 13 740497 7290018770771 = 7290018770771 ית כתית מעולה 750 מל - 0 3200 1250 2800 14600",
+      "confidence": 0.7123529411764706
+    },
+    {
+      "index": 69,
+      "page": 0,
+      "bbox": [
+        514.0,
+        1057.0,
+        619.0,
+        1076.0
+      ],
+      "text_raw": "שף צ'ויס כשלפ",
+      "text_normalized": "שף צ'ויס כשלפ",
+      "confidence": 0.7166666666666667
+    },
+    {
+      "index": 70,
+      "page": 0,
+      "bbox": [
+        1031.0,
+        1068.0,
+        1048.0,
+        1085.0
+      ],
+      "text_raw": "5",
+      "text_normalized": "5",
+      "confidence": 0.59
+    },
+    {
+      "index": 71,
+      "page": 0,
+      "bbox": [
+        1031.0,
+        1094.0,
+        1048.0,
+        1109.0
+      ],
+      "text_raw": ".",
+      "text_normalized": ".",
+      "confidence": 0.52
+    },
+    {
+      "index": 72,
+      "page": 0,
+      "bbox": [
+        849.0,
+        1343.0,
+        854.0,
+        1363.0
+      ],
+      "text_raw": "1",
+      "text_normalized": "1",
+      "confidence": 0.17
+    },
+    {
+      "index": 73,
+      "page": 0,
+      "bbox": [
+        383.0,
+        1454.0,
+        645.0,
+        1473.0
+      ],
+      "text_raw": "תי /",
+      "text_normalized": "תי /",
+      "confidence": 0.9
+    },
+    {
+      "index": 74,
+      "page": 0,
+      "bbox": [
+        366.0,
+        1456.0,
+        883.0,
+        1488.0
+      ],
+      "text_raw": "ללכש כמושלוח דואר: -/",
+      "text_normalized": "ללכש כמושלוח דואר: -/",
+      "confidence": 0.5125
+    },
+    {
+      "index": 75,
+      "page": 0,
+      "bbox": [
+        524.0,
+        1464.0,
+        725.0,
+        1501.0
+      ],
+      "text_raw": "מושב 8 ת.ד.",
+      "text_normalized": "מושב 8 ת.ד.",
+      "confidence": 0.67
+    },
+    {
+      "index": 76,
+      "page": 0,
+      "bbox": [
+        311.0,
+        1471.0,
+        515.0,
+        1513.0
+      ],
+      "text_raw": "255. מיקוד 756006",
+      "text_normalized": "255. מיקוד 756006",
+      "confidence": 0.39666666666666667
+    },
+    {
+      "index": 77,
+      "page": 0,
+      "bbox": [
+        245.0,
+        1482.0,
+        761.0,
+        1503.0
+      ],
+      "text_raw": "טל: חפון:",
+      "text_normalized": "טל: חפון:",
+      "confidence": 0.41500000000000004
+    },
+    {
+      "index": 78,
+      "page": 0,
+      "bbox": [
+        148.0,
+        1490.0,
+        586.0,
+        1511.0
+      ],
+      "text_raw": "פקס: 5ספַטַמ\"פ ,תעשו -ונעצשיה",
+      "text_normalized": "פקס: 5ספטמ\"פ ,תעשו -ונעצשיה",
+      "confidence": 0.295
+    },
+    {
+      "index": 79,
+      "page": 0,
+      "bbox": [
+        95.0,
+        1500.0,
+        672.0,
+        1533.0
+      ],
+      "text_raw": ". חן 9 | רדון",
+      "text_normalized": ". חן 9 | רדון",
+      "confidence": 0.51
+    },
+    {
+      "index": 80,
+      "page": 0,
+      "bbox": [
+        217.0,
+        1508.0,
+        1063.0,
+        1600.0
+      ],
+      "text_raw": "חור תור \\ פע",
+      "text_normalized": "חור תור \\ פע",
+      "confidence": 0.3675
+    },
+    {
+      "index": 81,
+      "page": 0,
+      "bbox": [
+        967.0,
+        1525.0,
+        976.0,
+        1536.0
+      ],
+      "text_raw": "2",
+      "text_normalized": "2",
+      "confidence": 0.09
+    },
+    {
+      "index": 82,
+      "page": 0,
+      "bbox": [
+        786.0,
+        1559.0,
+        788.0,
+        1561.0
+      ],
+      "text_raw": "\\",
+      "text_normalized": "\\",
+      "confidence": 0.91
+    }
+  ]
+}
