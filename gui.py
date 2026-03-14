@@ -123,7 +123,7 @@ class ReceiptOCRApp:
                 sys.stdout = captured
                 
                 try:
-                    sys.argv = ["test_cli", "--images-dir", "sample_images", "--config", "config.yml"]
+                    sys.argv = ["--images-dir", "sample_images", "--config", "config.yml"]
                     test_cli.main(sys.argv)
                 except SystemExit:
                     pass
