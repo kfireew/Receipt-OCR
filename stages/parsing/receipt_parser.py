@@ -37,7 +37,7 @@ def parse_receipt(recognized_boxes: Iterable[RecognizedBox]) -> ParsedReceipt:
         # Candidate lines are the first few lines that are NOT mostly digits or known keywords
         candidates = []
         for i in range(min(5, len(lines))):
-            txt = lines[i].text_raw or ""
+            txt = lines[i].text_normalized or lines[i].text_raw or ""
             # Stop if we hit a line that looks like an invoice header or date
             if any(kw in txt for kw in ("חשבונית", "תאריך", "מספר", "תעודת")):
                 break

@@ -24,7 +24,7 @@ def main(argv: list[str] | None = None) -> int:
         config = yaml.safe_load(f)
 
     tesseract_cmd = config.get("tesseract", {}).get("executable_path")
-    confusion_map_path = "receipt_ocr/confusion_map.json" # Temporary path until moved
+    confusion_map_path = "confusion_map.json"
 
     results = preprocess_image(args.image, debug_enabled=args.debug)
     all_boxes = []

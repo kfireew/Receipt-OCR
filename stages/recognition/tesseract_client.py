@@ -120,7 +120,8 @@ def recognize_boxes(
     if isinstance(confusion_map, str):
         try:
             confusion_map = load_confusion_map(Path(confusion_map))
-        except Exception:
+        except Exception as e:
+            print(f"Warning: Failed to load confusion map from {confusion_map}: {e}")
             confusion_map = {}
     else:
         confusion_map = confusion_map or {}
