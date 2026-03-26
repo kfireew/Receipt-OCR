@@ -7,6 +7,28 @@ from stages.post_process.math_validator import validate_math
 from stages.parsing.models import (
     ParsedReceipt, ParsedStringField, ParsedAmountField, LineItem
 )
+import os
+import json
+
+def _match_merchant(combined_val: str) -> str:
+    """Matches the merchant name using the merchants_mapping.json config file."""
+    lower_val = combined_val.lower()
+    
+    # Load mapping from project root
+    try:
+        current_dir = os.path.dirname(__file__)
+        project_root = os.path.dirname(os.path.dirname(current_dir))
+        mapping_path = os.path.join(project_root, "merchants_mapping.json")
+        with open(mapping_path, "r", encoding="utf-8") as f:
+            mapping = json.load(f)
+    except Exception:
+        mapping = {}
+        
+    for normalized_name, keywords in mapping.items():
+        if any(kw in lower_val for kw in keywords):
+            return normalized_name
+            
+    return combined_val
 
 def parse_receipt(recognized_boxes: Iterable[RecognizedBox]) -> ParsedReceipt:
     from stages.parsing.field_extractors import (
@@ -57,25 +79,8 @@ def parse_receipt(recognized_boxes: Iterable[RecognizedBox]) -> ParsedReceipt:
         combined_val = _re.sub(r'[\|\\/]+', ' ', combined_val)
         combined_val = _re.sub(r'\s+', ' ', combined_val).strip()
         
-        # Standardize for XAMPP Checksum script
-        lower_val = combined_val.lower()
-        normalized_merchant = combined_val
-        if "אביקם" in lower_val or "זינגר" in lower_val:
-            normalized_merchant = "Avikam"
-        elif "גלוב" in lower_val or "globrands" in lower_val:
-            normalized_merchant = "Globrands"
-        elif "המפיץ" in lower_val:
-            normalized_merchant = "Hamefitz"
-        elif "עידה" in lower_val or "י.ד" in lower_val or "יבוא ושיווק קדימה" in lower_val:
-            normalized_merchant = "Angel"
-        elif "שטראוס" in lower_val or "strauss" in lower_val:
-            normalized_merchant = "StraussCool"
-        elif "טיירי" in lower_val:
-            normalized_merchant = "Tayari"
-        elif "תנובה" in lower_val:
-            normalized_merchant = "Tnuva"
-        elif "ויסוצקי" in lower_val or "wisso" in lower_val:
-            normalized_merchant = "Wisso"
+        # Standardize for XAMPP Checksum script using config
+        normalized_merchant = _match_merchant(combined_val)
         
         return ParsedStringField(value=normalized_merchant, confidence=lines[0].confidence, line_index=0)
 
