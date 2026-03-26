@@ -1,0 +1,25 @@
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Avikam_10.03.2025_Avikam 11-03-25.JSON : Avikam
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Avikam_10.03.2025_Avikam 11-03-25.pred.json : ו סחר שיווק בעע"מ בע"מ גורמה 1 אביקם זינגר שוקולדים, rm‏ ומוצרי גורכוה 0 - ג (a1; a1s)‏ יבשים - שוקולדים, י"! ap j שיווק שיווק פיצוחים ופירות ae‏ ל
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Avikam_OLD.json : זינגר זינגר סחר סחר ושיווק ושיווכק בע"כו בע"כז גורמוה
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Globrands_23.03.2025_Globrands 24-03-25.JSON : Globrands
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Globrands_23.03.2025_Globrands 24-03-25.pred.json : 0 ו
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Hamefitz_27.12.2024_Hamefitz 15-01-25 A.JSON : Hamefitz
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Hamefitz_27.12.2024_Hamefitz 15-01-25 A.pred.json : 1 זווו המפיץ : סיעונאות מזון כתובת חברה: היוצר 2 באר יעקב,08-9959389 טלפון חברה: עוסק מורשה: 557652476 מדווחת באיחוד עוסקים ח.צ. 520022732 אצאצ מקור אאא
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Ida_20.03.2025_Ida 24-03-25.JSON : Angel
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Ida_20.03.2025_Ida 24-03-25.pred.json : 1 . שק םוט .- 5 - :הבו הבו -5 1 ן י.ד. יי,ד, י.ד. י,ד. 9 ע?דה עידהת עידה ידה 6 יבוא באוש וו שיווק ו כ ממתקים בסיטונאות - 2 :0 ₪ 0 א 0 ב בע"מ א.ת. מערב קדימה, ת.ד. 9147, תל מונד 4064129 א בצ 5 לט : "הו = ם 1=] משרד טל: טל;: טל: 09-7440326 פקס: 09-7464510 1 = 1 = מצלתמאעו מצלהמאשט מציהיממעטו וה תוניי ומת יי ור ד ו 8 0 512808726 קושל
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\StraussCool_18.08.2024_StraussCool 18-08-24.JSON : YLG
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\StraussCool_18.08.2024_StraussCool 18-08-24.pred.json : בסייר שטראום גרופ בע"מ 1 - 1100 . מאוחדך 557268061 טל נווחר 1-800-606-606 1
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\StraussCool_18.08.2024_StraussCool 19-08-24.JSON : StraussCool
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\StraussCool_18.08.2024_StraussCool 19-08-24.pred.json : בסייר שטראום גרופ בע"מ 1 - 1100 . מאוחדך 557268061 טל נווחר 1-800-606-606 1
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Tayari_11.03.2025_Tayari 11-03-25.JSON : Tayari
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Tayari_11.03.2025_Tayari 11-03-25.pred.json : ו א שחים ם טייך1 צויירד = > - > ו - 2 . 5 1 וה ה 1ההצמד ומד = 6 עסקי עסקימזון מזון בע"מ בע"מ 2 ש המר ו 0 .פד .סדו 55שאופטם 555א8051 פסס; פסס- ת.ד, ת.ד. 29289 ירועונים, ירושנים, 9129102 8129102 . ו 1]: : מצמוד : ו 51 9129102 ₪ש. 541 05051.5 29289 .₪0 .סק טל. 02-6420698, פקס, פהס. 02-6415044 אחים טיידי שיירי עסקי מזון בע"ם בע"מ 4 :;א ] := :> 972-2-6420698 : :]שד ופד אתר הבית: !ו.3 811.60!.שצששצ !ו.1.60ז3ע3).אוצ 1 [ו.1.60זה !ו.1.60זה 3). ץ3).אחטו ו 133710013 0 :36ק6וחסון :0שהק6וחסו]
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Tnuva_16.04.2025_Tnuva 21-04-25.JSON : Tnuva
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Tnuva_16.04.2025_Tnuva 21-04-25.pred.json : 7 - =-ש: 55 תנונה בלה זו בע 1 8.5.5 -חולוג רמה 202 דרום 055 - 5 טסט - : =בבבבבבבבבבבמבבבבפבבבבםבטבבםבבבבבטבבבבטבבבבב םבטסכטםבפסבפםמפסבטסבבססבמסנטסבבם . טסוזט חוריך: 16 04 2025 כו שה: 05:14 9 ₪. . וק . 2 5 -
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Tnuva_19.08.2024_Tnuva 19-08-24.JSON : Tnuva
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Tnuva_19.08.2024_Tnuva 19-08-24.pred.json : וו מ = ו מ. ווטרינריה : 0-5 =>== 8 001] הרחה 99 =ב== 2 882 0.1.9 במשבבבבבבבםבבמסבבבבבכבטבבבבבבםככטבבבבבבבבטבב 2 טסוזש הונינר א פיך 19 08 2024 יטראל
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Tnuva_20.01.2025_Tnuva 20-01-25 B.JSON : Tnuva
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Tnuva_20.01.2025_Tnuva 20-01-25 B.pred.json : ₪ 0 - . טסוז ₪ 1 =מסם ]101 200 07 5שםםםבבבבבבבבבבבבבבבבבבבטבבטבבבבבםבבבבטםב ₪ בבבם (110 0.4.0 =בשםבבבבבבבבכבבבבבבבבבבבבטבבבבטבבבבבבבבבבבבם ם הנונה מו 7 -חרלול דרום - 7563 0 ב חויך: 20 01 2005 מה: 05:42
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Tnuva_20.01.2025_Tnuva 20-01-25 E.JSON : Tnuva
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Tnuva_20.01.2025_Tnuva 20-01-25 E.pred.json : ₪ 0 - . טסוז ₪ 1 =מסם ]101 200 07 5שםםםבבבבבבבבבבבבבבבבבבבטבבטבבבבבםבבבבטםב ₪ בבבם (110 0.4.0 =בשםבבבבבבבבכבבבבבבבבבבבבטבבבבטבבבבבבבבבבבבם ם הנונה מו 7 -חרלול דרום - 7563 0 ב חויך: 20 01 2005 מה: 05:42
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Wisso_03.03.2025_Wisso 13-03-25 A.JSON : Wisso
+c:/Users/Kfir Ezer/Desktop/Receipt OCR/sample_images\Wisso_03.03.2025_Wisso 13-03-25 A.pred.json : 7 עמוד 1 עמוד מתוך 2 3 מתוך . תף ויסוצקי (ישראל) בע"מ : - מסמך 2 .,. 1 : ז ע.מ. עימ. ויסוצקי 557651833 ו ש 1 03 03 2025

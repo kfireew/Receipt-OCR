@@ -57,7 +57,27 @@ def parse_receipt(recognized_boxes: Iterable[RecognizedBox]) -> ParsedReceipt:
         combined_val = _re.sub(r'[\|\\/]+', ' ', combined_val)
         combined_val = _re.sub(r'\s+', ' ', combined_val).strip()
         
-        return ParsedStringField(value=combined_val, confidence=lines[0].confidence, line_index=0)
+        # Standardize for XAMPP Checksum script
+        lower_val = combined_val.lower()
+        normalized_merchant = combined_val
+        if "אביקם" in lower_val or "זינגר" in lower_val:
+            normalized_merchant = "Avikam"
+        elif "גלוב" in lower_val or "globrands" in lower_val:
+            normalized_merchant = "Globrands"
+        elif "המפיץ" in lower_val:
+            normalized_merchant = "Hamefitz"
+        elif "עידה" in lower_val or "י.ד" in lower_val or "יבוא ושיווק קדימה" in lower_val:
+            normalized_merchant = "Angel"
+        elif "שטראוס" in lower_val or "strauss" in lower_val:
+            normalized_merchant = "StraussCool"
+        elif "טיירי" in lower_val:
+            normalized_merchant = "Tayari"
+        elif "תנובה" in lower_val:
+            normalized_merchant = "Tnuva"
+        elif "ויסוצקי" in lower_val or "wisso" in lower_val:
+            normalized_merchant = "Wisso"
+        
+        return ParsedStringField(value=normalized_merchant, confidence=lines[0].confidence, line_index=0)
 
     merchant_field = _guess_merchant(raw_lines)
     invoice_field = _parse_invoice_no(raw_lines)

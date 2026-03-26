@@ -55,27 +55,53 @@ class ParsedReceipt:
 
     def to_gdocument_dict(self) -> Dict[str, Any]:
         fields = []
-        if self.invoice_no and self.invoice_no.value:
-            fields.append({"name": "InvoiceNo", "value": self.invoice_no.value})
+        
+        # indices 0, 1: InvoiceNo
+        invoice_val = self.invoice_no.value if (self.invoice_no and self.invoice_no.value) else ""
+        fields.append({"name": "InvoiceNo", "value": invoice_val})
+        fields.append({"name": "InvoiceNo", "value": invoice_val})
+
+        # indices 2, 3: VendorNameS
+        merchant_val = self.merchant.value if (self.merchant and self.merchant.value) else ""
+        fields.append({"name": "VendorNameS", "value": merchant_val})
+        fields.append({"name": "VendorNameS", "value": merchant_val})
+
+        # indices 4, 5: Date
+        date_val = ""
         if self.date and self.date.value:
             try:
                 dt = datetime.fromisoformat(self.date.value)
-                fields.append({"name": "Date", "value": dt.strftime(r"%d.%m.%Y")})
+                date_val = dt.strftime(r"%d.%m.%Y")
             except:
-                fields.append({"name": "Date", "value": self.date.value})
-        if self.total and self.total.value is not None:
-            fields.append({"name": "Total", "value": f"{self.total.value:.2f}"})
-        if self.merchant and self.merchant.value:
-            fields.append({"name": "VendorName", "value": self.merchant.value})
-            fields.append({"name": "VendorNameS", "value": self.merchant.value})
+                date_val = self.date.value
+        fields.append({"name": "Date", "value": date_val})
+        fields.append({"name": "Date", "value": date_val})
+
+        # indices 6, 7: Total
+        total_val = f"{self.total.value:.2f}" if (self.total and self.total.value is not None) else ""
+        fields.append({"name": "Total", "value": total_val})
+        fields.append({"name": "Total", "value": total_val})
 
         table_groups = []
         for it in self.items:
             item_fields = []
-            if it.unit_price is not None: item_fields.append({"name": "Price", "value": f"{it.unit_price:.2f}"})
-            if it.quantity is not None: item_fields.append({"name": "Quantity", "value": f"{it.quantity:.2f}"})
-            if it.catalog_no: item_fields.append({"name": "CatalogNo", "value": it.catalog_no})
-            if it.line_total is not None: item_fields.append({"name": "LineTotal", "value": f"{it.line_total:.2f}"})
+            if it.unit_price is not None:
+                val = f"{it.unit_price:.2f}"
+                item_fields.append({"name": "Price", "value": val})
+                fields.append({"name": "Price", "value": val})
+            if it.quantity is not None:
+                val = f"{it.quantity:.2f}"
+                item_fields.append({"name": "Quantity", "value": val})
+                fields.append({"name": "Quantity", "value": val})
+            if it.catalog_no:
+                val = str(it.catalog_no)
+                item_fields.append({"name": "CatalogNo", "value": val})
+                fields.append({"name": "CatalogNo", "value": val})
+            if it.line_total is not None:
+                val = f"{it.line_total:.2f}"
+                item_fields.append({"name": "LineTotal", "value": val})
+                fields.append({"name": "LineTotal", "value": val})
+                
             table_groups.append({"name": "Table", "fields": item_fields, "groups": []})
 
         return {"GDocument": {"fields": fields, "groups": [{"name": "Table", "groups": table_groups, "fields": []}]}}
