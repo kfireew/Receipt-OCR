@@ -122,6 +122,12 @@ def _extract_items(lines: Sequence[RawLine], used_line_indices: Sequence[int]) -
         if line.index in used_set: continue
         txt = line.text_normalized or line.text_raw
         if not txt: continue
+        
+        # Rigorous filtering: skip header/footer strings that aren't product names
+        txt_lower = txt.lower()
+        if any(w in txt_lower for w in ("חשבונית", "תאריך", "לקוח", "עמוד", "מחלק", "מספר", "לכבוד", "כתובת", "טלפון", "מיקוד", "טל.", "ע.מ", "ח.פ", "bn")):
+            continue
+            
         amounts = [m.group(1) for m in _AMOUNT_RE.finditer(txt)]
         if not amounts: continue
         line_total = None
@@ -144,8 +150,15 @@ def _extract_items(lines: Sequence[RawLine], used_line_indices: Sequence[int]) -
         catalog_no = None
         for m in re.finditer(r"\b(\d{5,14})\b", txt):
             found_num = m.group(1)
+            # Make sure the found catalog number isn't actually our quantity or price
             if float(found_num) not in (quantity, unit_price, line_total):
                 catalog_no = found_num
                 break
+                
+        # Filter out fake items to prevent "empty slots" in downstream systems
+        if line_total == 0.0 and len(amounts) < 2:
+            continue
+        if catalog_no is None and len(amounts) < 2:
+            continue
         items.append(LineItem(description=desc, quantity=quantity, unit_price=unit_price, line_total=line_total, confidence=line.confidence, line_index=line.index, catalog_no=catalog_no))
     return items

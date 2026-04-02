@@ -17,7 +17,7 @@ class RawLine:
 
 def _boxes_to_lines(
     boxes: Sequence[RecognizedBox],
-    y_overlap_thresh: float = 0.7,
+    y_overlap_thresh: float = 1.2,
 ) -> List[RawLine]:
     """Group individual word/box recognitions into line-level structures."""
     def _center_and_height(b: RecognizedBox) -> Tuple[float, float]:

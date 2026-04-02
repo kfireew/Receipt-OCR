@@ -137,6 +137,45 @@ def recognize_boxes(
                 psm=p,
                 extra_config=extra_config
             ))
+            
+        # Add a 90-degree rotation specifically targeting the right side of the image.
+        H, W = work_img.shape[:2]
+        # Crop the rightmost 30% of the image for performance and context isolation
+        right_cutoff = int(W * 0.70)
+        right_side = work_img[:, right_cutoff:W]
+        
+        # Test both counter-clockwise and clockwise 90-degree rotations
+        for rot in [cv2.ROTATE_90_COUNTERCLOCKWISE, cv2.ROTATE_90_CLOCKWISE]:
+            rot_img = cv2.rotate(right_side, rot)
+            rot_boxes = _ocr_full_page(rot_img, page_num=page_idx, lang=lang, psm=6, extra_config=extra_config)
+            
+            for (rx1, ry1, rx2, ry2), txt, conf in rot_boxes:
+                # Map back to right_side coordinates:
+                if rot == cv2.ROTATE_90_COUNTERCLOCKWISE:
+                    orig_x1 = rot_img.shape[0] - ry2
+                    orig_x2 = rot_img.shape[0] - ry1
+                    orig_y1 = rx1
+                    orig_y2 = rx2
+                else: # CLOCKWISE
+                    orig_x1 = ry1
+                    orig_x2 = ry2
+                    orig_y1 = rot_img.shape[1] - rx2
+                    orig_y2 = rot_img.shape[1] - rx1
+                
+                # Check bounds
+                orig_x1 = max(0, min(orig_x1, right_side.shape[1]))
+                orig_x2 = max(0, min(orig_x2, right_side.shape[1]))
+                orig_y1 = max(0, min(orig_y1, right_side.shape[0]))
+                orig_y2 = max(0, min(orig_y2, right_side.shape[0]))
+
+                # Add right_cutoff to X coordinates to map back to work_img
+                abs_x1 = orig_x1 + right_cutoff
+                abs_x2 = orig_x2 + right_cutoff
+                abs_y1 = orig_y1
+                abs_y2 = orig_y2
+                
+                if abs_x2 > abs_x1 and abs_y2 > abs_y1:
+                    all_native_boxes.append(([float(abs_x1), float(abs_y1), float(abs_x2), float(abs_y2)], txt, conf))
         
         for i, (box_coords, text_raw, conf) in enumerate(all_native_boxes):
             norm = normalize_for_parsing(text_raw)

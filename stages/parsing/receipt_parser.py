@@ -55,8 +55,27 @@ def parse_receipt(recognized_boxes: Iterable[RecognizedBox]) -> ParsedReceipt:
     def _guess_merchant(lines: List[RawLine]) -> ParsedStringField:
         if not lines:
             return ParsedStringField(value=None, confidence=None, line_index=None)
+            
+        from stages.post_process.fuzzy_corrector import fuzzy_correct_line
+        import re as _re
+
+        # 1. Broad search: scan ALL lines for known merchant keywords
+        for line in lines:
+            txt = line.text_normalized or line.text_raw or ""
+            if not txt or len(txt) < 3:
+                continue
+            
+            # Apply fuzzy correction just for checking
+            fuzzy_txt = fuzzy_correct_line(txt)
+            fuzzy_txt = _re.sub(r'[\|\\/]+', ' ', fuzzy_txt)
+            fuzzy_txt = _re.sub(r'\s+', ' ', fuzzy_txt).strip()
+            
+            mapped = _match_merchant(fuzzy_txt)
+            # If the mapping returned something different than what was inputted, we found a known merchant!
+            if mapped != fuzzy_txt:
+                return ParsedStringField(value=mapped, confidence=line.confidence, line_index=line.index)
         
-        # Candidate lines are the first few lines that are NOT mostly digits or known keywords
+        # 2. Fallback: Candidate lines are the first few lines that are NOT mostly digits or known keywords
         candidates = []
         for i in range(min(5, len(lines))):
             txt = lines[i].text_normalized or lines[i].text_raw or ""
@@ -71,11 +90,9 @@ def parse_receipt(recognized_boxes: Iterable[RecognizedBox]) -> ParsedReceipt:
             
         combined_val = " ".join(candidates)
         # Apply fuzzy correction to fix common OCR errors in merchant name
-        from stages.post_process.fuzzy_corrector import fuzzy_correct_line
         combined_val = fuzzy_correct_line(combined_val)
         
         # Post-clean: remove noise like pipes and multiple spaces
-        import re as _re
         combined_val = _re.sub(r'[\|\\/]+', ' ', combined_val)
         combined_val = _re.sub(r'\s+', ' ', combined_val).strip()
         

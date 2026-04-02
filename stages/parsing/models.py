@@ -87,20 +87,29 @@ class ParsedReceipt:
             item_fields = []
             if it.unit_price is not None:
                 val = f"{it.unit_price:.2f}"
-                item_fields.append({"name": "Price", "value": val})
-                fields.append({"name": "Price", "value": val})
+            else:
+                val = "0.00"
+            item_fields.append({"name": "Price", "value": val})
+            fields.append({"name": "Price", "value": val})
+
             if it.quantity is not None:
                 val = f"{it.quantity:.2f}"
-                item_fields.append({"name": "Quantity", "value": val})
-                fields.append({"name": "Quantity", "value": val})
-            if it.catalog_no:
-                val = str(it.catalog_no)
-                item_fields.append({"name": "CatalogNo", "value": val})
-                fields.append({"name": "CatalogNo", "value": val})
+            else:
+                val = "1.00"
+            item_fields.append({"name": "Quantity", "value": val})
+            fields.append({"name": "Quantity", "value": val})
+            
+            # CatalogNo
+            val = str(it.catalog_no) if it.catalog_no else ""
+            item_fields.append({"name": "CatalogNo", "value": val})
+            fields.append({"name": "CatalogNo", "value": val})
+
             if it.line_total is not None:
                 val = f"{it.line_total:.2f}"
-                item_fields.append({"name": "LineTotal", "value": val})
-                fields.append({"name": "LineTotal", "value": val})
+            else:
+                val = "0.00"
+            item_fields.append({"name": "LineTotal", "value": val})
+            fields.append({"name": "LineTotal", "value": val})
                 
             table_groups.append({"name": "Table", "fields": item_fields, "groups": []})
 
