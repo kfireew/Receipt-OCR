@@ -120,8 +120,9 @@ if __name__ == "__main__":
 
 # ====== NEW: Google Cloud Vision API for header extraction ======
 
-# Default credentials path
-DEFAULT_GOOGLE_CREDS = r"C:\Users\Kfir Ezer\Downloads\receipt-ocr-492912-26e12b387ea2.json"
+# Default credentials path - can be set via GOOGLE_APPLICATION_CREDENTIALS env var
+import os
+DEFAULT_GOOGLE_CREDS = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', '')
 
 
 def _load_image_for_vision(image_path: str) -> bytes:
