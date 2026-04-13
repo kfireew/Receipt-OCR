@@ -96,19 +96,186 @@ def process_receipt(
     from utils.post_processor import process_items
     fixed_items = process_items(raw_items)
 
+    # Extract vendor and date using tesseract (header parsing)
+    vendor, date = extract_header_from_tesseract(image_path)
+
     # Convert to ABBYY format
     from utils.format_converter import mindee_to_abbey
 
-    receipt_name = os.path.splitext(os.path.basename(image_path))[0]
-    receipt_name = receipt_name.replace('_page-', '_')
+    # Generate filename from detected vendor and date (NOT from input filename)
+    if vendor and date:
+        # Format: Vendor_Date_Vendor Date (e.g., "StraussCool_18.08.2024_StraussCool 18-08-24")
+        # Convert date from DD.MM.YYYY to DD-MM-YY
+        parts = date.split('.')
+        if len(parts) == 3:
+            date_dash = f"{parts[0]}-{parts[1]}-{parts[2][-2:]}"  # 18.08.2024 -> 18-08-24
+        else:
+            date_dash = date.replace('.', '-')
+        receipt_name = f"{vendor}_{date}_{vendor} {date_dash}"
+    else:
+        receipt_name = normalize_filename(image_path)
 
-    gdoc = mindee_to_abbey(fixed_items, receipt_name)
+    gdoc = mindee_to_abbey(fixed_items, receipt_name, vendor=vendor, date=date)
 
     # Save to output folder if enabled
     if save_to_output:
         _save_to_output(gdoc, receipt_name)
 
     return gdoc
+
+
+def normalize_filename(image_path: str) -> str:
+    """
+    Normalize filename to format: Vendor_Date_Vendor Date
+
+    Examples:
+        - StraussCool_18.08.2024_StraussCool 18-08-24.pdf → StraussCool_18.08.2024_StraussCool 18-08-24
+        - Avikam_10.03.2025_Avikam 11-03-25.pdf → Avikam_10.03.2025_Avikam 11-03-25
+        - WhatsApp Scan 2026-04-09 at 11.32.13.pdf → WhatsApp_Scan_2026-04-09_at_11.32.13
+    """
+    import re
+
+    # Get filename without extension
+    filename = os.path.splitext(os.path.basename(image_path))[0]
+
+    # Handle page suffixes like _page-0001
+    filename = re.sub(r'_page-\d+$', '', filename)
+
+    # Check if it matches known pattern: Vendor_Date_Vendor Date
+    # Pattern: word_word.word.word_word word-word (with space)
+    pattern = r'^(\w+)_(\d{2}\.\d{2}\.\d{4})_(\w+)\s+(\d{2}-\d{2}-\d{2})$'
+    match = re.match(pattern, filename)
+
+    if match:
+        # Already in correct format - just return with underscore
+        return filename
+
+    # Try reverse pattern: Vendor Date_Vendor_Date
+    # Example: "StraussCool 18.08.2024_StraussCool 18-08-24"
+    pattern2 = r'^(\w+)\s+(\d{2}\.\d{2}\.\d{4})_(\w+)\s+(\d{2}-\d{2}-\d{2})$'
+    match2 = re.match(pattern2, filename)
+
+    if match2:
+        # Convert: "Vendor Date_Vendor Date" → "Vendor_Date_Vendor Date"
+        vendor1 = match2.group(1)
+        date1 = match2.group(2)
+        vendor2 = match2.group(3)
+        date_dash = match2.group(4)
+        # Format: Vendor_Date_Vendor Date (keep space between vendor and date)
+        return f"{vendor1}_{date1}_{vendor2} {date_dash}"
+
+    # Try another pattern: Vendor_Date_Vendor_Date (with underscores)
+    # Example: "StraussCool_18.08.2024_StraussCool_18-08-24"
+    pattern3 = r'^(\w+)_(\d{2}\.\d{2}\.\d{4})_(\w+)_(\d{2}-\d{2}-\d{2})$'
+    match3 = re.match(pattern3, filename)
+
+    if match3:
+        # Convert underscores to space in second part
+        # "Vendor_Date_Vendor_Date" → "Vendor_Date_Vendor Date"
+        vendor1 = match3.group(1)
+        date1 = match3.group(2)
+        vendor2 = match3.group(3)
+        date_dash = match3.group(4)
+        return f"{vendor1}_{date1}_{vendor2} {date_dash}"
+
+    # For other filenames, just normalize spaces to underscores
+    return filename.replace(' ', '_')
+
+
+def extract_header_from_tesseract(image_path: str) -> tuple:
+    """
+    Extract vendor and date using tesseract OCR (for header parsing).
+
+    Uses tesseract pipeline for header (vendor, date) - better for Hebrew text.
+    Falls back to filename parsing if tesseract unavailable.
+
+    Returns: (vendor, date) tuple
+    """
+    try:
+        # Preprocess
+        from stages.preprocess.image_loader import PreprocessConfig
+        from stages.preprocess.image_processor import preprocess_image
+        pp_cfg = PreprocessConfig(target_height=2400, target_width=1800)
+        pres = preprocess_image(image_path, cfg=pp_cfg)
+
+        # OCR with tesseract
+        from stages.recognition.tesseract_client import recognize_boxes
+        all_boxes = []
+        for i, pre in enumerate(pres):
+            boxes = recognize_boxes(pre.preprocessed, page_idx=i)
+            all_boxes.extend(boxes)
+
+        # Parse header using tesseract pipeline
+        from stages.grouping.line_assembler import _boxes_to_lines
+        raw_lines = _boxes_to_lines(all_boxes)
+
+        # Extract vendor
+        from stages.parsing.vendor import extract_vendor
+        vendor_result = extract_vendor(raw_lines)
+        vendor = vendor_result.value if vendor_result and vendor_result.value else ""
+
+        # Extract date
+        from stages.parsing.dates import _parse_date_from_lines
+        date_result = _parse_date_from_lines(raw_lines)
+        date = date_result.value if date_result and date_result.value else ""
+
+        return vendor, date
+    except Exception as e:
+        # Fall back to filename parsing
+        return extract_vendor_date_from_filename(image_path)
+
+
+def extract_vendor_date_from_filename(image_path: str) -> tuple:
+    """
+    Extract vendor name and date from filename pattern.
+
+    Pattern: Vendor_Date_Vendor Date
+    Example: StraussCool_18.08.2024_StraussCool 18-08-24
+
+    Returns: (vendor, date) tuple
+    """
+    import re
+
+    filename = os.path.splitext(os.path.basename(image_path))[0]
+
+    # Try pattern: Vendor_Date_Vendor Date
+    pattern = r'^(\w+)_(\d{2}\.\d{2}\.\d{4})_(\w+)\s+(\d{2}-\d{2}-\d{2})$'
+    match = re.match(pattern, filename)
+
+    if match:
+        vendor = match.group(1)  # First vendor
+        date = match.group(2)    # Date in DD.MM.YYYY format
+        return vendor, date
+
+    # Try without space: Vendor_Date_Vendor_Date
+    pattern2 = r'^(\w+)_(\d{2}\.\d{2}\.\d{4})_(\w+)_(\d{2}-\d{2}-\d{2})$'
+    match2 = re.match(pattern2, filename)
+
+    if match2:
+        vendor = match2.group(1)
+        date = match2.group(2)
+        return vendor, date
+
+    # Try reverse: Vendor Date_Vendor_Date
+    pattern3 = r'^(\w+)\s+(\d{2}\.\d{2}\.\d{4})_(\w+)_(\d{2}-\d{2}-\d{2})$'
+    match3 = re.match(pattern3, filename)
+
+    if match3:
+        vendor = match3.group(1)
+        date = match3.group(2)
+        return vendor, date
+
+    # Try WhatsApp pattern: WhatsApp_Scan_YYYY-MM-DD
+    pattern4 = r'^(WhatsApp[_\s]\w+)_(\d{4}-\d{2}-\d{2})'
+    match4 = re.match(pattern4, filename)
+
+    if match4:
+        vendor = match4.group(1).replace('_', ' ')
+        date = match4.group(2)
+        return vendor, date
+
+    # Default: return filename as vendor, empty date
+    return filename, ""
 
 
 def _save_to_output(gdoc: dict, receipt_name: str):

@@ -20,6 +20,10 @@ Usage:
         api_key='your-azure-key'
     )
 
+    # Combined: Tesseract for header + Mindee for items
+    from stages.recognition.tesseract_client import parse_receipt_combined
+    result = parse_receipt_combined('receipt.pdf')
+
 Supported providers:
 - mindee: Best for receipts (purpose-built)
 - azure: Good for tables/layout

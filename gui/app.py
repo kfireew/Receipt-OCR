@@ -7,6 +7,10 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, font as tkfont
 from tkinter import ttk
 
+# Load environment variables from .env
+from dotenv import load_dotenv
+load_dotenv()
+
 try:
     from tkinterdnd2 import TkinterDnD, DND_FILES
     HAS_DND = False  # Disabled for stability

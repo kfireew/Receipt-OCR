@@ -257,3 +257,190 @@ def recognize_boxes(
             )
 
     return results
+
+
+def extract_header_fields(
+    image_path: str,
+    tesseract_executable: Optional[str] = None,
+    confusion_map: Optional[Dict[str, str] | str] = None,
+) -> Dict[str, Any]:
+    """Extract vendor and date from receipt header using Tesseract.
+
+    Runs full receipt OCR with Tesseract, then extracts vendor + date
+    from the OCR lines. Designed to be called alongside Mindee for items.
+
+    Args:
+        image_path: Path to receipt image
+        tesseract_executable: Optional path to tesseract executable
+        confusion_map: Optional confusion map for OCR corrections
+
+    Returns:
+        Dict with 'vendor' and 'date' ParsedStringField objects
+    """
+    from stages.preprocess.image_processor import preprocess_image
+    from stages.grouping.line_assembler import _boxes_to_lines
+    from stages.parsing.vendor import extract_vendor
+    from stages.parsing.dates import _parse_date_from_lines
+
+    # 1. Preprocess the image
+    results = preprocess_image(image_path)
+
+    # 2. Run Tesseract OCR on all pages
+    all_boxes: List[RecognizedBox] = []
+    for i, res in enumerate(results):
+        boxes = recognize_boxes(
+            res.preprocessed,
+            page_idx=i,
+            tesseract_executable=tesseract_executable,
+            confusion_map=confusion_map,
+            use_multi_psm=True,
+        )
+        all_boxes.extend(boxes)
+
+    # 3. Convert boxes to lines
+    raw_lines = _boxes_to_lines(all_boxes)
+
+    # 4. Extract vendor and date using existing parsers
+    vendor = extract_vendor(raw_lines)
+    date = _parse_date_from_lines(raw_lines)
+
+    return {
+        'vendor': vendor,
+        'date': date,
+    }
+
+
+def recognize_with_tesseract(image_path: str, **kwargs) -> List[RecognizedBox]:
+    """Convenience function for full-page Tesseract OCR.
+
+    Args:
+        image_path: Path to receipt image
+        **kwargs: Arguments passed to recognize_boxes()
+
+    Returns:
+        List of RecognizedBox objects
+    """
+    from stages.preprocess.image_processor import preprocess_image
+
+    results = preprocess_image(image_path)
+    all_boxes: List[RecognizedBox] = []
+
+    for i, res in enumerate(results):
+        boxes = recognize_boxes(res.preprocessed, page_idx=i, **kwargs)
+        all_boxes.extend(boxes)
+
+    return all_boxes
+
+
+def parse_receipt_combined(
+    image_path: str,
+    header_ocr: str = "google",  # "google" or "tesseract"
+    tesseract_executable: str = None,
+    confusion_map: str = None,
+    mindee_api_key: str = None,
+    google_credentials_path: str = None,
+) -> "ParsedReceipt":
+    """Parse receipt using both OCR for header + Mindee for items.
+
+    Runs full receipt through Tesseract or Google Vision for vendor + date,
+    then through Mindee for items and totals.
+    Combines results into a single ParsedReceipt.
+
+    Args:
+        image_path: Path to receipt image
+        header_ocr: "google" for Cloud Vision, "tesseract" for local Tesseract
+        tesseract_executable: Optional path to tesseract (if using tesseract)
+        confusion_map: Optional confusion map path
+        mindee_api_key: Optional Mindee API key
+        google_credentials_path: Path to Google credentials JSON
+
+    Returns:
+        ParsedReceipt with vendor/date from OCR, items from Mindee
+    """
+    from stages.parsing.shared import ParsedReceipt, ParsedStringField, ParsedAmountField, LineItem
+    from stages.grouping.line_assembler import RawLine
+
+    # --- Step 1: Header OCR for vendor + date ---
+    if header_ocr == "google":
+        from stages.recognition.google_cloud_ocr import extract_header_with_google_vision
+        header = extract_header_with_google_vision(
+            image_path,
+            credentials_path=google_credentials_path,
+        )
+    else:
+        # Fallback to Tesseract
+        header = extract_header_fields(
+            image_path,
+            tesseract_executable=tesseract_executable,
+            confusion_map=confusion_map,
+        )
+    vendor = header['vendor']
+    date = header['date']
+
+    # --- Step 2: Mindee for items ---
+    from stages.recognition.mindee_ocr import MindeeOCR
+    ocr = MindeeOCR(api_key=mindee_api_key)
+    mindee_items = ocr.extract_items(image_path)
+    total_amount = ocr.get_total(image_path)
+
+    # Convert Mindee items to LineItem format
+    items = [
+        LineItem(
+            description=item.description,
+            quantity=item.quantity,
+            unit_price=item.unit_price,
+            line_total=item.total,
+            confidence=0.8,  # Mindee doesn't provide per-item confidence
+            line_index=i,
+        )
+        for i, item in enumerate(mindee_items)
+    ]
+
+    # --- Step 3: Build ParsedReceipt ---
+    # Currency detection
+    currency = ParsedStringField(value="ILS", confidence=0.9, line_index=0)
+
+    # Total from Mindee
+    total_field = ParsedAmountField(
+        value=total_amount,
+        raw_text=str(total_amount),
+        confidence=0.9,
+        line_index=0,
+    )
+
+    # Subtotal (Mindee doesn't always provide, estimate from items sum)
+    items_sum = sum(item.line_total for item in items)
+    subtotal_field = ParsedAmountField(
+        value=items_sum if items_sum else None,
+        raw_text=str(items_sum) if items_sum else None,
+        confidence=0.7 if items_sum else 0.0,
+        line_index=0,
+    )
+
+    # VAT (calculate if we have total)
+    vat_field = ParsedAmountField(value=None, raw_text=None, confidence=None, line_index=None)
+    if total_amount and items_sum and total_amount > items_sum:
+        vat_field = ParsedAmountField(
+            value=total_amount - items_sum,
+            raw_text=str(total_amount - items_sum),
+            confidence=0.8,
+            line_index=0,
+        )
+
+    # Empty raw_lines since we don't have tesseract boxes here
+    # (we only ran tesseract for header extraction)
+    raw_lines: List[RawLine] = []
+
+    parsed = ParsedReceipt(
+        merchant=vendor,
+        date=date,
+        subtotal=subtotal_field,
+        vat=vat_field,
+        total=total_field,
+        currency=currency,
+        items=items,
+        raw_lines=raw_lines,
+        invoice_no=None,
+    )
+
+    return parsed

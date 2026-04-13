@@ -30,13 +30,15 @@ import json
 from typing import List, Dict, Any
 
 
-def mindee_to_abbey(items: List[Dict], receipt_name: str = "Receipt") -> Dict:
+def mindee_to_abbey(items: List[Dict], receipt_name: str = "Receipt", vendor: str = "", date: str = "") -> Dict:
     """
     Convert Mindee items to ABBYY GDocument format.
 
     Args:
         items: List of items from Mindee [{"description": ..., "quantity": ..., "unit_price": ..., "line_total": ...}]
         receipt_name: Name for the receipt
+        vendor: Vendor name (optional)
+        date: Date string (optional)
 
     Returns:
         ABBYY format dict
@@ -102,7 +104,10 @@ def mindee_to_abbey(items: List[Dict], receipt_name: str = "Receipt") -> Dict:
 
         field_id += 6
 
-    # Build full GDocument
+    # Calculate total from items
+    total = sum(float(item.get('line_total', 0)) for item in items)
+
+    # Build full GDocument with top-level fields for PHP compatibility
     gdoc = {
         "GDocument": {
             "id": "1",
@@ -127,7 +132,18 @@ def mindee_to_abbey(items: List[Dict], receipt_name: str = "Receipt") -> Dict:
                     "fields": []
                 }
             ],
-            "fields": {},
+            # Top-level fields for PHP compatibility
+            # Format: [InvoiceNo, ?, VendorName, ?, Date, ?, Total, ?]
+            "fields": [
+                {"name": "InvoiceNo", "value": ""},
+                {"name": "Field1", "value": ""},
+                {"name": "VendorName", "value": vendor},
+                {"name": "Field3", "value": ""},
+                {"name": "Date", "value": date},
+                {"name": "Field5", "value": ""},
+                {"name": "Total", "value": str(total)},
+                {"name": "Field7", "value": ""},
+            ],
             "errors": ""
         }
     }
