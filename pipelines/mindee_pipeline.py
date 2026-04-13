@@ -27,15 +27,15 @@ import os
 API_KEY = os.environ.get("MINDEE_API_KEY", "")
 MODEL_ID = os.environ.get("MINDEE_MODEL_ID", "2794301c-25bd-402a-bebe-5295a67416e6")
 
-# Sample images directory for training data
-SAMPLES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "sample_images")
+# Output directory for processed receipts
+OUTPUT_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "output")
 
 
 def process_receipt(
     image_path: str,
     api_key: str = None,
     model_id: str = None,
-    save_to_samples: bool = True,
+    save_to_output: bool = True,
 ) -> dict:
     """
     Process receipt using Mindee API.
@@ -44,6 +44,7 @@ def process_receipt(
         image_path: Path to receipt file (PDF, PNG, JPG)
         api_key: Mindee API key (uses default if not provided)
         model_id: Mindee model ID (uses default if not provided)
+        save_to_output: Save result to output/ folder (default True)
 
     Returns:
         GDocument dict with items
@@ -80,67 +81,46 @@ def process_receipt(
                 total=total,
             ))
 
-    # Build GDocument format
-    gdoc = {
-        "GDocument": {
-            "fields": {
-                "items": [
-                    {
-                        "description": item.description,
-                        "quantity": item.quantity,
-                        "unit_price": item.unit_price,
-                        "line_total": item.total,
-                    }
-                    for item in extracted_items
-                ]
-            }
+    # Convert raw items to dicts for post-processing
+    raw_items = [
+        {
+            "description": item.description,
+            "quantity": item.quantity,
+            "unit_price": item.unit_price,
+            "line_total": item.total,
         }
-    }
+        for item in extracted_items
+    ]
 
-    # Save JSON to samples folder if enabled and file is new
-    if save_to_samples and os.path.exists(SAMPLES_DIR):
-        _save_to_samples(image_path, gdoc, extracted_items)
+    # Post-process to fix quantity=weight and add discounts
+    from utils.post_processor import process_items
+    fixed_items = process_items(raw_items)
+
+    # Convert to ABBYY format
+    from utils.format_converter import mindee_to_abbey
+
+    receipt_name = os.path.splitext(os.path.basename(image_path))[0]
+    receipt_name = receipt_name.replace('_page-', '_')
+
+    gdoc = mindee_to_abbey(fixed_items, receipt_name)
+
+    # Save to output folder if enabled
+    if save_to_output:
+        _save_to_output(gdoc, receipt_name)
 
     return gdoc
 
 
-def _save_to_samples(image_path: str, gdoc: dict, items: List[MindeeItem]):
-    """Save output to sample_images folder if it's a new receipt."""
+def _save_to_output(gdoc: dict, receipt_name: str):
+    """Save output to output/ folder."""
     import json
-    import shutil
-    import re
 
-    # Get base name without extension
-    basename = os.path.splitext(os.path.basename(image_path))[0]
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    # Strip page suffixes like _page-0001 to get the original name
-    base_name_clean = re.sub(r'_page-\d+$', '', basename)
-
-    # Check existing files in samples (use clean name for comparison)
-    existing_files = os.listdir(SAMPLES_DIR)
-    existing_bases = {re.sub(r'_page-\d+$', '', os.path.splitext(f)[0]) for f in existing_files if f.endswith('.JSON')}
-
-    # If this receipt is new, save it
-    if base_name_clean not in existing_bases and items:
-        # Save JSON with clean name
-        json_filename = base_name_clean + ".JSON"
-        json_path = os.path.join(SAMPLES_DIR, json_filename)
-
-        with open(json_path, 'w', encoding='utf-8') as f:
-            json.dump(gdoc, f, indent=2, ensure_ascii=False)
-
-        # Copy original file with clean name if it exists
-        ext = os.path.splitext(os.path.basename(image_path))[1]
-        clean_image_name = base_name_clean + ext
-        dst_path = os.path.join(SAMPLES_DIR, clean_image_name)
-
-        if not os.path.exists(dst_path):
-            src_path = os.path.join(SAMPLES_DIR, os.path.basename(image_path))
-            if os.path.exists(src_path):
-                shutil.copy2(src_path, dst_path)
-            elif os.path.exists(image_path):
-                # Copy from source with clean name
-                shutil.copy2(image_path, dst_path)
+    # Save JSON
+    json_path = os.path.join(OUTPUT_DIR, f"{receipt_name}.JSON")
+    with open(json_path, 'w', encoding='utf-8') as f:
+        json.dump(gdoc, f, indent=2, ensure_ascii=False)
 
 
 def extract_items(image_path: str) -> List[MindeeItem]:
