@@ -65,4 +65,4 @@ Receipt OCR/
 Required in `.env` file:
 - `MINDEE_API_KEY` - Mindee API key
 - `MINDEE_MODEL_ID` - Mindee model ID
-- `GOOGLE_APPLICATION_CREDENTIALS` - Path to Google Cloud Vision credentials JSON
+- `GOOGLE_APPLICATION_CREDENTIALS` - Path to Google Cloud Vision credentials JSON (download from Google Cloud Console)

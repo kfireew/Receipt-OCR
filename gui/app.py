@@ -282,7 +282,7 @@ class ReceiptOCRApp:
                 import traceback
                 self.root.after(0, lambda: self._log(f"Error: {e}"))
                 self.root.after(0, lambda: self._log(traceback.format_exc()))
-                self.root.after(0, self._set_busy)
+                self.root.after(0, lambda: self._set_busy(False))
                 self.root.after(0, lambda: self.lbl_status.config(text="Error \u274c"))
 
         threading.Thread(target=run, daemon=True).start()
