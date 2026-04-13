@@ -31,8 +31,8 @@ from dataclasses import dataclass
 from typing import List, Optional
 import os
 
-# Default API keys (should be in environment or config)
-DEFAULT_MINDEE_KEY = os.environ.get('MINDEE_API_KEY', 'md_QWugkCswh_7PVgoRm-PcGv-K6J2J-wCDi8JNLwr9avg')
+# Default API keys (should be in environment)
+DEFAULT_MINDEE_KEY = os.environ.get('MINDEE_API_KEY', '')
 DEFAULT_AZURE_KEY = os.environ.get('AZURE_DOCUMENT_KEY', '')
 DEFAULT_AZURE_ENDPOINT = os.environ.get('AZURE_DOCUMENT_ENDPOINT', '')
 DEFAULT_GOOGLE_KEY = os.environ.get('GOOGLE_VISION_KEY', '')

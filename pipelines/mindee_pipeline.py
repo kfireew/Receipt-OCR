@@ -21,9 +21,11 @@ class MindeeItem:
     total: float
 
 
-# API Configuration
-API_KEY = "md_1o31rOriCtDKdFNUEh4aWLIj57Ns7D8Kz9hp33rj1m0"
-MODEL_ID = "2794301c-25bd-402a-bebe-5295a67416e6"
+# API Configuration - Set via environment variables
+import os
+
+API_KEY = os.environ.get("MINDEE_API_KEY", "")
+MODEL_ID = os.environ.get("MINDEE_MODEL_ID", "2794301c-25bd-402a-bebe-5295a67416e6")
 
 # Sample images directory for training data
 SAMPLES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "sample_images")

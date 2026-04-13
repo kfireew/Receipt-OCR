@@ -26,8 +26,8 @@ class MindeeItem:
 class MindeeOCR:
     """Mindee API client for receipt extraction."""
 
-    API_KEY = "md_1o31rOriCtDKdFNUEh4aWLIj57Ns7D8Kz9hp33rj1m0"
-    MODEL_ID = "2794301c-25bd-402a-bebe-5295a67416e6"
+    API_KEY = os.environ.get("MINDEE_API_KEY", "")
+    MODEL_ID = os.environ.get("MINDEE_MODEL_ID", "2794301c-25bd-402a-bebe-5295a67416e6")
 
     def __init__(self, api_key: str = None, model_id: str = None):
         """
