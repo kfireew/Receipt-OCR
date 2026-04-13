@@ -338,8 +338,9 @@ class ReceiptOCRApp:
         output = Path(folder_path) / receipt_name
         output.mkdir(parents=True, exist_ok=True)
 
-        # Copy original file
-        dst_file = output / Path(self.last_input_path).name
+        # Rename PDF to Vendor_Date format
+        ext = Path(self.last_input_path).suffix
+        dst_file = output / f"{full_name}{ext}"
         shutil.copy2(self.last_input_path, dst_file)
 
         # Save JSON: Vendor_Date_Vendor Date.JSON
