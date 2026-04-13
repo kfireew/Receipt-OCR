@@ -17,7 +17,7 @@ cd "C:\Users\Kfir Ezer\Desktop\Receipt OCR" && python -m gui.app
 ## Run CLI (Google Vision + Mindee)
 
 ```cmd
-cd "C:\Users\Kfir Ezer\Desktop\Receipt OCR" && python -c "from stages.parsing import parse_receipt_combined; import json; r=parse_receipt_combined(r'path\to\receipt.pdf', header_ocr='google'); print(json.dumps(r.to_dict(), ensure_ascii=False, indent=2))"
+cd "C:\Users\Kfir Ezer\Desktop\Receipt OCR" && python -c "from stages.parsing import parse_receipt_combined; import json; r=parse_receipt_combined('receipt.pdf'); print(json.dumps(r.to_dict(), ensure_ascii=False, indent=2))"
 ```
 
 ## OCR Architecture

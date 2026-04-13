@@ -235,10 +235,10 @@ class ReceiptOCRApp:
                     # Use combined pipeline (Google Vision for header + Mindee for items)
                     from stages.parsing import parse_receipt_combined
                     result = parse_receipt_combined(file_path, header_ocr='google')
-                    self.last_result = result.to_dict()
+                    self.last_result = result.to_gdocument_dict()
                     self.last_input_path = file_path
 
-                    self.root.after(0, lambda: self._log(json.dumps(result.to_dict(), indent=2, ensure_ascii=False)))
+                    self.root.after(0, lambda: self._log(json.dumps(result.to_gdocument_dict(), indent=2, ensure_ascii=False)))
                     self.root.after(0, lambda: self._set_busy(False))
                     self.root.after(0, lambda: self.lbl_status.config(text="Done \u2705"))
                     return
@@ -292,9 +292,42 @@ class ReceiptOCRApp:
             messagebox.showwarning("No result", "Process a receipt first.")
             return
 
-        # Default folder name from source file name
-        src_name = Path(self.last_input_path or "receipt").stem
-        initial_name = src_name.replace(" ", "_")
+        # Get vendor and date from GDocument result
+        vendor = None
+        date = None
+        for f in self.last_result.get("GDocument", {}).get("fields", []):
+            if f.get("name") == "VendorNameS":
+                vendor = f.get("value", "")
+            elif f.get("name") == "Date":
+                date = f.get("value", "")
+
+        if not vendor:
+            vendor = "Unknown"
+        if not date:
+            date = "Unknown"
+
+        # Generate filename: Vendor_Date (e.g., "StraussCool_18.08.2024")
+        # Format date as DD.MM.YYYY
+        if vendor and date and date != "Unknown":
+            # Convert date from DD-MM-YY to DD.MM.YYYY if needed
+            date_clean = date.replace("-", ".")
+            if len(date_clean.split('.')) == 3 and len(date_clean.split('.')[-1]) == 2:
+                # Already has 2-digit year
+                pass
+            receipt_name = f"{vendor}_{date_clean}"
+        else:
+            receipt_name = f"{vendor}_{date}" if vendor else "Unknown"
+
+        # Also create full filename for JSON: Vendor_Date_Vendor Date (e.g., "StraussCool_18.08.2024_StraussCool 18-08-24")
+        if vendor and date and date != "Unknown":
+            parts = date.split('.')
+            if len(parts) == 3:
+                date_dash = f"{parts[0]}-{parts[1]}-{parts[2][-2:]}"
+            else:
+                date_dash = date.replace('.', '-')
+            full_name = f"{vendor}_{date}_{vendor} {date_dash}"
+        else:
+            full_name = receipt_name
 
         folder_path = filedialog.askdirectory(
             title="Choose where to save the folder",
@@ -302,21 +335,25 @@ class ReceiptOCRApp:
         if not folder_path:
             return
 
-        output = Path(folder_path) / initial_name
+        output = Path(folder_path) / receipt_name
         output.mkdir(parents=True, exist_ok=True)
 
         # Copy original file
         dst_file = output / Path(self.last_input_path).name
         shutil.copy2(self.last_input_path, dst_file)
 
-        # Save JSON with uppercase .JSON extension
-        json_path = output / (output.name + ".JSON")
+        # Save JSON: Vendor_Date_Vendor Date.JSON
+        json_path = output / f"{full_name}.JSON"
         json_path.write_text(
             json.dumps(self.last_result, indent=2, ensure_ascii=False),
             encoding="utf-8",
         )
 
-        messagebox.showinfo("Saved", f"Folder created:\n{output}")
+        # Also copy to clipboard in GDocument format
+        self.root.clipboard_clear()
+        self.root.clipboard_append(json.dumps(self.last_result, ensure_ascii=False))
+
+        messagebox.showinfo("Saved", f"Folder created:\n{output}\n\nJSON copied to clipboard!")
         self._log(f"\nSaved to folder: {output}")
 
 
