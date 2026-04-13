@@ -340,6 +340,9 @@ def parse_receipt_combined(
     mindee_api_key: str = None,
     google_credentials_path: str = None,
 ) -> "ParsedReceipt":
+    # Load environment variables for API keys
+    from dotenv import load_dotenv
+    load_dotenv()
     """Parse receipt using both OCR for header + Mindee for items.
 
     Runs full receipt through Tesseract or Google Vision for vendor + date,

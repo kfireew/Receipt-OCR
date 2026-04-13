@@ -1,11 +1,17 @@
 import json
 import os
+import sys
 import shutil
 import threading
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, font as tkfont
 from tkinter import ttk
+
+# Add project root to path for imports
+PROJECT_ROOT = Path(__file__).parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 # Load environment variables from .env
 from dotenv import load_dotenv
@@ -226,14 +232,16 @@ class ReceiptOCRApp:
                 ocr_method = self.ocr_method.get()
 
                 if ocr_method == "mindee":
-                    # Use Mindee pipeline
-                    from pipelines.mindee_pipeline import process_receipt
-                    result = process_receipt(file_path)
-                    self.last_result = result
+                    # Use combined pipeline (Google Vision for header + Mindee for items)
+                    from stages.parsing import parse_receipt_combined
+                    result = parse_receipt_combined(file_path, header_ocr='google')
+                    self.last_result = result.to_dict()
                     self.last_input_path = file_path
 
-                    items = result.get("GDocument", {}).get("fields", {}).get("items", [])
-                    self.root.after(0, lambda: self._log(f"Mindee extracted {len(items)} items"))
+                    self.root.after(0, lambda: self._log(json.dumps(result.to_dict(), indent=2, ensure_ascii=False)))
+                    self.root.after(0, lambda: self._set_busy(False))
+                    self.root.after(0, lambda: self.lbl_status.config(text="Done \u2705"))
+                    return
                     self.root.after(0, lambda: self._log(json.dumps(result, indent=2, ensure_ascii=False)))
                     self.root.after(0, lambda: self._set_busy(False))
                     self.root.after(0, lambda: self.lbl_status.config(text="Done \u2705"))
