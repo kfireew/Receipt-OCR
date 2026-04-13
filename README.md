@@ -10,31 +10,25 @@ pip install -r requirements.txt
 
 ## Run GUI
 
-```bash
+```cmd
 python -m gui.app
 ```
 
 Or from cmd directly:
 ```cmd
-python "C:\Users\Kfir Ezer\Desktop\Receipt OCR\gui\app.py" "receipt.pdf"
+python "C:\Users\Kfir Ezer\Desktop\Receipt OCR\gui\app.py"
 ```
 
-## Run CLI (Combined Google Vision + Mindee)
+## Run CLI (Google Vision + Mindee)
 
 ```cmd
 python -c "from stages.parsing import parse_receipt_combined; import json; r=parse_receipt_combined('receipt.pdf', header_ocr='google'); print(json.dumps(r.to_dict(), ensure_ascii=False, indent=2))"
 ```
 
-Or with Tesseract for header (free, local):
-```cmd
-python -c "from stages.parsing import parse_receipt_combined; r=parse_receipt_combined('receipt.pdf', header_ocr='tesseract', tesseract_executable='C:/Program Files/Tesseract-OCR/tesseract.exe'); print(r.merchant.value, r.date.value)"
-```
-
 ## OCR Architecture
 
-- **Header (vendor + date)**: Google Cloud Vision API (or Tesseract)
+- **Header (vendor + date)**: Google Cloud Vision API
 - **Items + total**: Mindee API
-- Combined for best accuracy
 
 ## Project Structure
 
