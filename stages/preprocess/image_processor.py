@@ -38,6 +38,7 @@ def _denoise_and_binarize(
 ) -> np.ndarray:
     """Apply light denoising and adaptive thresholding."""
     gray = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2GRAY)
+
     # Light denoising
     denoised = cv2.GaussianBlur(gray, (3, 3), 0)
 

@@ -70,6 +70,53 @@ def _ocr_single_box(
     confidence = float(combine_confidences(confs)["mean"]) if confs else 0.0
     return text, confidence
 
+def ocr_number_crop(
+    image: np.ndarray,
+    box: Sequence[float],
+    tesseract_executable: Optional[str] = None,
+) -> Tuple[str, float]:
+    """Perform a targeted OCR pass on a specific bounding box for numbers."""
+    _configure_tesseract(tesseract_executable)
+    crop = _crop_box(image, box)
+    if crop.size == 0:
+        return "", 0.0
+        
+    if crop.ndim == 3:
+        gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+    else:
+        gray = crop
+
+    # Enlarge the crop slightly and optionally binarize
+    height = gray.shape[0]
+    if height < 30:
+        scale = 30.0 / height
+        gray = cv2.resize(gray, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
+
+    # Use eng language and whitelist for numbers and commas/dots
+    config = "-l eng --psm 7 -c tessedit_char_whitelist=0123456789.,₪-"
+    data = pytesseract.image_to_data(gray, config=config, output_type=pytesseract.Output.DICT)
+
+    texts: List[str] = []
+    confs: List[float] = []
+    for txt, conf in zip(data.get("text", []), data.get("conf", [])):
+        if not txt or txt.isspace():
+            continue
+        try:
+            conf_f = float(conf)
+        except Exception:
+            conf_f = -1.0
+        # clean up any dangling punctuation
+        txt = txt.strip(".,-")
+        if not txt:
+            continue
+        texts.append(txt)
+        if conf_f >= 0:
+            confs.append(conf_f / 100.0)
+
+    text = " ".join(texts) if texts else ""
+    confidence = float(combine_confidences(confs)["mean"]) if confs else 0.0
+    return text, confidence
+
 def _ocr_full_page(
     image: np.ndarray,
     page_num: int = 0,

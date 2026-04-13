@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from typing import Optional
-from stages.parsing.models import ParsedReceipt
+from stages.parsing.shared.models import ParsedReceipt
 
 logger = logging.getLogger(__name__)
 

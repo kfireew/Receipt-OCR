@@ -1,20 +1,38 @@
-# Debug and temporary files
-debug/
-*.log
-*.pred.json
-*.pred.OLD.json
-debug_*
-raw_lines_dump.txt
-_dump_lines.py
-
-# Python related
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
+*.egg-info/
+dist/
+build/
 
 # IDEs
 .vscode/
 .idea/
+*.swp
+*.swo
 
-# Dependencies
-vendor/
+# Environment
+.env
+.venv
+env/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Claude memory and session files
+memory/
+*.md
+
+# Test outputs
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Output folders
+output/
+results/

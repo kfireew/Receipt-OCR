@@ -1,13 +1,15 @@
 import json
+import os
+import shutil
 import threading
 from pathlib import Path
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, font as tkfont
 from tkinter import ttk
 
 try:
     from tkinterdnd2 import TkinterDnD, DND_FILES
-    HAS_DND = True
+    HAS_DND = False  # Disabled for stability
 except ImportError:
     HAS_DND = False
 
@@ -19,154 +21,298 @@ from stages.recognition.tesseract_client import recognize_boxes
 from utils.io_utils import get_nested, load_config
 from utils.text_normalization import load_confusion_map
 
+
 class ReceiptOCRApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Receipt OCR & Evaluator")
-        self.root.geometry("800x700")
+        self.root.title("Receipt OCR")
+        self.root.geometry("900x750")
+        self.root.minsize(700, 500)
+
+        # Configure style/theme
+        self._setup_theme()
 
         try:
             self.cfg = load_config()
-        except:
+        except Exception:
             self.cfg = {}
-            
-        self.last_result = None
-        self.is_processing = False
-        self.animation_frames = [
-            "  [ Kfir .     ]  ", "  [ . Kfir .   ]  ", "  [ . . Kfir . ]  ",
-            "  [ . . . Kfir ]  ", "  [ . . . . Kfir] ", "  [ . . . . . Kfir]",
-            "  [ . . . . . Kfir ]", "  [ . . . . Kfir . ]", "  [ . . . Kfir . . ]",
-            "  [ . . Kfir . . . ]", "  [ . Kfir . . . . ]", "  [ Kfir . . . . . ]"
-        ]
-        self.current_frame = 0
-        self.build_ui()
 
-    def build_ui(self):
-        top_frame = ttk.Frame(self.root, padding=10); top_frame.pack(fill=tk.X)
-        self.btn_browse = ttk.Button(top_frame, text="Browse Image/PDF", command=self.do_browse); self.btn_browse.pack(side=tk.LEFT, padx=5)
-        self.btn_test = ttk.Button(top_frame, text="Run Test Evaluation", command=self.do_test); self.btn_test.pack(side=tk.LEFT, padx=5)
-        self.btn_save = ttk.Button(top_frame, text="Download JSON", command=self.do_save_json, state=tk.DISABLED); self.btn_save.pack(side=tk.LEFT, padx=5)
-        self.lbl_status = ttk.Label(top_frame, text="", font=("Consolas", 10, "bold")); self.lbl_status.pack(side=tk.LEFT, padx=10)
-        
-        self.text_out = tk.Text(self.root, wrap=tk.WORD, bg="#f4f4f4", font=("Consolas", 10)); self.text_out.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-        
-        footer_frame = ttk.Frame(self.root, padding=2); footer_frame.pack(fill=tk.X, side=tk.BOTTOM)
-        ttk.Label(footer_frame, text="All rights belong to Kfir Ezer", font=("Arial", 8)).pack(side=tk.RIGHT, padx=10)
+        self.last_result = None
+        self.last_input_path = None
+        self.is_processing = False
+        self.spin_var = tk.IntVar(value=0)
+        self.spin_frames = ["\u280b", "\u2819", "\u2839", "\u283d", "\u2836", "\u2826", "\u282b", "\u2827", "\u281f"]
+
+        self._build_ui()
+
+    # -- theme ----------------------------------------------------------
+
+    def _setup_theme(self):
+        self._CLR_BG = "#f0f0f0"
+        self._CLR_SURFACE = "#ffffff"
+        self._CLR_ACCENT = "#2563eb"
+        self._CLR_TEXT = "#1f2937"
+        self._CLR_SUBTEXT = "#6b7280"
+        self._CLR_BORDER = "#e5e7eb"
+
+        style = ttk.Style()
+        style.theme_use("clam")
+
+        style.configure(".", font=("Segoe UI", 10))
+        style.configure("TFrame", background=self._CLR_BG)
+        style.configure("TLabel", background=self._CLR_BG, foreground=self._CLR_TEXT)
+        style.configure("Primary.TButton", font=("Segoe UI", 10, "bold"))
+        style.configure("Secondary.TButton")
+        style.configure("Status.TLabel", foreground=self._CLR_SUBTEXT, font=("Segoe UI", 9))
+
+        style.configure(
+            "Vertical.TScrollbar",
+            background=self._CLR_BG,
+            lightcolor=self._CLR_BORDER,
+            troughcolor=self._CLR_BG,
+            bordercolor=self._CLR_BG,
+            arrowcolor=self._CLR_TEXT,
+            width=16,
+        )
+        style.map(
+            "Vertical.TScrollbar",
+            background=[("active", self._CLR_ACCENT)],
+        )
+
+        self.root.configure(bg=self._CLR_BG)
+
+    # -- layout ---------------------------------------------------------
+
+    def _build_ui(self):
+        # Header
+        hdr = ttk.Frame(self.root, padding=(24, 20, 24, 10))
+        hdr.pack(fill=tk.X)
+        tk.Label(
+            hdr, text="Receipt OCR", font=("Segoe UI", 22, "bold"),
+            fg=self._CLR_ACCENT, bg=self._CLR_BG,
+        ).pack(anchor=tk.W)
+        tk.Label(
+            hdr, text="Upload an image or PDF — results can be saved as a folder",
+            fg=self._CLR_SUBTEXT, font=("Segoe UI", 10), bg=self._CLR_BG,
+        ).pack(anchor=tk.W, pady=(0, 4))
+
+        # Action bar
+        bar = ttk.Frame(self.root, padding=(24, 4))
+        bar.pack(fill=tk.X)
+
+        # OCR method selector
+        self.ocr_method = tk.StringVar(value="mindee")
+        ttk.Label(bar, text="OCR:").pack(side=tk.LEFT, padx=(0, 5))
+        self.cb_ocr = ttk.Combobox(bar, textvariable=self.ocr_method, values=["mindee", "tesseract", "google"], state="readonly", width=10)
+        self.cb_ocr.pack(side=tk.LEFT, padx=(0, 15))
+        self.cb_ocr.bind("<<ComboboxSelected>>", lambda e: self._log(f"OCR: {self.ocr_method.get()}"))
+
+        self.btn_browse = ttk.Button(
+            bar, text="\U0001f4c2 Browse", style="Primary.TButton",
+            command=self.do_browse,
+        )
+        self.btn_browse.pack(side=tk.LEFT, padx=(0, 10))
+
+        self.btn_save_folder = ttk.Button(
+            bar, text="\U0001f4be Save as Folder", style="Secondary.TButton",
+            command=self.do_save_folder, state=tk.DISABLED,
+        )
+        self.btn_save_folder.pack(side=tk.LEFT, padx=(0, 10))
+
+        self.lbl_status = ttk.Label(
+            bar, text="Ready", style="Status.TLabel"
+        )
+        self.lbl_status.pack(side=tk.LEFT, fill=tk.X, expand=True)
+
+        # Drop zone
+        self.drop_zone = tk.Frame(
+            self.root, bg=self._CLR_SURFACE, relief=tk.GROOVE, bd=2,
+        )
+        self.drop_zone.pack(fill=tk.BOTH, expand=True, padx=24, pady=8)
+        tk.Label(
+            self.drop_zone,
+            text="Drag & drop image / PDF here\nor click Browse above",
+            fg=self._CLR_SUBTEXT, font=("Segoe UI", 12), bg=self._CLR_SURFACE,
+            justify=tk.CENTER,
+        ).place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
         if HAS_DND:
-            self.text_out.drop_target_register(DND_FILES)
-            self.text_out.dnd_bind('<<Drop>>', self.on_drop)
+            self.drop_zone.drop_target_register(DND_FILES)
+            self.drop_zone.dnd_bind("<<Drop>>", self._on_drop)
 
-    def update_animation(self):
+        # Result panel
+        self.result_pane = tk.Frame(self.root, bg=self._CLR_BG)
+        self.result_pane.pack(fill=tk.BOTH, expand=True, padx=24, pady=(0, 12))
+
+        self.text_out = tk.Text(
+            self.result_pane, wrap=tk.WORD, bg=self._CLR_SURFACE,
+            fg=self._CLR_TEXT, font=("Consolas", 10),
+            insertbackground=self._CLR_TEXT,
+            selectbackground=self._CLR_ACCENT,
+            relief=tk.FLAT, padx=14, pady=10,
+        )
+        self.text_out.pack(fill=tk.BOTH, expand=True)
+
+        # Scrollbar
+        sb = ttk.Scrollbar(self.result_pane, orient=tk.VERTICAL,
+                           command=self.text_out.yview)
+        sb.pack(side=tk.RIGHT, fill=tk.Y)
+        self.text_out.config(yscrollcommand=sb.set)
+
+        # Footer
+        tk.Label(
+            self.root,
+            text="All rights belong to Kfir Ezer",
+            fg=self._CLR_SUBTEXT,
+            font=("Segoe UI", 8),
+            bg=self._CLR_BG,
+        ).pack(pady=(0, 4))
+
+    # -- state helpers --------------------------------------------------
+
+    def _set_busy(self, busy: bool):
+        self.is_processing = busy
+        self.btn_browse.config(state=tk.DISABLED if busy else tk.NORMAL)
+        self.btn_save_folder.config(
+            state=tk.DISABLED if busy else (tk.NORMAL if self.last_result else tk.DISABLED),
+        )
+
+    def _log(self, message: str):
+        self.text_out.config(state=tk.NORMAL)
+        self.text_out.insert(tk.END, message + "\n")
+        self.text_out.see(tk.END)
+        self.text_out.config(state=tk.NORMAL)
+
+    def _clear_log(self):
+        self.text_out.config(state=tk.NORMAL)
+        self.text_out.delete(1.0, tk.END)
+
+    def _spin_animation(self):
         if self.is_processing:
-            self.lbl_status.config(text=self.animation_frames[self.current_frame])
-            self.current_frame = (self.current_frame + 1) % len(self.animation_frames)
-            self.root.after(100, self.update_animation)
-        else: self.lbl_status.config(text="")
+            idx = self.spin_var.get()
+            self.lbl_status.config(text=self.spin_frames[idx])
+            self.spin_var.set((idx + 1) % len(self.spin_frames))
+            self.root.after(120, self._spin_animation)
+        else:
+            self.lbl_status.config(text="Ready")
 
-    def start_processing(self):
-        self.is_processing = True
-        self.btn_browse.config(state=tk.DISABLED)
-        self.btn_test.config(state=tk.DISABLED)
-        self.btn_save.config(state=tk.DISABLED)
-        self.update_animation()
+    # -- callbacks ------------------------------------------------------
 
-    def stop_processing(self, has_result=False):
-        self.is_processing = False
-        self.btn_browse.config(state=tk.NORMAL)
-        self.btn_test.config(state=tk.NORMAL)
-        if has_result: self.btn_save.config(state=tk.NORMAL)
-
-    def log(self, message): self.text_out.insert(tk.END, message + "\n"); self.text_out.see(tk.END)
-    def clear_log(self): self.text_out.delete(1.0, tk.END)
-
-    def on_drop(self, event):
+    def _on_drop(self, event):
         files = self.root.tk.splitlist(event.data)
-        if files: self.process_file(files[0])
+        if files:
+            self._process_file(files[0])
 
     def do_browse(self):
-        file_path = filedialog.askopenfilename(filetypes=[("Image/PDF files", "*.pdf *.png *.jpg *.jpeg"), ("All files", "*.*")])
-        if file_path: self.process_file(file_path)
-
-    def do_save_json(self):
-        if not self.last_result: return
-        file_path = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("JSON files", "*.json")], initialfile="result.json")
+        file_path = filedialog.askopenfilename(
+            filetypes=[("Image/PDF files", "*.pdf *.png *.jpg *.jpeg"), ("All files", "*.*")],
+        )
         if file_path:
-            with open(file_path, "w", encoding="utf-8") as f:
-                json.dump(self.last_result, f, indent=2, ensure_ascii=False)
+            self._process_file(file_path)
 
-    def process_file(self, file_path):
-        self.clear_log(); self.log(f"Processing: {file_path}...\n"); self.start_processing()
+    def _process_file(self, file_path: str):
+        self._clear_log()
+        self._set_busy(True)
+        self._spin_animation()
+        self._log(f"Processing: {file_path}")
+        self._log(f"OCR method: {self.ocr_method.get()}")
+
         def run():
             try:
-                pp_cfg = PreprocessConfig(
-                    target_height=int(get_nested(self.cfg, "preprocess.target_height", 2400)),
-                    target_width=int(get_nested(self.cfg, "preprocess.target_width", 1800)),
-                )
-                pres = preprocess_image(file_path, cfg=pp_cfg)
-                tesseract_executable = get_nested(self.cfg, "tesseract.executable_path")
-                
-                # Dynamic path to confusion map
-                conf_map_path = Path(__file__).resolve().parent.parent / "confusion_map.json"
-                confusion_map = load_confusion_map(conf_map_path) if conf_map_path.is_file() else {}
-                
-                all_boxes = []
-                for i, pre in enumerate(pres):
-                    boxes = recognize_boxes(pre.preprocessed, tesseract_executable=tesseract_executable, confusion_map=confusion_map, page_idx=i)
-                    all_boxes.extend(boxes)
-                
-                parsed = parse_receipt(all_boxes)
-                self.last_result = parsed.to_gdocument_dict()
-                self.root.after(0, self.log, json.dumps(self.last_result, indent=2, ensure_ascii=False))
-                self.root.after(0, lambda: self.stop_processing(has_result=True))
+                ocr_method = self.ocr_method.get()
+
+                if ocr_method == "mindee":
+                    # Use Mindee pipeline
+                    from pipelines.mindee_pipeline import process_receipt
+                    result = process_receipt(file_path)
+                    self.last_result = result
+                    self.last_input_path = file_path
+
+                    items = result.get("GDocument", {}).get("fields", {}).get("items", [])
+                    self.root.after(0, lambda: self._log(f"Mindee extracted {len(items)} items"))
+                    self.root.after(0, lambda: self._log(json.dumps(result, indent=2, ensure_ascii=False)))
+                    self.root.after(0, lambda: self._set_busy(False))
+                    self.root.after(0, lambda: self.lbl_status.config(text="Done \u2705"))
+                    return
+
+                elif ocr_method == "google":
+                    # Use Google Cloud pipeline
+                    from pipelines.google_pipeline import process_receipt
+                    credentials_path = get_nested(self.cfg, "google.credentials_path", "")
+                    if not credentials_path:
+                        raise ValueError("Google credentials not configured in config")
+                    result = process_receipt(file_path, credentials_path=credentials_path)
+                    self.last_result = result
+                    self.last_input_path = file_path
+
+                    items = result.get("GDocument", {}).get("fields", {}).get("items", [])
+                    self.root.after(0, lambda: self._log(f"Google extracted {len(items)} items"))
+                    self.root.after(0, lambda: self._log(json.dumps(result, indent=2, ensure_ascii=False)))
+                    self.root.after(0, lambda: self._set_busy(False))
+                    self.root.after(0, lambda: self.lbl_status.config(text="Done \u2705"))
+                    return
+
+                else:
+                    # Use Tesseract pipeline
+                    from pipelines.tesseract_pipeline import process_receipt
+                    result = process_receipt(file_path)
+                    self.last_result = result
+                    self.last_input_path = file_path
+
+                    items = result.get("GDocument", {}).get("fields", {}).get("items", [])
+                    self.root.after(0, lambda: self._log(f"Tesseract extracted {len(items)} items"))
+                    self.root.after(0, lambda: self._log(json.dumps(result, indent=2, ensure_ascii=False)))
+                    self.root.after(0, lambda: self._set_busy(False))
+                    self.root.after(0, lambda: self.lbl_status.config(text="Done \u2705"))
+                    return
+
             except Exception as e:
-                self.root.after(0, self.log, f"Error: {e}")
-                self.root.after(0, self.stop_processing)
+                import traceback
+                self.root.after(0, lambda: self._log(f"Error: {e}"))
+                self.root.after(0, lambda: self._log(traceback.format_exc()))
+                self.root.after(0, self._set_busy)
+                self.root.after(0, lambda: self.lbl_status.config(text="Error \u274c"))
+
         threading.Thread(target=run, daemon=True).start()
 
-    def do_test(self):
-        self.clear_log()
-        self.log("Starting Automated Evaluation (this may take several minutes)...\n")
-        self.start_processing()
-        
-        def run():
-            import sys
-            import io
-            from test_accuracy.cli import main as test_main
-            
-            class StdoutRedirector:
-                def __init__(self, log_func, root):
-                    self.log_func = log_func
-                    self.root = root
-                def write(self, s):
-                    if s:
-                        self.root.after(0, lambda: self.log_func(s))
-                def flush(self):
-                    pass
-            
-            # Helper to log without adding extra newlines (since stdout already has them)
-            def log_raw(text):
-                self.text_out.insert(tk.END, text)
-                self.text_out.see(tk.END)
+    def do_save_folder(self):
+        if not self.last_result:
+            messagebox.showwarning("No result", "Process a receipt first.")
+            return
 
-            old_stdout = sys.stdout
-            sys.stdout = StdoutRedirector(log_raw, self.root)
-            try:
-                # Run with default arguments (sample_images directory)
-                test_main([])
-            except Exception as e:
-                self.root.after(0, lambda: self.log(f"\nEvaluation Error: {e}"))
-            finally:
-                sys.stdout = old_stdout
-                self.root.after(0, lambda: self.stop_processing())
-                self.root.after(0, lambda: self.log("\nEvaluation Complete."))
-                
-        threading.Thread(target=run, daemon=True).start()
+        # Default folder name from source file name
+        src_name = Path(self.last_input_path or "receipt").stem
+        initial_name = src_name.replace(" ", "_")
+
+        folder_path = filedialog.askdirectory(
+            title="Choose where to save the folder",
+        )
+        if not folder_path:
+            return
+
+        output = Path(folder_path) / initial_name
+        output.mkdir(parents=True, exist_ok=True)
+
+        # Copy original file
+        dst_file = output / Path(self.last_input_path).name
+        shutil.copy2(self.last_input_path, dst_file)
+
+        # Save JSON with uppercase .JSON extension
+        json_path = output / (output.name + ".JSON")
+        json_path.write_text(
+            json.dumps(self.last_result, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+
+        messagebox.showinfo("Saved", f"Folder created:\n{output}")
+        self._log(f"\nSaved to folder: {output}")
+
 
 def main():
     root = TkinterDnD.Tk() if HAS_DND else tk.Tk()
     app = ReceiptOCRApp(root)
     root.mainloop()
+
 
 if __name__ == "__main__":
     main()

@@ -14,6 +14,7 @@ class RawLine:
     text_raw: str
     text_normalized: str
     confidence: float
+    boxes: List[RecognizedBox] = None
 
 def _boxes_to_lines(
     boxes: Sequence[RecognizedBox],
@@ -89,6 +90,7 @@ def _boxes_to_lines(
                 text_raw=" ".join(texts_raw) if texts_raw else "",
                 text_normalized=" ".join(texts_norm) if texts_norm else "",
                 confidence=line_conf,
+                boxes=line_boxes_sorted,
             )
         )
     return raw_lines
