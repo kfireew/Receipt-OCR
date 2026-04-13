@@ -22,6 +22,14 @@ cd "C:\Users\Kfir Ezer\Desktop\Receipt OCR" && python -m gui.app
 4. Click Process
 5. Click "Save Folder" to save results
 
+### Adding New Vendors
+
+Click "Add Vendor" in the toolbar to add new merchants to `merchants_mapping.json`:
+- Enter vendor name in English (e.g., "Idan")
+- Keywords are auto-suggested based on transliteration and existing merchant patterns
+- Suggestions filter out duplicates already in the mapping
+- Edit keywords before saving if needed
+
 ### Output Format
 
 When saving, creates a folder named: `Vendor_Date`

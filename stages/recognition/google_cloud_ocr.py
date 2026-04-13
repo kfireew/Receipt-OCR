@@ -120,8 +120,12 @@ if __name__ == "__main__":
 
 # ====== NEW: Google Cloud Vision API for header extraction ======
 
-# Default credentials path - can be set via GOOGLE_APPLICATION_CREDENTIALS env var
 import os
+# Load .env first to get credentials
+from dotenv import load_dotenv
+load_dotenv()
+
+# Default credentials path - can be set via GOOGLE_APPLICATION_CREDENTIALS env var
 DEFAULT_GOOGLE_CREDS = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', '')
 
 
@@ -150,9 +154,9 @@ def extract_header_with_google_vision(
     image_path: str,
     credentials_path: str = None,
 ) -> Dict[str, Any]:
-    """Extract vendor and date from receipt using Google Cloud Vision API.
+    """Extract vendor, date, invoice_no, and total from receipt using Google Cloud Vision API.
 
-    Uses the Vision API to OCR the full receipt and extract vendor + date.
+    Uses the Vision API to OCR the full receipt and extract vendor + date + invoice_no + total.
     Handles both images and PDFs (converts first page to image).
 
     Args:
@@ -160,7 +164,7 @@ def extract_header_with_google_vision(
         credentials_path: Path to Google service account JSON
 
     Returns:
-        Dict with 'vendor' and 'date' ParsedStringField objects
+        Dict with 'vendor', 'date', 'invoice_no', and 'total' ParsedStringField/ParsedAmountField objects
     """
     from stages.parsing.shared import ParsedStringField
 
@@ -192,30 +196,35 @@ def extract_header_with_google_vision(
 
     # Split into lines
     lines = []
-    for line_text in all_text.split('\n'):
+    for idx, line_text in enumerate(all_text.split('\n')):
         if line_text.strip():
             lines.append(_GoogleLine(
                 text=line_text.strip(),
-                confidence=0.9
+                confidence=0.9,
+                index=idx
             ))
 
     # Use existing parsers
     vendor = extract_vendor_from_google_lines(lines)
     date = _parse_date_from_google_lines(lines)
+    invoice_no = _parse_invoice_no_from_google_lines(lines)
+    total = _parse_total_from_google_lines(lines)
 
     return {
         'vendor': vendor,
         'date': date,
+        'invoice_no': invoice_no,
+        'total': total,
     }
 
 
 class _GoogleLine:
     """Simple line object compatible with vendor/date extractors."""
-    def __init__(self, text: str, confidence: float):
+    def __init__(self, text: str, confidence: float, index: int = 0):
         self.text_raw = text
         self.text_normalized = text
         self.confidence = confidence
-        self.index = 0
+        self.index = index
         self.page = 0
         self.bbox = [0, 0, 0, 0]
 
@@ -230,3 +239,15 @@ def _parse_date_from_google_lines(lines: List[_GoogleLine]):
     """Extract date from Google OCR lines."""
     from stages.parsing.dates import _parse_date_from_lines
     return _parse_date_from_lines(lines)
+
+
+def _parse_invoice_no_from_google_lines(lines: List[_GoogleLine]):
+    """Extract invoice number from Google OCR lines."""
+    from stages.parsing.invoices import invoice_extractor
+    return invoice_extractor._parse_invoice_no(lines)
+
+
+def _parse_total_from_google_lines(lines: List[_GoogleLine]):
+    """Extract total amount from Google OCR lines."""
+    from stages.parsing.amounts import _find_amount_field
+    return _find_amount_field(lines, ["סה\"כ", "סהכ", "לתשלום", "סיכום", "ה\"כ", "סח\"כ"])

@@ -13,6 +13,9 @@ from dataclasses import dataclass
 from typing import List
 import os
 
+# Load .env first to get API keys
+from dotenv import load_dotenv
+load_dotenv()
 
 @dataclass
 class MindeeItem:

@@ -23,6 +23,13 @@ try:
 except ImportError:
     HAS_DND = False
 
+# Translation for Hebrew keywords
+try:
+    from deep_translator import GoogleTranslator
+    HAS_TRANSLATOR = True
+except ImportError:
+    HAS_TRANSLATOR = False
+
 # New structure imports
 from stages.preprocess.image_loader import PreprocessConfig
 from stages.preprocess.image_processor import preprocess_image
@@ -129,6 +136,12 @@ class ReceiptOCRApp:
         )
         self.btn_save_folder.pack(side=tk.LEFT, padx=(0, 10))
 
+        self.btn_add_vendor = ttk.Button(
+            bar, text="\U0001f4dd Add Vendor", style="Secondary.TButton",
+            command=self.do_add_vendor,
+        )
+        self.btn_add_vendor.pack(side=tk.LEFT, padx=(0, 10))
+
         self.lbl_status = ttk.Label(
             bar, text="Ready", style="Status.TLabel"
         )
@@ -205,6 +218,12 @@ class ReceiptOCRApp:
             self.root.after(120, self._spin_animation)
         else:
             self.lbl_status.config(text="Ready")
+
+    def _schedule_suggestions(self, entry_widget, callback):
+        """Debounce: cancel previous, schedule new after delay"""
+        if hasattr(self, '_suggestion_job') and self._suggestion_job:
+            self.root.after_cancel(self._suggestion_job)
+        self._suggestion_job = self.root.after(300, lambda: callback())
 
     # -- callbacks ------------------------------------------------------
 
@@ -356,6 +375,209 @@ class ReceiptOCRApp:
 
         messagebox.showinfo("Saved", f"Folder created:\n{output}\n\nJSON copied to clipboard!")
         self._log(f"\nSaved to folder: {output}")
+
+    def do_add_vendor(self):
+        """Open dialog to add a new vendor to merchants_mapping.json"""
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Add New Vendor")
+        dialog.geometry("500x380")
+        dialog.transient(self.root)
+        dialog.grab_set()
+
+        # Load current mapping
+        mapping_path = PROJECT_ROOT / "merchants_mapping.json"
+        try:
+            with open(mapping_path, "r", encoding="utf-8") as f:
+                merchants = json.load(f)
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to load merchants_mapping.json: {e}")
+            dialog.destroy()
+            return
+
+        # UI Elements
+        main_frame = tk.Frame(dialog, padx=20, pady=20)
+        main_frame.pack(fill=tk.BOTH, expand=True)
+
+        tk.Label(main_frame, text="Vendor Name (English):", font=("Segoe UI", 10, "bold")).pack(anchor=tk.W, pady=(0, 5))
+        entry_name = tk.Entry(main_frame, font=("Segoe UI", 11), width=30)
+        entry_name.pack(anchor=tk.W, pady=(0, 15))
+
+        # Debounce for suggestions
+        suggestion_job = [None]
+
+        tk.Label(main_frame, text="Keywords (Hebrew/English, comma separated):", font=("Segoe UI", 10, "bold")).pack(anchor=tk.W, pady=(0, 5))
+        entry_keywords = tk.Entry(main_frame, font=("Segoe UI", 11), width=40)
+        entry_keywords.pack(anchor=tk.W, pady=(0, 10))
+
+        # Suggested keywords label
+        lbl_suggested = tk.Label(main_frame, text="", fg="#6b7280", font=("Segoe UI", 9))
+        lbl_suggested.pack(anchor=tk.W, pady=(0, 5))
+
+        # Build pattern lookup from existing merchants dynamically
+        _NAME_PATTERNS = {}
+        for vendor, kw_list in merchants.items():
+            vendor_lower = vendor.lower()
+            for kw in kw_list:
+                # Extract first 2-4 chars as pattern
+                if len(kw) >= 2:
+                    _NAME_PATTERNS[vendor_lower] = kw[:4]
+                    if len(vendor_lower) >= 3:
+                        _NAME_PATTERNS[vendor_lower[:3]] = kw[:4]
+                    break
+
+        _EN_TO_HE = {
+            'a': 'ה', 'b': 'ב', 'c': 'ק', 'd': 'ד', 'e': 'א', 'f': 'פ', 'g': 'ג', 'h': 'ה',
+            'i': 'ע', 'j': 'ג', 'k': 'ק', 'l': 'ל', 'm': 'מ', 'n': 'נ', 'o': 'ו', 'p': 'פ',
+            'q': 'ק', 'r': 'ר', 's': 'ס', 't': 'ט', 'u': 'יו', 'v': 'ו', 'w': 'ו', 'x': 'קס',
+            'y': 'י', 'z': 'ז',
+        }
+        _CLUSTERS = {'sh': 'ש', 'ch': 'ח', 'th': 'ת', 'ou': 'או', 'ee': 'י', 'oo': 'ו'}
+
+        def transliterate(name: str) -> str:
+            """Fallback transliteration with smart patterns"""
+            if not name:
+                return ""
+            name_lower = name.lower()
+
+            # Check pattern lookup first
+            if name_lower in _NAME_PATTERNS:
+                return _NAME_PATTERNS[name_lower]
+            for pattern, hebrew in _NAME_PATTERNS.items():
+                if name_lower.startswith(pattern):
+                    prefix = hebrew
+                    remainder = ""
+                    for c in name_lower[len(pattern):]:
+                        remainder += _EN_TO_HE.get(c, c)
+                    return prefix + remainder
+
+            # Fallback letter by letter
+            result = ""
+            i = 0
+            while i < len(name_lower):
+                if i < len(name_lower) - 1:
+                    cluster = name_lower[i:i+2]
+                    if cluster in _CLUSTERS:
+                        result += _CLUSTERS[cluster]
+                        i += 2
+                        continue
+                c = name_lower[i]
+                result += _EN_TO_HE.get(c, c)
+                i += 1
+            return result
+
+        def translate_to_hebrew(name: str) -> str:
+            """Translate English to Hebrew with fallback and retries"""
+            # Try Google Translate up to 2 times
+            if HAS_TRANSLATOR:
+                for attempt in range(2):
+                    try:
+                        result = GoogleTranslator(source='en', target='iw').translate(name)
+                        if result and len(result) > 1 and not result.startswith('http'):
+                            return result
+                    except Exception:
+                        import time
+                        time.sleep(0.3)
+            # Fallback to transliteration
+            return transliterate(name)
+
+        # Patch stdout for Hebrew output
+        import sys
+        if sys.stdout.encoding != 'utf-8':
+            import io
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+
+        # Helper to generate suggestions
+        def generate_suggestions():
+            name = entry_name.get().strip()
+            if not name:
+                lbl_suggested.config(text="")
+                return
+
+            # Gather all used keywords from existing merchants
+            used_keywords = set()
+            for kw_list in merchants.values():
+                used_keywords.update(kw_list)
+
+            hebrew = translate_to_hebrew(name)
+            suggestions = []
+
+            if hebrew and len(hebrew) >= 3:
+                # Short form (first 2-3 chars for short names)
+                short = hebrew[:2] if len(hebrew) <= 3 else hebrew[:3]
+                if short not in used_keywords:
+                    suggestions.append(short)
+
+            # Full form
+            if hebrew and hebrew not in used_keywords:
+                suggestions.append(hebrew)
+
+            # English lowercase
+            if name.lower() not in used_keywords:
+                suggestions.append(name.lower())
+
+            # Full English
+            if name not in used_keywords:
+                suggestions.append(name)
+
+            # Dedupe while preserving order
+            seen = set()
+            unique = []
+            for s in suggestions:
+                if s not in seen:
+                    seen.add(s)
+                    unique.append(s)
+
+            if not unique:
+                lbl_suggested.config(text="(all keywords already exist)")
+            else:
+                lbl_suggested.config(text="Suggested: " + ", ".join(unique[:4]))
+
+            # Auto-fill with suggestions
+            entry_keywords.delete(0, tk.END)
+            entry_keywords.insert(0, ", ".join(unique[:4]) if unique else "")
+
+        def debounce_suggestions():
+            if suggestion_job[0]:
+                dialog.after_cancel(suggestion_job[0])
+            suggestion_job[0] = dialog.after(300, lambda: generate_suggestions())
+
+        entry_name.bind("<KeyRelease>", lambda e: debounce_suggestions())
+
+        # Buttons
+        btn_frame = tk.Frame(main_frame)
+        btn_frame.pack(fill=tk.X, pady=(15, 0))
+
+        def save_vendor():
+            name = entry_name.get().strip()
+            keywords = entry_keywords.get().strip()
+
+            if not name:
+                messagebox.showwarning("Missing Name", "Please enter a vendor name.")
+                return
+            if not keywords:
+                messagebox.showwarning("Missing Keywords", "Please enter at least one keyword.")
+                return
+
+            # Parse keywords
+            kw_list = [k.strip() for k in keywords.split(",") if k.strip()]
+
+            if name in merchants:
+                if not messagebox.askyesno("Vendor Exists", f"'{name}' already exists. Overwrite?"):
+                    return
+
+            # Save to mapping
+            merchants[name] = kw_list
+            try:
+                with open(mapping_path, "w", encoding="utf-8") as f:
+                    json.dump(merchants, f, ensure_ascii=False, indent=2)
+                messagebox.showinfo("Saved", f"Vendor '{name}' added to merchants_mapping.json")
+                self._log(f"Added vendor: {name} -> {kw_list}")
+                dialog.destroy()
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to save: {e}")
+
+        ttk.Button(btn_frame, text="Cancel", command=dialog.destroy).pack(side=tk.LEFT, padx=(0, 10))
+        ttk.Button(btn_frame, text="Save", style="Primary.TButton", command=save_vendor).pack(side=tk.LEFT)
 
 
 def main():

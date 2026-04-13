@@ -264,9 +264,9 @@ def extract_header_fields(
     tesseract_executable: Optional[str] = None,
     confusion_map: Optional[Dict[str, str] | str] = None,
 ) -> Dict[str, Any]:
-    """Extract vendor and date from receipt header using Tesseract.
+    """Extract vendor, date, invoice_no, and total from receipt header using Tesseract.
 
-    Runs full receipt OCR with Tesseract, then extracts vendor + date
+    Runs full receipt OCR with Tesseract, then extracts vendor + date + invoice_no + total
     from the OCR lines. Designed to be called alongside Mindee for items.
 
     Args:
@@ -275,12 +275,14 @@ def extract_header_fields(
         confusion_map: Optional confusion map for OCR corrections
 
     Returns:
-        Dict with 'vendor' and 'date' ParsedStringField objects
+        Dict with 'vendor', 'date', 'invoice_no', and 'total' ParsedStringField/ParsedAmountField objects
     """
     from stages.preprocess.image_processor import preprocess_image
     from stages.grouping.line_assembler import _boxes_to_lines
     from stages.parsing.vendor import extract_vendor
     from stages.parsing.dates import _parse_date_from_lines
+    from stages.parsing.invoices import invoice_extractor
+    from stages.parsing.amounts import _find_amount_field
 
     # 1. Preprocess the image
     results = preprocess_image(image_path)
@@ -300,13 +302,17 @@ def extract_header_fields(
     # 3. Convert boxes to lines
     raw_lines = _boxes_to_lines(all_boxes)
 
-    # 4. Extract vendor and date using existing parsers
+    # 4. Extract vendor, date, invoice_no, and total using existing parsers
     vendor = extract_vendor(raw_lines)
     date = _parse_date_from_lines(raw_lines)
+    invoice_no = invoice_extractor._parse_invoice_no(raw_lines)
+    total = _find_amount_field(raw_lines, ["סה\"כ", "סהכ", "לתשלום", "סיכום", "ה\"כ", "סח\"כ"])
 
     return {
         'vendor': vendor,
         'date': date,
+        'invoice_no': invoice_no,
+        'total': total,
     }
 
 
@@ -380,12 +386,14 @@ def parse_receipt_combined(
         )
     vendor = header['vendor']
     date = header['date']
+    invoice_no = header.get('invoice_no')  # From Google Vision
+    google_total = header.get('total')  # From Google Vision
 
     # --- Step 2: Mindee for items ---
     from stages.recognition.mindee_ocr import MindeeOCR
     ocr = MindeeOCR(api_key=mindee_api_key)
     mindee_items = ocr.extract_items(image_path)
-    total_amount = ocr.get_total(image_path)
+    mindee_total = ocr.get_total(image_path)
 
     # Convert Mindee items to LineItem format
     items = [
@@ -404,16 +412,36 @@ def parse_receipt_combined(
     # Currency detection
     currency = ParsedStringField(value="ILS", confidence=0.9, line_index=0)
 
-    # Total from Mindee
-    total_field = ParsedAmountField(
-        value=total_amount,
-        raw_text=str(total_amount),
-        confidence=0.9,
-        line_index=0,
-    )
+    # Subtotal (calculate from items sum first)
+    items_sum = sum(item.line_total for item in items if item.line_total)
+
+    # Total: prefer Google Vision total, then Mindee total, finally items_sum as fallback
+    if google_total and google_total.value and google_total.value > 0:
+        total_field = google_total
+    elif mindee_total and mindee_total > 0:
+        total_field = ParsedAmountField(
+            value=mindee_total,
+            raw_text=str(mindee_total),
+            confidence=0.9,
+            line_index=0,
+        )
+    elif items_sum > 0:
+        # Fallback: use items sum as total
+        total_field = ParsedAmountField(
+            value=items_sum,
+            raw_text=str(items_sum),
+            confidence=0.7,  # Lower confidence since it's estimated
+            line_index=0,
+        )
+    else:
+        total_field = ParsedAmountField(
+            value=None,
+            raw_text=None,
+            confidence=None,
+            line_index=None,
+        )
 
     # Subtotal (Mindee doesn't always provide, estimate from items sum)
-    items_sum = sum(item.line_total for item in items)
     subtotal_field = ParsedAmountField(
         value=items_sum if items_sum else None,
         raw_text=str(items_sum) if items_sum else None,
@@ -423,10 +451,11 @@ def parse_receipt_combined(
 
     # VAT (calculate if we have total)
     vat_field = ParsedAmountField(value=None, raw_text=None, confidence=None, line_index=None)
-    if total_amount and items_sum and total_amount > items_sum:
+    final_total = total_field.value if total_field.value else mindee_total
+    if final_total and items_sum and final_total > items_sum:
         vat_field = ParsedAmountField(
-            value=total_amount - items_sum,
-            raw_text=str(total_amount - items_sum),
+            value=final_total - items_sum,
+            raw_text=str(final_total - items_sum),
             confidence=0.8,
             line_index=0,
         )
@@ -444,7 +473,26 @@ def parse_receipt_combined(
         currency=currency,
         items=items,
         raw_lines=raw_lines,
-        invoice_no=None,
+        invoice_no=invoice_no,
     )
+
+    # --- Step 4: Post-process items ---
+    # Import post-processing functions (generic)
+    from stages.post_process import (
+        extract_produce_codes_from_lines,
+        extract_produce_codes_from_descriptions,
+        assign_produce_codes_to_items,
+        fix_incorrect_amounts,
+    )
+
+    # Extract produce codes from Mindee descriptions
+    produce_codes = extract_produce_codes_from_descriptions([item.description for item in items])
+    items = assign_produce_codes_to_items(items, produce_codes)
+
+    # Apply generic fixes (weight-based amounts, consistency checks)
+    items = fix_incorrect_amounts(items)
+
+    # Update parsed with processed items
+    parsed.items = items
 
     return parsed
