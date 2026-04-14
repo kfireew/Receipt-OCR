@@ -210,40 +210,43 @@ def process_items(items: List[Dict]) -> List[Dict]:
 
     for item in items:
         description = item.get('description', '')
-        quantity = item.get('quantity', 1)
-        unit_price = item.get('unit_price', item.get('unit', 0))
-        line_total = item.get('line_total', item.get('total', 0))
+        quantity = float(item.get('quantity', 1))
+        unit_price = float(item.get('unit_price', item.get('unit', 0)))
+        original_line_total = float(item.get('line_total', item.get('total', 0)))
 
-        # 1. Check for discount line
-        if detect_discount_line(description, quantity, line_total):
-            # Keep negative quantity for discount lines
-            item['discount'] = abs(line_total) if line_total < 0 else extract_percent_discount(description)
+        # 1. Check for discount line (use original line_total)
+        if detect_discount_line(description, quantity, original_line_total):
+            item['discount'] = abs(original_line_total) if original_line_total < 0 else extract_percent_discount(description)
+            item['line_total'] = round(quantity * unit_price, 2)
             fixed_items.append(item)
             continue
 
-        # 2. Check if quantity looks like weight - FIRST fix quantity
+        # 2. Check if quantity looks like weight - use ORIGINAL line_total
         has_weight, weight_val = has_weight_in_description(description)
-        is_weight_qty = is_likely_weight_quantity(quantity, unit_price, line_total)
+        is_weight_qty = is_likely_weight_quantity(quantity, unit_price, original_line_total)
 
         fixed_quantity = quantity
         if has_weight or is_weight_qty:
-            # Calculate actual item count from price
-            fixed_quantity = fix_quantity_from_price(quantity, unit_price, line_total)
+            fixed_quantity = fix_quantity_from_price(quantity, unit_price, original_line_total)
             item['quantity'] = fixed_quantity
-            # Note: might be a weight item
             item['is_weight_item'] = True
 
-        # 3. Calculate discount from line_total vs expected using FIXED quantity
-        if 'discount' not in item or item['discount'] == 0.0:
-            item['discount'] = calculate_discount(fixed_quantity, unit_price, line_total)
+        # 3. CRITICAL FIX: Calculate line_total from price × qty (ALWAYS)
+        line_total = round(fixed_quantity * unit_price, 2)
+        item['line_total'] = line_total
 
         fixed_items.append(item)
 
     # 4. Deduplicate by description (keep first occurrence)
+    # Don't deduplicate items with empty descriptions
     seen = {}
     deduplicated = []
     for item in fixed_items:
         desc = item.get('description', '')
+        if not desc:
+            # Empty description - don't merge
+            deduplicated.append(item)
+            continue
         if desc not in seen:
             seen[desc] = len(deduplicated)
             deduplicated.append(item)
