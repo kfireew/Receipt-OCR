@@ -293,16 +293,15 @@ class ReceiptOCRApp:
         if not date:
             date = "Unknown"
 
+        # Convert date from YYYY-MM-DD to DD.MM.YYYY format
+        if date and date != "Unknown" and '-' in date and len(date.split('-')[0]) == 4:
+            parts = date.split('-')
+            date = f"{parts[2]}.{parts[1]}.{parts[0][-2:]}"
+
         # Generate filename: Vendor_Date (e.g., "StraussCool_18.08.2024")
-        # Format date as DD.MM.YYYY
         receipt_name = None  # Initialize to avoid UnboundLocalError
         if vendor and date and date != "Unknown":
-            # Convert date from DD-MM-YY to DD.MM.YYYY if needed
-            date_clean = date.replace("-", ".")
-            if len(date_clean.split('.')) == 3 and len(date_clean.split('.')[-1]) == 2:
-                # Already has 2-digit year
-                pass
-            receipt_name = f"{vendor}_{date_clean}"
+            receipt_name = f"{vendor}_{date}"
         else:
             receipt_name = f"{vendor}_{date}" if vendor else "Unknown"
 

@@ -32,6 +32,15 @@ pipelines/
 1. **Scan 1: Receipt Model** - Gets structured fields (vendor, date, items, totals)
 2. **Scan 2: Raw OCR** - Gets word positions for column detection (may fail on Starter tier)
 
+**Vendor Name Translation:**
+- Mindee returns vendor names in Hebrew
+- `merchants_mapping.json` maps Hebrew keywords to English names
+- Matching priority (stops at first match):
+  1. Exact match (100%) - returns immediately
+  2. Partial match (keyword in vendor or vendor in keyword)
+  3. Fuzzy match (character overlap >= 50%)
+- Both JSON output and filenames use English vendor names (e.g., `StraussCool_18.08.24_StraussCool 18-08-24`)
+
 **Heuristics:**
 - `qty = total / unit_price` when Mindee's qty detection is wrong
 - Allow ±2 ILS tolerance for rounding and discounts

@@ -27,7 +27,70 @@ ABBYY format structure:
 }
 """
 import json
+import os
 from typing import List, Dict, Any
+
+
+def _get_english_vendor(hebrew_vendor: str) -> str:
+    """Convert Hebrew vendor to English using merchants_mapping.json.
+
+    Uses fuzzy matching:
+    1. Exact match (100%)
+    2. Partial match (keyword in vendor or vendor in keyword)
+    3. Fuzzy match (character overlap >= 50%)
+    """
+    if not hebrew_vendor:
+        return hebrew_vendor
+
+    mapping_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "merchants_mapping.json")
+    try:
+        with open(mapping_path, 'rb') as f:
+            content = f.read().decode('utf-8')
+        mapping = json.loads(content)
+    except Exception:
+        return hebrew_vendor
+
+    # Build reverse mapping: Hebrew keyword -> English vendor name
+    hebrew_to_english = {}
+    for english_name, hebrew_keywords in mapping.items():
+        for kw in hebrew_keywords:
+            hebrew_to_english[kw] = english_name
+
+    # 1. Exact match
+    if hebrew_vendor in hebrew_to_english:
+        return hebrew_to_english[hebrew_vendor]
+
+    # 2. Partial match (keyword in vendor OR vendor in keyword)
+    for keyword, english_name in hebrew_to_english.items():
+        if keyword in hebrew_vendor or hebrew_vendor in keyword:
+            return english_name
+
+    # 3. Fuzzy match - find keyword with highest character overlap
+    best_match = None
+    best_score = 0
+
+    for keyword, english_name in hebrew_to_english.items():
+        score = _char_overlap(hebrew_vendor, keyword)
+        if score > best_score and score >= 0.5:  # At least 50% overlap
+            best_score = score
+            best_match = english_name
+
+    if best_match:
+        return best_match
+
+    return hebrew_vendor
+
+
+def _char_overlap(s1: str, s2: str) -> float:
+    """Calculate character overlap between two strings (0.0 to 1.0)."""
+    set1 = set(s1)
+    set2 = set(s2)
+    if not set1 or not set2:
+        return 0.0
+
+    intersection = len(set1 & set2)
+    union = len(set1 | set2)
+    return intersection / union
 
 
 def mindee_to_abbey(items: List[Dict], receipt_name: str = "Receipt", vendor: str = "", date: str = "") -> Dict:
@@ -137,7 +200,7 @@ def mindee_to_abbey(items: List[Dict], receipt_name: str = "Receipt", vendor: st
             "fields": [
                 {"name": "InvoiceNo", "value": ""},
                 {"name": "Field1", "value": ""},
-                {"name": "VendorName", "value": vendor},
+                {"name": "VendorName", "value": _get_english_vendor(vendor)},
                 {"name": "Field3", "value": ""},
                 {"name": "Date", "value": date},
                 {"name": "Field5", "value": ""},
