@@ -517,6 +517,8 @@ class ReceiptOCRApp:
 
         def save_vendor():
             name = entry_name.get().strip()
+            # Normalize: first letter capitalized
+            name = name[0].upper() + name[1:] if name else ""
             keywords = entry_keywords.get().strip()
 
             if not name:
@@ -529,6 +531,39 @@ class ReceiptOCRApp:
             # Parse keywords
             kw_list = [k.strip() for k in keywords.split(",") if k.strip()]
 
+            # Check for case-insensitive match - expand with non-conflicting keywords
+            name_lower = name.lower()
+            existing_match = None
+            for existing_name in merchants:
+                if existing_name.lower() == name_lower:
+                    existing_match = existing_name
+                    break
+
+            if existing_match:
+                # Expand existing vendor with new keywords (skip conflicts)
+                existing_kws = set(merchants[existing_match])
+                new_kws = []
+                skipped = []
+                for kw in kw_list:
+                    # Check if keyword is used by another vendor
+                    conflict = False
+                    for other_name, other_kws in merchants.items():
+                        if other_name != existing_match and kw in other_kws:
+                            conflict = True
+                            skipped.append(kw)
+                            break
+                    if not conflict:
+                        new_kws.append(kw)
+                merchants[existing_match] = list(existing_kws | set(new_kws))
+                msg = f"Expanded '{existing_match}' with: {new_kws}"
+                if skipped:
+                    msg += f"\nSkipped (conflict): {skipped}"
+                messagebox.showinfo("Vendor Expanded", msg)
+                with open(mapping_path, "w", encoding="utf-8") as f:
+                    json.dump(merchants, f, ensure_ascii=False, indent=2)
+                self._log(f"Expanded vendor: {existing_match} -> {merchants[existing_match]}")
+                dialog.destroy()
+                return
             if name in merchants:
                 if not messagebox.askyesno("Vendor Exists", f"'{name}' already exists. Overwrite?"):
                     return

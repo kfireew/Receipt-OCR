@@ -31,16 +31,15 @@ import os
 from typing import List, Dict, Any
 
 
-def _get_english_vendor(hebrew_vendor: str) -> str:
-    """Convert Hebrew vendor to English using merchants_mapping.json.
+def _get_english_vendor(ocr_vendor: str) -> str:
+    """Map OCR vendor to merchant name from merchants_mapping.
 
-    Uses fuzzy matching:
-    1. Exact match (100%)
-    2. Partial match (keyword in vendor or vendor in keyword)
-    3. Fuzzy match (character overlap >= 50%)
+    1. Exact match -> return merchant name
+    2. Partial match (keyword in OCR vendor) -> return merchant name
+    3. Fuzzy match -> return merchant name
     """
-    if not hebrew_vendor:
-        return hebrew_vendor
+    if not ocr_vendor:
+        return ocr_vendor
 
     mapping_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "merchants_mapping.json")
     try:
@@ -48,37 +47,37 @@ def _get_english_vendor(hebrew_vendor: str) -> str:
             content = f.read().decode('utf-8')
         mapping = json.loads(content)
     except Exception:
-        return hebrew_vendor
+        return ocr_vendor
 
-    # Build reverse mapping: Hebrew keyword -> English vendor name
-    hebrew_to_english = {}
-    for english_name, hebrew_keywords in mapping.items():
-        for kw in hebrew_keywords:
-            hebrew_to_english[kw] = english_name
+    # Build keyword -> merchant name mapping
+    kw_to_merchant = {}
+    for merchant_name, keywords in mapping.items():
+        for kw in keywords:
+            kw_to_merchant[kw] = merchant_name
 
     # 1. Exact match
-    if hebrew_vendor in hebrew_to_english:
-        return hebrew_to_english[hebrew_vendor]
+    if ocr_vendor in kw_to_merchant:
+        return kw_to_merchant[ocr_vendor]
 
-    # 2. Partial match (keyword in vendor OR vendor in keyword)
-    for keyword, english_name in hebrew_to_english.items():
-        if keyword in hebrew_vendor or hebrew_vendor in keyword:
-            return english_name
+    # 2. Partial match (keyword in OCR vendor - case insensitive)
+    ocr_lower = ocr_vendor.lower()
+    for keyword, merchant_name in kw_to_merchant.items():
+        if keyword.lower() in ocr_lower:
+            return merchant_name
 
-    # 3. Fuzzy match - find keyword with highest character overlap
+    # 3. Fuzzy match
     best_match = None
     best_score = 0
-
-    for keyword, english_name in hebrew_to_english.items():
-        score = _char_overlap(hebrew_vendor, keyword)
-        if score > best_score and score >= 0.5:  # At least 50% overlap
+    for keyword, merchant_name in kw_to_merchant.items():
+        score = _char_overlap(ocr_vendor, keyword)
+        if score > best_score and score >= 0.5:
             best_score = score
-            best_match = english_name
+            best_match = merchant_name
 
     if best_match:
         return best_match
 
-    return hebrew_vendor
+    return ocr_vendor
 
 
 def _char_overlap(s1: str, s2: str) -> float:
