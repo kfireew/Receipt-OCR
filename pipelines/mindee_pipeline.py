@@ -24,6 +24,10 @@ class MindeeItem:
 # API Configuration - Set via environment variables
 import os
 
+# Mindee SDK V2 reads from MINDEE_V2_API_KEY, so set it if only MINDEE_API_KEY is provided
+if not os.environ.get("MINDEE_V2_API_KEY") and os.environ.get("MINDEE_API_KEY"):
+    os.environ["MINDEE_V2_API_KEY"] = os.environ["MINDEE_API_KEY"]
+
 API_KEY = os.environ.get("MINDEE_API_KEY", "")
 MODEL_ID = os.environ.get("MINDEE_MODEL_ID", "2794301c-25bd-402a-bebe-5295a67416e6")
 
@@ -66,6 +70,15 @@ def process_receipt(
     result = response.inference.result
     fields = result.fields
 
+    # Handle both dict and list formats from Mindee
+    if isinstance(fields, list):
+        # Convert list format to dict
+        fields_dict = {}
+        for f in fields:
+            if hasattr(f, 'name') and hasattr(f, 'value'):
+                fields_dict[f.name] = f
+        fields = fields_dict
+
     # Extract header from Mindee fields
     vendor_field = fields.get('supplier_name') or fields.get('merchant_name')
     vendor = vendor_field.value if vendor_field and vendor_field.value else ""
@@ -81,20 +94,41 @@ def process_receipt(
 
     # Get line items
     line_items_field = fields.get('line_items')
-    items = line_items_field.items if line_items_field else []
+    if line_items_field is None:
+        items = []
+    elif hasattr(line_items_field, 'items'):
+        items = line_items_field.items
+    elif isinstance(line_items_field, list):
+        items = line_items_field
+    else:
+        items = []
 
     # ===== SCAN 2: Raw OCR for better item parsing =====
-    # Use X-position based column detection for quantities
-    raw_items, debug_info = _scan_raw_ocr_for_items(image_path, key, mid, items, fields)
+    try:
+        raw_items, debug_info = _scan_raw_ocr_for_items(image_path, key, mid, items, fields)
+    except Exception as e:
+        # Fallback: use items directly
+        raw_items = _items_to_dicts(items)
+        debug_info = {'source': 'receipt_model', 'error': str(e)}
 
     # Post-process to fix quantity=weight and add discounts
     from utils.post_processor import process_items
-    fixed_items = process_items(raw_items)
+    try:
+        fixed_items = process_items(raw_items)
+    except Exception as e:
+        # Fallback: use raw items as-is
+        fixed_items = raw_items if isinstance(raw_items, list) else []
 
-    # Convert to ABBYY format
+    if not fixed_items:
+        # Final fallback: use items directly
+        fixed_items = _items_to_dicts(items)
+
+    # Ensure fixed_items is a list
+    if not isinstance(fixed_items, list):
+        fixed_items = []
+
+    # Generate receipt_name before use
     from utils.format_converter import mindee_to_abbey
-
-    # Generate filename from detected vendor and date
     if vendor and date:
         parts = date.split('.')
         if len(parts) == 3:
@@ -105,6 +139,7 @@ def process_receipt(
     else:
         receipt_name = normalize_filename(image_path)
 
+    # Convert to ABBYY format
     gdoc = mindee_to_abbey(fixed_items, receipt_name, vendor=vendor, date=date)
 
     # Save to output folder if enabled
@@ -229,10 +264,19 @@ def _parse_raw_ocr_positions(ocr) -> list:
 
 
 def _items_to_dicts(items: list) -> list:
-    """Convert Mindee items to dict format."""
+    """Convert Mindee items to dict format. Handles both object and dict formats."""
     result = []
     for item in items:
-        if hasattr(item, 'fields'):
+        # Handle dict format (Mindee plain dict response)
+        if isinstance(item, dict):
+            result.append({
+                'description': item.get('description', item.get('Description', '')),
+                'quantity': float(item.get('quantity', item.get('Quantity', 1))),
+                'unit_price': float(item.get('unit_price', item.get('UnitPrice', 0))),
+                'line_total': float(item.get('line_total', item.get('total', item.get('total_price', 0)))),
+            })
+        # Handle object format (Mindee SDK)
+        elif hasattr(item, 'fields'):
             item_fields = item.fields
             desc = item_fields.get('description')
             qty = item_fields.get('quantity')
@@ -304,49 +348,6 @@ def normalize_filename(image_path: str) -> str:
 
     # For other filenames, just normalize spaces to underscores
     return filename.replace(' ', '_')
-
-
-def extract_header_from_tesseract(image_path: str) -> tuple:
-    """
-    Extract vendor and date using tesseract OCR (for header parsing).
-
-    Uses tesseract pipeline for header (vendor, date) - better for Hebrew text.
-    Falls back to filename parsing if tesseract unavailable.
-
-    Returns: (vendor, date) tuple
-    """
-    try:
-        # Preprocess
-        from stages.preprocess.image_loader import PreprocessConfig
-        from stages.preprocess.image_processor import preprocess_image
-        pp_cfg = PreprocessConfig(target_height=2400, target_width=1800)
-        pres = preprocess_image(image_path, cfg=pp_cfg)
-
-        # OCR with tesseract
-        from stages.recognition.tesseract_client import recognize_boxes
-        all_boxes = []
-        for i, pre in enumerate(pres):
-            boxes = recognize_boxes(pre.preprocessed, page_idx=i)
-            all_boxes.extend(boxes)
-
-        # Parse header using tesseract pipeline
-        from stages.grouping.line_assembler import _boxes_to_lines
-        raw_lines = _boxes_to_lines(all_boxes)
-
-        # Extract vendor
-        from stages.parsing.vendor import extract_vendor
-        vendor_result = extract_vendor(raw_lines)
-        vendor = vendor_result.value if vendor_result and vendor_result.value else ""
-
-        # Extract date
-        from stages.parsing.dates import _parse_date_from_lines
-        date_result = _parse_date_from_lines(raw_lines)
-        date = date_result.value if date_result and date_result.value else ""
-
-        return vendor, date
-    except Exception as e:
-        # Fall back to filename parsing
-        return extract_vendor_date_from_filename(image_path)
 
 
 def extract_vendor_date_from_filename(image_path: str) -> tuple:

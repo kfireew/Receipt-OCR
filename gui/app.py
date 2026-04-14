@@ -17,9 +17,13 @@ if str(PROJECT_ROOT) not in sys.path:
 from dotenv import load_dotenv
 load_dotenv()
 
+# Mindee SDK V2 needs MINDEE_V2_API_KEY
+if not os.environ.get("MINDEE_V2_API_KEY") and os.environ.get("MINDEE_API_KEY"):
+    os.environ["MINDEE_V2_API_KEY"] = os.environ["MINDEE_API_KEY"]
+
 try:
     from tkinterdnd2 import TkinterDnD, DND_FILES
-    HAS_DND = False  # Disabled for stability
+    HAS_DND = True
 except ImportError:
     HAS_DND = False
 
@@ -29,14 +33,6 @@ try:
     HAS_TRANSLATOR = True
 except ImportError:
     HAS_TRANSLATOR = False
-
-# New structure imports
-from stages.preprocess.image_loader import PreprocessConfig
-from stages.preprocess.image_processor import preprocess_image
-from stages.parsing.receipt_parser import parse_receipt
-from stages.recognition.tesseract_client import recognize_boxes
-from utils.io_utils import get_nested, load_config
-from utils.text_normalization import load_confusion_map
 
 
 class ReceiptOCRApp:
@@ -84,16 +80,16 @@ class ReceiptOCRApp:
 
         style.configure(
             "Vertical.TScrollbar",
-            background=self._CLR_BG,
+            background=self._CLR_SURFACE,
             lightcolor=self._CLR_BORDER,
             troughcolor=self._CLR_BG,
-            bordercolor=self._CLR_BG,
+            bordercolor=self._CLR_BORDER,
             arrowcolor=self._CLR_TEXT,
-            width=16,
+            width=14,
         )
         style.map(
             "Vertical.TScrollbar",
-            background=[("active", self._CLR_ACCENT)],
+            background=[("active", self._CLR_SURFACE)],
         )
 
         self.root.configure(bg=self._CLR_BG)
@@ -147,11 +143,12 @@ class ReceiptOCRApp:
         )
         self.lbl_status.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
-        # Drop zone
+        # Drop zone - fixed height
         self.drop_zone = tk.Frame(
-            self.root, bg=self._CLR_SURFACE, relief=tk.GROOVE, bd=2,
+            self.root, bg=self._CLR_SURFACE, relief=tk.GROOVE, bd=2, height=100,
         )
-        self.drop_zone.pack(fill=tk.BOTH, expand=True, padx=24, pady=8)
+        self.drop_zone.pack(fill=tk.X, padx=24, pady=8)
+        self.drop_zone.pack_propagate(False)
         tk.Label(
             self.drop_zone,
             text="Drag & drop image / PDF here\nor click Browse above",
@@ -163,10 +160,12 @@ class ReceiptOCRApp:
             self.drop_zone.drop_target_register(DND_FILES)
             self.drop_zone.dnd_bind("<<Drop>>", self._on_drop)
 
-        # Result panel
+        # Result panel with fixed size to prevent resizing
         self.result_pane = tk.Frame(self.root, bg=self._CLR_BG)
         self.result_pane.pack(fill=tk.BOTH, expand=True, padx=24, pady=(0, 12))
+        self.result_pane.pack_propagate(False)
 
+        # Text area
         self.text_out = tk.Text(
             self.result_pane, wrap=tk.WORD, bg=self._CLR_SURFACE,
             fg=self._CLR_TEXT, font=("Consolas", 10),
@@ -174,11 +173,11 @@ class ReceiptOCRApp:
             selectbackground=self._CLR_ACCENT,
             relief=tk.FLAT, padx=14, pady=10,
         )
-        self.text_out.pack(fill=tk.BOTH, expand=True)
+        self.text_out.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        # Scrollbar
-        sb = ttk.Scrollbar(self.result_pane, orient=tk.VERTICAL,
-                           command=self.text_out.yview)
+        # Scrollbar - properly linked
+        sb = ttk.Scrollbar(self.result_pane, orient=tk.VERTICAL)
+        sb.config(command=self.text_out.yview)
         sb.pack(side=tk.RIGHT, fill=tk.Y)
         self.text_out.config(yscrollcommand=sb.set)
 
@@ -219,12 +218,6 @@ class ReceiptOCRApp:
         else:
             self.lbl_status.config(text="Ready")
 
-    def _schedule_suggestions(self, entry_widget, callback):
-        """Debounce: cancel previous, schedule new after delay"""
-        if hasattr(self, '_suggestion_job') and self._suggestion_job:
-            self.root.after_cancel(self._suggestion_job)
-        self._suggestion_job = self.root.after(300, lambda: callback())
-
     # -- callbacks ------------------------------------------------------
 
     def _on_drop(self, event):
@@ -254,8 +247,16 @@ class ReceiptOCRApp:
                 self.last_result = result
                 self.last_input_path = file_path
 
-                items = result.get("GDocument", {}).get("fields", {}).get("items", [])
-                self.root.after(0, lambda: self._log(f"Mindee extracted {len(items)} items"))
+                # Extract items from GDocument.groups[0].groups (table items)
+                gdoc = result.get("GDocument", {})
+                groups = gdoc.get("groups", [])
+                items_count = 0
+                if groups and len(groups) > 0:
+                    table_group = groups[0]
+                    table_items = table_group.get("groups", [])
+                    items_count = len(table_items)
+
+                self.root.after(0, lambda: self._log(f"Mindee extracted {items_count} items"))
                 self.root.after(0, lambda: self._log(json.dumps(result, indent=2, ensure_ascii=False)))
                 self.root.after(0, lambda: self._set_busy(False))
                 self.root.after(0, lambda: self.lbl_status.config(text="Done \u2705"))
@@ -276,10 +277,13 @@ class ReceiptOCRApp:
             return
 
         # Get vendor and date from GDocument result
-        vendor = None
-        date = None
-        for f in self.last_result.get("GDocument", {}).get("fields", []):
-            if f.get("name") == "VendorNameS":
+        gdoc = self.last_result.get("GDocument", {})
+        vendor = ""
+        date = ""
+
+        # Vendor and date are in top-level fields
+        for f in gdoc.get("fields", []):
+            if f.get("name") == "VendorName":
                 vendor = f.get("value", "")
             elif f.get("name") == "Date":
                 date = f.get("value", "")
@@ -291,6 +295,7 @@ class ReceiptOCRApp:
 
         # Generate filename: Vendor_Date (e.g., "StraussCool_18.08.2024")
         # Format date as DD.MM.YYYY
+        receipt_name = None  # Initialize to avoid UnboundLocalError
         if vendor and date and date != "Unknown":
             # Convert date from DD-MM-YY to DD.MM.YYYY if needed
             date_clean = date.replace("-", ".")

@@ -9,9 +9,6 @@ Usage:
 
     # Tesseract (free, local)
     result = process_receipt("receipt.pdf", method="tesseract")
-
-    # Google Cloud
-    result = process_receipt("receipt.pdf", method="google", credentials_path="...")
 """
 from typing import Optional
 
@@ -26,9 +23,8 @@ def process_receipt(
 
     Args:
         image_path: Path to receipt file
-        method: OCR method - "mindee", "tesseract", or "google"
+        method: OCR method - "mindee" or "tesseract"
         **kwargs: Additional args:
-            - credentials_path: For Google Cloud
             - config: For Tesseract
 
     Returns:
@@ -42,13 +38,5 @@ def process_receipt(
         from pipelines.tesseract_pipeline import process_receipt as tesseract_process
         return tesseract_process(image_path, kwargs.get("config"))
 
-    elif method == "google":
-        from pipelines.google_pipeline import process_receipt as google_process
-        return google_process(
-            image_path,
-            credentials_path=kwargs.get("credentials_path"),
-            config=kwargs.get("config"),
-        )
-
     else:
-        raise ValueError(f"Unknown method: {method}. Use: mindee, tesseract, google")
+        raise ValueError(f"Unknown method: {method}. Use: mindee or tesseract")

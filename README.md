@@ -28,15 +28,9 @@ cd "C:\Users\Kfir Ezer\Desktop\Receipt OCR" && python -m gui.app
 - Allow ±2 ILS tolerance for rounding and discounts
 - Trust line_total from Mindee as ground truth
 
-### Google Cloud Vision (Optional)
-
-Used for header extraction (vendor, date, invoice_no).
-Can be removed if Mindee's header extraction is sufficient.
-
 ### Tesseract (Fallback)
 
 Local OCR for:
-- Header fallback when Google Cloud fails
 - Box detection for custom processing
 - Number OCR for quantity verification
 
@@ -85,7 +79,6 @@ Receipt OCR/
 ├── stages/
 │   ├── recognition/          # OCR engines
 │   │   ├── mindee_ocr.py    # Dual scan parser (primary)
-│   │   ├── google_cloud_ocr.py  # Header extraction (optional)
 │   │   └── tesseract_client.py  # Local OCR + box detection
 │   ├── parsing/              # Item extraction
 │   └── post_process/         # Post-processing
@@ -93,20 +86,8 @@ Receipt OCR/
 └── sample_images/             # Test receipts
 ```
 
-## Can We Remove Google Cloud Vision?
-
-**Yes**, if we accept these limitations:
-- Mindee provides: date, total
-- Missing: vendor name (need simple heuristic or Tesseract)
-- Missing: invoice_no
-
-**Recommendation:** Keep Google Cloud for now. When implementing own box detection, we can remove it.
-
 ## API Keys (Optional)
 
-For Mindee only (Starter tier works):
+For Mindee (Starter tier works):
 - `MINDEE_API_KEY` - Mindee API key
 - `MINDEE_MODEL_ID` - Mindee model ID
-
-For Google Cloud Vision (optional):
-- `GOOGLE_APPLICATION_CREDENTIALS` - Path to Google credentials JSON

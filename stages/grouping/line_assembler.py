@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Sequence, Tuple
 from utils.confidence_utils import combine_confidences
-from stages.recognition.tesseract_client import RecognizedBox
+from stages.recognition.tesseract_client_SAMPLE import RecognizedBox
 from stages.post_process.fuzzy_corrector import fuzzy_correct_line
 
 @dataclass
