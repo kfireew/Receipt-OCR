@@ -14,63 +14,99 @@ pip install -r requirements.txt
 cd "C:\Users\Kfir Ezer\Desktop\Receipt OCR" && python -m gui.app
 ```
 
-## How to Use GUI
+## Architecture
 
-1. Run the GUI command above
-2. Drag and drop a receipt PDF onto the window
-3. Select OCR method (mindee - uses Google Vision + Mindee)
-4. Click Process
-5. Click "Save Folder" to save results
+### Mindee API (Primary) - Works with Starter Tier
 
-### Adding New Vendors
+**Dual Scan Approach** (2 API calls per receipt):
 
-Click "Add Vendor" in the toolbar to add new merchants to `merchants_mapping.json`:
-- Enter vendor name in English (e.g., "Idan")
-- Keywords are auto-suggested based on transliteration and existing merchant patterns
-- Suggestions filter out duplicates already in the mapping
-- Edit keywords before saving if needed
+1. **Scan 1: Receipt Model** - Gets structured items (description, qty, unit_price, total)
+2. **Scan 2: Raw OCR** - Tries to get word positions (may fail on Starter tier)
 
-### Output Format
+**Heuristics:**
+- `qty = total / unit_price` when Mindee's qty detection is wrong
+- Allow ±2 ILS tolerance for rounding and discounts
+- Trust line_total from Mindee as ground truth
 
-When saving, creates a folder named: `Vendor_Date`
+### Google Cloud Vision (Optional)
 
-Example: `Haperesal_2026-04-13`
+Used for header extraction (vendor, date, invoice_no).
+Can be removed if Mindee's header extraction is sufficient.
 
-Files created:
-- `Haperesal_2026-04-13_Haperesal 13-04-26.pdf` (renamed receipt)
-- `Haperesal_2026-04-13_Haperesal 13-04-26.JSON` (results in GDocument format)
+### Tesseract (Fallback)
 
-## OCR Architecture
-
-- **Header (vendor + date)**: Google Cloud Vision API
-- **Items + total**: Mindee API
+Local OCR for:
+- Header fallback when Google Cloud fails
+- Box detection for custom processing
+- Number OCR for quantity verification
 
 ## Run CLI
 
 ```cmd
-cd "C:\Users\Kfir Ezer\Desktop\Receipt OCR" && python -c "from stages.parsing import parse_receipt_combined; import json; r=parse_receipt_combined('receipt.pdf'); print(json.dumps(r.to_gdocument_dict(), ensure_ascii=False, indent=2))"
+cd "C:\Users\Kfir Ezer\Desktop\Receipt OCR" && python -c "from stages.recognition.tesseract_client import parse_receipt_combined; r=parse_receipt_combined('receipt.pdf'); print(r)"
 ```
+
+## Test Results
+
+| Receipt | Items | Accuracy | Multi-Qty |
+|---------|-------|----------|-----------|
+| Avikam 10.03.2025 | 14 | 85.7% | 13 |
+| Hamefitz 27.12.2024 | 8 | 100.0% | 8 |
+| Ida 20.03.2025 | 90 | 100.0% | 64 |
+| Tnuva 19.08.2024 | 12 | 100.0% | 12 |
+| Wisso 03.03.2025 | 27 | 88.9% | 27 |
+| Shufersal 12.04.2026 | 23 | 100.0% | 1 |
+| **TOTAL** | **174** | **95.4%** | **125** |
+
+## Future: Own Box Detection (1 Scan Approach)
+
+Instead of Mindee's dual scan, implement our own:
+
+1. **OpenCV line detection** - Find table rows/columns
+2. **Tesseract OCR** - Extract text from each cell
+3. **Quantity detection** - Use positions to identify columns
+
+**Pros:**
+- 1 scan (Tesseract only)
+- No API costs
+- Full control over positions
+- Works offline
+
+**Cons:**
+- Need to implement line/column detection
+- Less accurate for descriptions
+- Hebrew text handling
 
 ## Project Structure
 
 ```
 Receipt OCR/
-├── gui/                    # GUI application
-├── stages/                 # Processing stages
-│   ├── preprocess/        # Image preprocessing
-│   ├── recognition/       # OCR (Google Vision, Mindee, Tesseract)
-│   ├── parsing/           # Item extraction
-│   ├── grouping/         # Line assembly
-│   └── post_process/     # Post-processing
-├── pipelines/            # OCR pipelines
-├── utils/                 # Utilities
-├── sample_images/          # Sample receipts
-└── mindee/               # Mindee client
+├── gui/                      # GUI application
+├── stages/
+│   ├── recognition/          # OCR engines
+│   │   ├── mindee_ocr.py    # Dual scan parser (primary)
+│   │   ├── google_cloud_ocr.py  # Header extraction (optional)
+│   │   └── tesseract_client.py  # Local OCR + box detection
+│   ├── parsing/              # Item extraction
+│   └── post_process/         # Post-processing
+├── utils/                     # Utilities
+└── sample_images/             # Test receipts
 ```
 
-## API Keys
+## Can We Remove Google Cloud Vision?
 
-Required in `.env` file:
+**Yes**, if we accept these limitations:
+- Mindee provides: date, total
+- Missing: vendor name (need simple heuristic or Tesseract)
+- Missing: invoice_no
+
+**Recommendation:** Keep Google Cloud for now. When implementing own box detection, we can remove it.
+
+## API Keys (Optional)
+
+For Mindee only (Starter tier works):
 - `MINDEE_API_KEY` - Mindee API key
 - `MINDEE_MODEL_ID` - Mindee model ID
-- `GOOGLE_APPLICATION_CREDENTIALS` - Path to Google Cloud Vision credentials JSON (download from Google Cloud Console)
+
+For Google Cloud Vision (optional):
+- `GOOGLE_APPLICATION_CREDENTIALS` - Path to Google credentials JSON

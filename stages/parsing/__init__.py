@@ -14,8 +14,6 @@ from .items import (
     DetectedTable, TableItem, ValidatedItem,
     validate_items, fix_math_mismatches
 )
-# Combined Tesseract + Mindee
-from stages.recognition.tesseract_client import parse_receipt_combined
 
 __all__ = [
     "parse_receipt", "_match_merchant",
@@ -31,6 +29,4 @@ __all__ = [
     "ParsedReceipt", "ParsedStringField", "ParsedAmountField",
     "LineItem", "ExtractedItem",
     "_DATE_PATTERNS", "_AMOUNT_RE", "parse_amount",
-    # Combined OCR
-    "parse_receipt_combined",
 ]

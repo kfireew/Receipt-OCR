@@ -117,10 +117,10 @@ class ReceiptOCRApp:
         bar = ttk.Frame(self.root, padding=(24, 4))
         bar.pack(fill=tk.X)
 
-        # OCR method selector
+        # OCR method selector (just Mindee now)
         self.ocr_method = tk.StringVar(value="mindee")
         ttk.Label(bar, text="OCR:").pack(side=tk.LEFT, padx=(0, 5))
-        self.cb_ocr = ttk.Combobox(bar, textvariable=self.ocr_method, values=["mindee", "tesseract", "google"], state="readonly", width=10)
+        self.cb_ocr = ttk.Combobox(bar, textvariable=self.ocr_method, values=["mindee"], state="readonly", width=10)
         self.cb_ocr.pack(side=tk.LEFT, padx=(0, 15))
         self.cb_ocr.bind("<<ComboboxSelected>>", lambda e: self._log(f"OCR: {self.ocr_method.get()}"))
 
@@ -248,54 +248,18 @@ class ReceiptOCRApp:
 
         def run():
             try:
-                ocr_method = self.ocr_method.get()
+                # Use Mindee pipeline
+                from pipelines.mindee_pipeline import process_receipt
+                result = process_receipt(file_path)
+                self.last_result = result
+                self.last_input_path = file_path
 
-                if ocr_method == "mindee":
-                    # Use combined pipeline (Google Vision for header + Mindee for items)
-                    from stages.parsing import parse_receipt_combined
-                    result = parse_receipt_combined(file_path, header_ocr='google')
-                    self.last_result = result.to_gdocument_dict()
-                    self.last_input_path = file_path
-
-                    self.root.after(0, lambda: self._log(json.dumps(result.to_gdocument_dict(), indent=2, ensure_ascii=False)))
-                    self.root.after(0, lambda: self._set_busy(False))
-                    self.root.after(0, lambda: self.lbl_status.config(text="Done \u2705"))
-                    return
-                    self.root.after(0, lambda: self._log(json.dumps(result, indent=2, ensure_ascii=False)))
-                    self.root.after(0, lambda: self._set_busy(False))
-                    self.root.after(0, lambda: self.lbl_status.config(text="Done \u2705"))
-                    return
-
-                elif ocr_method == "google":
-                    # Use Google Cloud pipeline
-                    from pipelines.google_pipeline import process_receipt
-                    credentials_path = get_nested(self.cfg, "google.credentials_path", "")
-                    if not credentials_path:
-                        raise ValueError("Google credentials not configured in config")
-                    result = process_receipt(file_path, credentials_path=credentials_path)
-                    self.last_result = result
-                    self.last_input_path = file_path
-
-                    items = result.get("GDocument", {}).get("fields", {}).get("items", [])
-                    self.root.after(0, lambda: self._log(f"Google extracted {len(items)} items"))
-                    self.root.after(0, lambda: self._log(json.dumps(result, indent=2, ensure_ascii=False)))
-                    self.root.after(0, lambda: self._set_busy(False))
-                    self.root.after(0, lambda: self.lbl_status.config(text="Done \u2705"))
-                    return
-
-                else:
-                    # Use Tesseract pipeline
-                    from pipelines.tesseract_pipeline import process_receipt
-                    result = process_receipt(file_path)
-                    self.last_result = result
-                    self.last_input_path = file_path
-
-                    items = result.get("GDocument", {}).get("fields", {}).get("items", [])
-                    self.root.after(0, lambda: self._log(f"Tesseract extracted {len(items)} items"))
-                    self.root.after(0, lambda: self._log(json.dumps(result, indent=2, ensure_ascii=False)))
-                    self.root.after(0, lambda: self._set_busy(False))
-                    self.root.after(0, lambda: self.lbl_status.config(text="Done \u2705"))
-                    return
+                items = result.get("GDocument", {}).get("fields", {}).get("items", [])
+                self.root.after(0, lambda: self._log(f"Mindee extracted {len(items)} items"))
+                self.root.after(0, lambda: self._log(json.dumps(result, indent=2, ensure_ascii=False)))
+                self.root.after(0, lambda: self._set_busy(False))
+                self.root.after(0, lambda: self.lbl_status.config(text="Done \u2705"))
+                return
 
             except Exception as e:
                 import traceback

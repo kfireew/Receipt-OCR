@@ -38,7 +38,9 @@ def process_receipt(
     save_to_output: bool = True,
 ) -> dict:
     """
-    Process receipt using Mindee API.
+    Process receipt using Mindee 2-scan method:
+    1. Receipt Model scan - gets structured fields (items, qty, prices)
+    2. Raw OCR scan - gets word positions for better parsing
 
     Args:
         image_path: Path to receipt file (PDF, PNG, JPG)
@@ -55,60 +57,48 @@ def process_receipt(
     mid = model_id or MODEL_ID
 
     client = ClientV2(api_key=key)
+
+    # ===== SCAN 1: Receipt Model =====
     params = InferenceParameters(model_id=mid)
     input_source = PathInput(image_path)
     response = client.enqueue_and_get_result(InferenceResponse, input_source, params)
 
     result = response.inference.result
     fields = result.fields
+
+    # Extract header from Mindee fields
+    vendor_field = fields.get('supplier_name') or fields.get('merchant_name')
+    vendor = vendor_field.value if vendor_field and vendor_field.value else ""
+
+    date_field = fields.get('date')
+    date = date_field.value if date_field and date_field.value else ""
+
+    invoice_field = fields.get('invoice_number')
+    invoice_no = invoice_field.value if invoice_field and invoice_field.value else ""
+
+    total_field = fields.get('total_amount')
+    total = total_field.value if total_field and total_field.value else 0.0
+
+    # Get line items
     line_items_field = fields.get('line_items')
-    items = line_items_field.items
+    items = line_items_field.items if line_items_field else []
 
-    # Convert to our format
-    extracted_items = []
-    for item in items:
-        item_fields = item.fields
-        desc = item_fields.get('description').value if item_fields.get('description') and item_fields.get('description').value else ''
-        qty = item_fields.get('quantity').value if item_fields.get('quantity') and item_fields.get('quantity').value else 1.0
-        unit_price = item_fields.get('unit_price').value if item_fields.get('unit_price') and item_fields.get('unit_price').value else 0.0
-        total = item_fields.get('total_price').value if item_fields.get('total_price') and item_fields.get('total_price').value else 0.0
-
-        if desc and total and total > 0:
-            extracted_items.append(MindeeItem(
-                description=desc,
-                quantity=qty,
-                unit_price=unit_price,
-                total=total,
-            ))
-
-    # Convert raw items to dicts for post-processing
-    raw_items = [
-        {
-            "description": item.description,
-            "quantity": item.quantity,
-            "unit_price": item.unit_price,
-            "line_total": item.total,
-        }
-        for item in extracted_items
-    ]
+    # ===== SCAN 2: Raw OCR for better item parsing =====
+    # Use X-position based column detection for quantities
+    raw_items, debug_info = _scan_raw_ocr_for_items(image_path, key, mid, items, fields)
 
     # Post-process to fix quantity=weight and add discounts
     from utils.post_processor import process_items
     fixed_items = process_items(raw_items)
 
-    # Extract vendor and date using tesseract (header parsing)
-    vendor, date = extract_header_from_tesseract(image_path)
-
     # Convert to ABBYY format
     from utils.format_converter import mindee_to_abbey
 
-    # Generate filename from detected vendor and date (NOT from input filename)
+    # Generate filename from detected vendor and date
     if vendor and date:
-        # Format: Vendor_Date_Vendor Date (e.g., "StraussCool_18.08.2024_StraussCool 18-08-24")
-        # Convert date from DD.MM.YYYY to DD-MM-YY
         parts = date.split('.')
         if len(parts) == 3:
-            date_dash = f"{parts[0]}-{parts[1]}-{parts[2][-2:]}"  # 18.08.2024 -> 18-08-24
+            date_dash = f"{parts[0]}-{parts[1]}-{parts[2][-2:]}"
         else:
             date_dash = date.replace('.', '-')
         receipt_name = f"{vendor}_{date}_{vendor} {date_dash}"
@@ -122,6 +112,140 @@ def process_receipt(
         _save_to_output(gdoc, receipt_name)
 
     return gdoc
+
+
+def _scan_raw_ocr_for_items(image_path: str, api_key: str, model_id: str, structured_items: list, fields: dict) -> tuple:
+    """
+    Second scan: Get raw OCR with word positions for better column detection.
+
+    Uses X-position bins to detect: LineTotal | Price | Quantity | CatalogNo
+    Then calculates: unit_price = total / quantity (handles discounts)
+
+    Returns:
+        Tuple of (items list as dicts, debug_info)
+    """
+    from mindee import ClientV2, InferenceParameters, InferenceResponse, PathInput
+    from collections import defaultdict
+    import re
+
+    client = ClientV2(api_key=api_key)
+
+    # Scan 2: Raw OCR with polygon
+    try:
+        raw_params = InferenceParameters(model_id=model_id, polygon=True)
+        raw_response = client.enqueue_and_get_result(InferenceResponse, PathInput(image_path), raw_params)
+    except Exception:
+        # Fallback: use structured items only
+        return _items_to_dicts(structured_items), {'source': 'receipt_model'}
+
+    # Parse raw OCR response
+    if hasattr(raw_response, 'ocr') and raw_response.ocr:
+        raw_items = _parse_raw_ocr_positions(raw_response.ocr)
+        if raw_items:
+            return raw_items, {'source': 'raw_ocr'}
+
+    # Fallback to structured items
+    return _items_to_dicts(structured_items), {'source': 'receipt_model'}
+
+
+def _parse_raw_ocr_positions(ocr) -> list:
+    """Parse raw OCR to extract items using X-position column detection."""
+    from collections import defaultdict
+    import re
+
+    words = []
+    if hasattr(ocr, 'pages'):
+        for page in ocr.pages:
+            if hasattr(page, 'words'):
+                for word in page.words:
+                    if hasattr(word, 'polygon') and word.polygon:
+                        words.append({
+                            'content': word.content if hasattr(word, 'content') else str(word),
+                            'polygon': [[p.x, p.y] for p in word.polygon] if hasattr(word.polygon[0], 'x') else word.polygon
+                        })
+
+    if not words:
+        return []
+
+    # Group by Y position (rows)
+    rows = defaultdict(list)
+    for w in words:
+        polygon = w.get('polygon', [])
+        if polygon:
+            y = polygon[0][1]
+            x = polygon[0][0]
+            rows[y].append({'x': x, 'content': w['content']})
+
+    # Skip header keywords
+    skip_keywords = ['ךיראת', 'הלבק', 'םולשת', 'החנה', 'מ"עמ', 'כהס']
+
+    items = []
+    for y in sorted(rows.keys()):
+        row_words = rows[y]
+        row_text = ' '.join([w['content'] for w in row_words])
+
+        if any(skip in row_text for skip in skip_keywords):
+            continue
+        if len(row_text) < 3:
+            continue
+
+        # Extract numbers with X positions
+        numbers = []
+        for w in row_words:
+            nums = re.findall(r'[\d,]+\.?\d*', w['content'])
+            for n in nums:
+                try:
+                    val = float(n.replace(',', ''))
+                    if 0 < val < 1000000:
+                        numbers.append((w['x'], val))
+                except:
+                    pass
+
+        if len(numbers) >= 2:
+            # Last number = total, second-to-last = unit_price
+            numbers_sorted = sorted(numbers, key=lambda x: x[0])  # by X (left to right)
+            total = numbers_sorted[-1][1]  # rightmost = total
+            unit_price = numbers_sorted[-2][1]  # second-rightmost = unit_price
+
+            # Calculate qty = total / unit_price
+            qty = round(total / unit_price) if unit_price > 0 else 1
+
+            # Extract description (right side text)
+            desc_parts = []
+            for w in row_words:
+                if w['x'] >= 0.4 and not re.match(r'^[\d,\.]+$', w['content']):
+                    desc_parts.append(w['content'])
+            desc = ' '.join(desc_parts[:5])  # limit to 5 words
+
+            if desc and len(desc) > 1:
+                items.append({
+                    'description': desc[:50],
+                    'quantity': qty,
+                    'unit_price': round(unit_price, 2),
+                    'line_total': round(total, 2),
+                })
+
+    return items
+
+
+def _items_to_dicts(items: list) -> list:
+    """Convert Mindee items to dict format."""
+    result = []
+    for item in items:
+        if hasattr(item, 'fields'):
+            item_fields = item.fields
+            desc = item_fields.get('description')
+            qty = item_fields.get('quantity')
+            unit_price = item_fields.get('unit_price')
+            total_price = item_fields.get('total_price')
+
+            result.append({
+                'description': desc.value if desc and desc.value else '',
+                'quantity': float(qty.value) if qty and qty.value else 1.0,
+                'unit_price': float(unit_price.value) if unit_price and unit_price.value else 0.0,
+                'line_total': float(total_price.value) if total_price and total_price.value else 0.0,
+            })
+    return result
 
 
 def normalize_filename(image_path: str) -> str:

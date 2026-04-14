@@ -1,34 +1,19 @@
 """
 OCR Recognition Service - Unified Interface.
-Provides a single interface for receipt OCR with swappable backends.
+
+Provides a single interface for receipt OCR with Mindee.
 
 Usage:
     from stages.recognition import recognize_receipt
 
-    # Use Mindee (primary)
     result = recognize_receipt(
         image_path='receipt.pdf',
         provider='mindee',
         api_key='your-mindee-key'
     )
 
-    # Swap with Azure
-    result = recognize_receipt(
-        image_path='receipt.pdf',
-        provider='azure',
-        endpoint='your-endpoint',
-        api_key='your-azure-key'
-    )
-
-    # Combined: Tesseract for header + Mindee for items
-    from stages.recognition.tesseract_client import parse_receipt_combined
-    result = parse_receipt_combined('receipt.pdf')
-
 Supported providers:
-- mindee: Best for receipts (purpose-built)
-- azure: Good for tables/layout
-- google: Good alternative
-- tesseract: Free option
+- mindee: Primary (receipt model + raw OCR for better parsing)
 """
 from __future__ import annotations
 from dataclasses import dataclass
@@ -37,9 +22,6 @@ import os
 
 # Default API keys (should be in environment)
 DEFAULT_MINDEE_KEY = os.environ.get('MINDEE_API_KEY', '')
-DEFAULT_AZURE_KEY = os.environ.get('AZURE_DOCUMENT_KEY', '')
-DEFAULT_AZURE_ENDPOINT = os.environ.get('AZURE_DOCUMENT_ENDPOINT', '')
-DEFAULT_GOOGLE_KEY = os.environ.get('GOOGLE_VISION_KEY', '')
 
 
 @dataclass
@@ -73,24 +55,15 @@ def recognize_receipt(
     Args:
         image_path: Path to receipt image (PNG, JPG, PDF)
         image_bytes: Image as bytes
-        provider: OCR provider ('mindee', 'azure', 'google', 'tesseract')
+        provider: OCR provider ('mindee' or 'tesseract')
         api_key: Provider API key
-        **kwargs: Additional provider-specific params:
-            - azure: endpoint
-            - google: endpoint
-            - mindee: model_id (for custom models)
+        **kwargs: Additional provider-specific params
 
     Returns:
         OCRResult with boxes and raw text
     """
     if provider == 'mindee':
         return _recognize_mindee(image_path, image_bytes, api_key or DEFAULT_MINDEE_KEY, **kwargs)
-    elif provider == 'azure':
-        return _recognize_azure(image_path, image_bytes, api_key or DEFAULT_AZURE_KEY,
-                          kwargs.get('endpoint', DEFAULT_AZURE_ENDPOINT))
-    elif provider == 'google':
-        return _recognize_google(image_path, image_bytes, api_key or DEFAULT_GOOGLE_KEY,
-                              kwargs.get('endpoint', ''))
     elif provider == 'tesseract':
         return _recognize_tesseract(image_path, image_bytes, **kwargs)
     else:
@@ -127,75 +100,6 @@ def _recognize_mindee(image_path, image_bytes, api_key, **kwargs):
     )
 
 
-def _recognize_azure(image_path, image_bytes, api_key, endpoint):
-    """Azure Document Intelligence OCR."""
-    from stages.recognition.azure_ocr import recognize_with_azure
-    import cv2
-    import numpy as np
-
-    # Load image if path provided
-    if image_path:
-        image = cv2.imread(image_path)
-    elif image_bytes:
-        nparr = np.frombuffer(image_bytes, np.uint8)
-        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    else:
-        raise ValueError("Need image_path or image_bytes")
-
-    result = recognize_with_azure(image, endpoint, api_key)
-
-    boxes = [
-        OCRBox(
-            box=b.box,
-            page=b.page,
-            text_raw=b.text_raw,
-            text_normalized=b.text_normalized,
-            confidence=b.confidence
-        )
-        for b in result.boxes
-    ]
-
-    return OCRResult(
-        boxes=boxes,
-        raw_text='\n'.join(b.text_raw for b in boxes),
-        provider='azure'
-    )
-
-
-def _recognize_google(image_path, image_bytes, api_key, endpoint):
-    """Google Cloud Vision OCR."""
-    from stages.recognition.google_cloud_ocr import recognize_with_google
-    import cv2
-    import numpy as np
-
-    if image_path:
-        image = cv2.imread(image_path)
-    elif image_bytes:
-        nparr = np.frombuffer(image_bytes, np.uint8)
-        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    else:
-        raise ValueError("Need image_path or image_bytes")
-
-    result = recognize_with_google(image, api_key, endpoint)
-
-    boxes = [
-        OCRBox(
-            box=b.box,
-            page=b.page,
-            text_raw=b.text_raw,
-            text_normalized=b.text_normalized,
-            confidence=b.confidence
-        )
-        for b in result.boxes
-    ]
-
-    return OCRResult(
-        boxes=boxes,
-        raw_text='\n'.join(b.text_raw for b in boxes),
-        provider='google'
-    )
-
-
 def _recognize_tesseract(image_path, image_bytes, **kwargs):
     """Tesseract OCR."""
     from stages.recognition.tesseract_client import recognize_with_tesseract
@@ -220,35 +124,14 @@ def _recognize_tesseract(image_path, image_bytes, **kwargs):
     )
 
 
-# Convenience functions
+# Convenience function
 def recognize_with_mindee(image_path: str = None, image_bytes: bytes = None, **kwargs):
     """Quick Mindee recognition."""
     return recognize_receipt(image_path, image_bytes, provider='mindee', **kwargs)
 
 
-def recognize_with_azure_image(image, endpoint: str, key: str):
-    """Quick Azure recognition from numpy image."""
-    return _recognize_azure(None, None, key, endpoint)
-
-
 # Keep backward compatibility with old import paths
 try:
     from stages.recognition.mindee_ocr import MindeeItem
-except ImportError:
-    pass
-
-try:
-    from stages.recognition.azure_ocr import AzureRecognizedBox, AzureOCRResult
-except ImportError:
-    pass
-
-try:
-    from stages.recognition.google_cloud_ocr import CloudOCRResult
-    GoogleOCRResult = CloudOCRResult  # Alias for compatibility
-except ImportError:
-    pass
-
-try:
-    from stages.recognition.tesseract_client import TesseractResult
 except ImportError:
     pass

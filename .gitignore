@@ -15,7 +15,8 @@ build/
 # Environment
 .env
 .venv
-env/
+env*
+venv*
 
 # OS
 .DS_Store
