@@ -16,16 +16,21 @@ cd "C:\Users\Kfir Ezer\Desktop\Receipt OCR" && python -m gui.app
 
 ## Architecture
 
-### Mindee API (Current - 2 Scans)
+### Mindee Pipeline (2 Scans)
 
-**Dual Scan Approach** (2 API calls per receipt):
+```
+pipelines/
+├── mindee_pipeline.py    # Main entry point (~130 lines)
+└── _mindee/
+    ├── client.py          # Mindee API calls
+    ├── parser.py          # Response parsing
+    └── formatter.py       # Output formatting
+```
+
+**Dual Scan Approach:**
 
 1. **Scan 1: Receipt Model** - Gets structured fields (vendor, date, items, totals)
-2. **Scan 2: Raw OCR** - Gets word positions for column detection
-
-**Why 2 Scans?**
-- Raw OCR with polygon positions requires Mindee Pro tier
-- Workaround: scan receipt model + raw OCR to fill gaps
+2. **Scan 2: Raw OCR** - Gets word positions for column detection (may fail on Starter tier)
 
 **Heuristics:**
 - `qty = total / unit_price` when Mindee's qty detection is wrong
@@ -63,14 +68,18 @@ Implement own box detection to use with Tesseract:
 Receipt OCR/
 ├── gui/                      # GUI application
 ├── pipelines/
-│   ├── mindee_pipeline.py   # Current 2-scan pipeline
-│   └── tesseract_pipeline.py # Sample (not integrated)
+│   ├── mindee_pipeline.py   # Main pipeline (130 lines)
+│   └── _mindee/             # Pipeline modules
+│       ├── client.py        # API client
+│       ├── parser.py        # Response parser
+│       └── formatter.py     # Output formatter
 ├── stages/
-│   ├── recognition/          # OCR engines
-│   ├── parsing/              # Item extraction
-│   └── preprocessing/        # Image preprocessing
-├── utils/                     # Utilities
-└── sample_images/             # Test receipts
+│   ├── recognition/         # OCR engines (samples only)
+│   ├── parsing/             # Item extraction
+│   └── preprocessing/       # Image preprocessing
+├── utils/                   # Utilities
+├── tests/                   # Tests (22 tests, all passing)
+└── sample_images/           # Test receipts
 ```
 
 ## API Keys
@@ -78,3 +87,9 @@ Receipt OCR/
 Required for Mindee (Starter tier works):
 - `MINDEE_API_KEY` - Mindee API key
 - `MINDEE_MODEL_ID` - Mindee model ID
+
+## Running Tests
+
+```bash
+python -m pytest tests/test_mindee_pipeline.py -v
+```
