@@ -16,45 +16,31 @@ cd "C:\Users\Kfir Ezer\Desktop\Receipt OCR" && python -m gui.app
 
 ## Architecture
 
-### Mindee API (Primary) - Works with Starter Tier
+### Mindee API (Current - 2 Scans)
 
 **Dual Scan Approach** (2 API calls per receipt):
 
-1. **Scan 1: Receipt Model** - Gets structured items (description, qty, unit_price, total)
-2. **Scan 2: Raw OCR** - Tries to get word positions (may fail on Starter tier)
+1. **Scan 1: Receipt Model** - Gets structured fields (vendor, date, items, totals)
+2. **Scan 2: Raw OCR** - Gets word positions for column detection
+
+**Why 2 Scans?**
+- Raw OCR with polygon positions requires Mindee Pro tier
+- Workaround: scan receipt model + raw OCR to fill gaps
 
 **Heuristics:**
 - `qty = total / unit_price` when Mindee's qty detection is wrong
 - Allow ±2 ILS tolerance for rounding and discounts
 - Trust line_total from Mindee as ground truth
 
-### Tesseract (Fallback)
+### Tesseract (Sample Only)
 
-Local OCR for:
-- Box detection for custom processing
-- Number OCR for quantity verification
+Local OCR kept as reference for future 1-scan implementation:
+- Currently not integrated into the pipeline
+- Located at `stages/recognition/tesseract_client_SAMPLE.py`
 
-## Run CLI
+## Future: 1 Scan Approach
 
-```cmd
-cd "C:\Users\Kfir Ezer\Desktop\Receipt OCR" && python -c "from stages.recognition.tesseract_client import parse_receipt_combined; r=parse_receipt_combined('receipt.pdf'); print(r)"
-```
-
-## Test Results
-
-| Receipt | Items | Accuracy | Multi-Qty |
-|---------|-------|----------|-----------|
-| Avikam 10.03.2025 | 14 | 85.7% | 13 |
-| Hamefitz 27.12.2024 | 8 | 100.0% | 8 |
-| Ida 20.03.2025 | 90 | 100.0% | 64 |
-| Tnuva 19.08.2024 | 12 | 100.0% | 12 |
-| Wisso 03.03.2025 | 27 | 88.9% | 27 |
-| Shufersal 12.04.2026 | 23 | 100.0% | 1 |
-| **TOTAL** | **174** | **95.4%** | **125** |
-
-## Future: Own Box Detection (1 Scan Approach)
-
-Instead of Mindee's dual scan, implement our own:
+Implement own box detection to use with Tesseract:
 
 1. **OpenCV line detection** - Find table rows/columns
 2. **Tesseract OCR** - Extract text from each cell
@@ -76,18 +62,19 @@ Instead of Mindee's dual scan, implement our own:
 ```
 Receipt OCR/
 ├── gui/                      # GUI application
+├── pipelines/
+│   ├── mindee_pipeline.py   # Current 2-scan pipeline
+│   └── tesseract_pipeline.py # Sample (not integrated)
 ├── stages/
 │   ├── recognition/          # OCR engines
-│   │   ├── mindee_ocr.py    # Dual scan parser (primary)
-│   │   └── tesseract_client.py  # Local OCR + box detection
 │   ├── parsing/              # Item extraction
-│   └── post_process/         # Post-processing
+│   └── preprocessing/        # Image preprocessing
 ├── utils/                     # Utilities
 └── sample_images/             # Test receipts
 ```
 
-## API Keys (Optional)
+## API Keys
 
-For Mindee (Starter tier works):
+Required for Mindee (Starter tier works):
 - `MINDEE_API_KEY` - Mindee API key
 - `MINDEE_MODEL_ID` - Mindee model ID
