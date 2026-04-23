@@ -1,0 +1,267 @@
+Starting Integration Tests for Receipt-OCR 8-Phase Pipeline
+Test directory: C:\Users\Kfir Ezer\Desktop\tests
+Date: 2026-04-21 13:35:47
+Found 10 test PDF/JSON pairs
+
+================================================================================
+Testing: Globrands_23.03.2025_Globrands 24-03-25.pdf
+================================================================================
+Expected items: 12
+Running pipeline...
+
+================================================================================
+Processing receipt: Globrands_23.03.2025_Globrands 24-03-25.pdf
+================================================================================
+
+PHASE 1: Performing two scans...
+  Scan A: JSON scan for structured data
+    Extracted 12 items from JSON scan
+  Scan B: Raw text scan with raw_text=True
+    Extracted 2245 characters of raw text
+    Preview (first 300 chars): Inference
+#########
+Job
+===
+:ID: 32109228-33c6-4d38-ac7a-bc7bc7f1d4e8
+
+Model
+=====
+:ID: 2794301c-25bd-402a-bebe-5295a67416e6
+
+File
+====
+:Name: Globrands_23.03.2025_Globrands 24-03-25.pdf
+:Alias:
+:Page Count: 1
+:MIME Type: application/pdf
+
+Active Options
+==============
+:Raw Text: True
+:Polygon: False...
+
+PHASE 2: Raw text segmentation using JSON anchors...
+Phase 2: Segmenting 12 JSON items against 106 raw text lines
+
+Processing item 1/12
+  Looking for: 'וינסטון כחול בוקס...'
+  V Name match found at line 32 (score: 27.27272727272727)
+  Collected block of 6 lines
+  Block pattern: unknown
+
+Processing item 2/12
+  Looking for: 'וינסטון קוד...'
+  V Name match found at line 32 (score: 21.052631578947366)
+  Collected block of 6 lines
+  Block pattern: unknown
+
+Processing item 3/12
+  Looking for: 'וינסטון קומפקט ברי...'
+  V Name match found at line 32 (score: 31.11111111111111)
+  Collected block of 6 lines
+  Block pattern: unknown
+
+Processing item 4/12
+  Looking for: 'פאל מאל כחול דמי סלימס...'
+  V Name match found at line 33 (score: 22.22222222222222)
+  Collected block of 6 lines
+  Block pattern: unknown
+
+Processing item 5/12
+  Looking for: 'פאל מאל ס.ס כחול טיוב...'
+  V Name match found at line 33 (score: 22.64150943396226)
+  Collected block of 6 lines
+  Block pattern: unknown
+
+Processing item 6/12
+  Looking for: 'כאמל צהוב בוקס...'
+  V Name match found at line 32 (score: 24.390243902439025)
+  Collected block of 6 lines
+  Block pattern: unknown
+
+Processing item 7/12
+  Looking for: 'וג מנטה...'
+  X No good name match (score: 17.647058823529417, threshold: 20)
+
+Processing item 8/12
+  Looking for: 'וג לילך...'
+  X No good name match (score: 13.33333333333333, threshold: 20)
+
+Processing item 9/12
+  Looking for: 'RAW נייר גדול ופילטר...'
+  V Name match found at line 32 (score: 25.531914893617024)
+  Collected block of 6 lines
+  Block pattern: unknown
+
+Processing item 10/12
+  Looking for: 'קונוס 32 גדול RAW...'
+  V Name match found at line 32 (score: 31.818181818181824)
+  Collected block of 6 lines
+  Block pattern: unknown
+
+Processing item 11/12
+  Looking for: 'קונוס 32 בינוני RAW...'
+  V Name match found at line 32 (score: 26.086956521739136)
+  Collected block of 6 lines
+  Block pattern: unknown
+
+Processing item 12/12
+  Looking for: 'מצח מעוצב BIC J23...'
+  V Name match found at line 32 (score: 27.27272727272727)
+  Collected block of 6 lines
+  Block pattern: unknown
+
+Phase 2 complete: Successfully segmented 10/12 items
+  Enhanced 10/12 items
+
+PHASE 3: Column detection...
+Phase 3: Detecting columns in 106 lines
+  Outer loop: Trying different line ranges...
+  Fallback: Trying single lines...
+  ✗ No column headers detected, using default mapping
+  Column detection failed: No column headers detected
+
+PHASE 4: Quantity pattern detection...
+Phase 4: Analyzing quantity patterns across 12 items
+  Checking for quantity patterns...
+  ✓ Pattern 1 detected: Single quantity column
+  Detected pattern: pattern1
+
+PHASE 5: Product list integration...
+  Using vendor for filtering: גלוברנדס בע"מ
+Phase 5: Loading product list from C:/Users/Kfir Ezer/Downloads/prices_rimon_03-02-25.xlsx
+Phase 5: Column 'קוד פריט' found as 'קוד פריט ' (after trimming)
+Phase 5: Column 'תאור פריט' found as 'תאור פריט ' (after trimming)
+Phase 5: Loaded 10957 products
+Columns: ['קוד פריט ', 'ברקוד ', 'תאור פריט ', 'מחיר קניה ', ' ', 'אחוז רווח מלמעלה ', 'מכר חודש (מלא)', 'מלאי נוכחי ', 'סוג פריט ', 'תאריך מכר אחרון ', 'שם מחלקה ', 'שם ספק ראשי ', 'קוד ספק ראשי ']
+Phase 5: After cleaning, 10957 products remain
+Phase 5: Enriching 12 items (vendor: גלוברנדס בע"מ)
+
+  Item 1: וינסטון כחול בוקס*...
+    Trying fuzzy name match...
+    ✓ Fuzzy name match found (score: 80.0)
+
+  Item 2: וינסטון קוד*...
+    Trying fuzzy name match...
+    ✓ Fuzzy name match found (score: 100.0)
+
+  Item 3: וינסטון קומפקט ברי*...
+    Trying fuzzy name match...
+    ✓ Fuzzy name match found (score: 100.0)
+
+  Item 4: פאל מאל כחול דמי סלימס...
+    Trying fuzzy name match...
+    ✗ No match found
+
+  Item 5: פאל מאל ס.ס כחול טיוב...
+    Trying fuzzy name match...
+    ✗ No match found
+
+  Item 6: כאמל צהוב בוקס*...
+    Trying fuzzy name match...
+    ✗ No match found
+
+  Item 7: וג מנטה...
+    Trying fuzzy name match...
+    ✗ No match found
+
+  Item 8: וג לילך...
+    Trying fuzzy name match...
+    ✗ No match found
+
+  Item 9: RAW נייר גדול ופילטר...
+    Trying fuzzy name match...
+    ✓ Fuzzy name match found (score: 76.92307692307692)
+
+  Item 10: קונוס 32 גדול RAW...
+    Trying fuzzy name match...
+    ✓ Fuzzy name match found (score: 86.95652173913044)
+
+  Item 11: קונוס 32 בינוני RAW...
+    Trying fuzzy name match...
+    ✗ No match found
+
+  Item 12: מצח מעוצב BIC J23...
+    Trying fuzzy name match...
+    ✗ No match found
+
+Phase 5: Successfully enriched 5/12 items
+  Found CatalogNo for 5/12 items
+
+PHASE 6: Vendor cache...
+Phase 6: Cache file not found, will create: C:\Users\Kfir Ezer\Desktop\Receipt-OCR\data\vendor_cache.json
+Phase 6: Detecting vendor in first 10 lines
+  ✗ No vendor detected in first 10 lines
+  No vendor detected in text
+
+PHASE 7: Formatting ABBYY JSON output...
+  Creating ABBYY format for 12 items
+
+================================================================================
+Processing complete!
+================================================================================
+Actual items extracted: 12
+
+Test Results:
+  Item count: 12 actual vs 12 expected
+  Price matches: 4/12
+  Quantity matches: 0/12
+  CatalogNo matches: 0/12
+  LineTotal matches: 0/12
+
+Accuracy:
+  item_count_accuracy: 100.0%
+  item_matching_accuracy: 33.3%
+  price_accuracy: 33.3%
+  quantity_accuracy: 0.0%
+  catalog_no_accuracy: 0.0%
+  line_total_accuracy: 0.0%
+
+================================================================================
+Testing: Hamefitz_27.12.2024_Hamefitz 15-01-25 A.pdf
+================================================================================
+Expected items: 8
+Running pipeline...
+
+================================================================================
+Processing receipt: Hamefitz_27.12.2024_Hamefitz 15-01-25 A.pdf
+================================================================================
+
+PHASE 1: Performing two scans...
+  Scan A: JSON scan for structured data
+    Extracted 8 items from JSON scan
+  Scan B: Raw text scan with raw_text=True
+    Extracted 1710 characters of raw text
+    Preview (first 300 chars): Inference
+#########
+Job
+===
+:ID: c7e35d50-9cc6-4aab-8376-fe5d45077cdb
+
+Model
+=====
+:ID: 2794301c-25bd-402a-bebe-5295a67416e6
+
+File
+====
+:Name: Hamefitz_27.12.2024_Hamefitz 15-01-25 A.pdf
+:Alias:
+:Page Count: 1
+:MIME Type: application/pdf
+
+Active Options
+==============
+:Raw Text: True
+:Polygon: False...
+
+PHASE 2: Raw text segmentation using JSON anchors...
+Phase 2: Segmenting 8 JSON items against 88 raw text lines
+
+Processing item 1/8
+  Looking for: 'חומוס שלם יכין 550 גרם...'
+  V Name match found at line 50 (score: 78.57142857142857)
+  Collected block of 7 lines
+  Block pattern: unknown
+
+Processing item 2/8
+  Looking for: 'רוטב עגבניות 22% 100 גרם...'

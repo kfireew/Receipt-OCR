@@ -97,7 +97,9 @@ def mindee_to_abbey(items: List[Dict], receipt_name: str = "Receipt", vendor: st
     Convert Mindee items to ABBYY GDocument format.
 
     Args:
-        items: List of items from Mindee [{"description": ..., "quantity": ..., "unit_price": ..., "line_total": ...}]
+        items: List of items from Phase 5 [{"description": ..., "quantity": ..., "unit_price": ...,
+               "line_total": ..., "catalog_no": ..., "barcode": ...}]
+               CatalogNo priority: barcode → catalog_no (product code) → extract from description
         receipt_name: Name for the receipt
         vendor: Vendor name (optional)
         date: Date string (optional)
@@ -116,9 +118,12 @@ def mindee_to_abbey(items: List[Dict], receipt_name: str = "Receipt", vendor: st
         unit_price = item.get('unit_price', 0)
         line_total = item.get('line_total', item.get('total', 0))
 
-        # Determine catalog number (from description if present)
-        # Usually catalog numbers are at end of description or in parentheses
-        catalog_no = _extract_catalog_no(description)
+        # Determine catalog number
+        # Priority: barcode → catalog_no (product code) → extract from description
+        # Phase 5 provides both fields when available
+        catalog_no = item.get('barcode', item.get('catalog_no', ''))
+        if not catalog_no:
+            catalog_no = _extract_catalog_no(description)
 
         # Discount field (if negative items exist)
         discount = item.get('discount', 0)

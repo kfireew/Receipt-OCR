@@ -1,0 +1,235 @@
+{
+  "version": "2.0",
+  "vendors": {
+    "shufersal": {
+      "basics": {
+        "display_name": "שופרסל טסט",
+        "user_created": false,
+        "creation_date": "2026-04-23",
+        "last_modified": "2026-04-23",
+        "modified_by": "auto_update"
+      },
+      "confidence": {
+        "trust_score": 0.3333333333333333,
+        "source": "auto_detected",
+        "parses_since_verification": 2,
+        "user_verified": false,
+        "verification_date": null
+      },
+      "columns_gui": [],
+      "validation_rules": {
+        "quantity_calculation": "unknown",
+        "tolerance_percent": 5.0,
+        "auto_validate": true
+      },
+      "legacy_fields": {
+        "display_name": "שופרסל טסט",
+        "parse_count": 2,
+        "last_seen": "2026-04-23",
+        "confirmed_by_user": false,
+        "row_format": "multiline",
+        "quantity_pattern": "pattern1",
+        "has_discount_lines": false,
+        "discount_keywords": [],
+        "barcode_position": "unknown",
+        "confidence": 0.3333333333333333,
+        "column_assignments": {},
+        "detected_columns": [
+          {
+            "hebrew_text": "תאור",
+            "assigned_field": "description"
+          },
+          {
+            "hebrew_text": "",
+            "assigned_field": "product_code"
+          },
+          {
+            "hebrew_text": "כמות",
+            "assigned_field": "quantity"
+          },
+          {
+            "hebrew_text": "מחיר",
+            "assigned_field": "unit_price"
+          },
+          {
+            "hebrew_text": "שורה",
+            "assigned_field": "line_net_total"
+          },
+          {
+            "hebrew_text": "משקל",
+            "assigned_field": "weight"
+          }
+        ]
+      }
+    },
+    "globrands": {
+      "basics": {
+        "display_name": "גלוברנדס",
+        "user_created": true,
+        "creation_date": "2026-04-23",
+        "last_modified": "2026-04-23",
+        "modified_by": "auto_update",
+        "document_type": "invoice"
+      },
+      "confidence": {
+        "trust_score": 0.95,
+        "source": "user_verified",
+        "parses_since_verification": 5,
+        "user_verified": true,
+        "verification_date": "2026-04-23",
+        "verification_method": "invoice_structure_analysis"
+      },
+      "columns_gui": [],
+      "validation_rules": {
+        "quantity_calculation": "Quantity × Price = LineTotal",
+        "tolerance_percent": 1.0,
+        "auto_validate": true,
+        "barcode_format": "EAN13_13_digits",
+        "invoice_specific": true
+      },
+      "parsing_rules": {
+        "document_type": "invoice",
+        "skip_lines": [
+          "חשבונית מס",
+          "מספר לקוח",
+          "תאריך תעודה",
+          "סה״כ כולל"
+        ],
+        "item_separator": "multi_line",
+        "numeric_format": "decimal_dot",
+        "text_cleanup": [
+          "trim_spaces",
+          "remove_asterisks"
+        ],
+        "line_parsing": "barcode_first_then_description",
+        "multi_line_items": true,
+        "lines_per_item": 2,
+        "header_lines": 10,
+        "footer_lines": 5
+      },
+      "invoice_specific": {
+        "has_invoice_number": true,
+        "has_customer_details": true,
+        "has_tax_lines": true,
+        "item_layout": "barcode_on_separate_line",
+        "quantity_position": "after_description",
+        "price_position": "end_of_line"
+      },
+      "legacy_fields": {
+        "display_name": "גלוברנדס",
+        "parse_count": 8,
+        "last_seen": "2026-04-23",
+        "confirmed_by_user": true,
+        "confidence": 0.95,
+        "row_format": "multiline",
+        "quantity_pattern": "pattern1",
+        "has_discount_lines": true,
+        "discount_keywords": [
+          "הנחה"
+        ],
+        "barcode_position": "separate_line",
+        "column_assignments": {
+          "ברקוד": "CatalogNo",
+          "תאור": "description",
+          "כמות": "Quantity",
+          "מחיר": "Price",
+          "סה״כ": "LineTotal"
+        },
+        "is_invoice": true,
+        "detected_columns": [
+          {
+            "hebrew_text": "ברקוד",
+            "assigned_field": "CatalogNo",
+            "confidence": 0.95
+          },
+          {
+            "hebrew_text": "תאור",
+            "assigned_field": "description",
+            "confidence": 0.95
+          },
+          {
+            "hebrew_text": "כמות",
+            "assigned_field": "Quantity",
+            "confidence": 0.95
+          },
+          {
+            "hebrew_text": "מחיר",
+            "assigned_field": "Price",
+            "confidence": 0.95
+          },
+          {
+            "hebrew_text": "סה״כ",
+            "assigned_field": "LineTotal",
+            "confidence": 0.95
+          }
+        ]
+      },
+      "usage_stats": {
+        "total_parses": 1,
+        "successful_parses": 1,
+        "validation_rate": 1.0,
+        "last_used": "2026-04-23"
+      },
+      "phase2_overrides": {
+        "use_column_guided": false,
+        "fallback_method": "fuzzy_with_price_validation",
+        "confidence_threshold": 70,
+        "extract_all_numbers": true,
+        "prioritize_barcode_matching": true
+      }
+    },
+    "tnuva": {
+      "basics": {
+        "display_name": "תנובה",
+        "user_created": false,
+        "creation_date": "2026-04-23",
+        "last_modified": "2026-04-23",
+        "modified_by": "auto_create"
+      },
+      "confidence": {
+        "trust_score": 0.33,
+        "source": "auto_detected",
+        "parses_since_verification": 1,
+        "user_verified": false,
+        "verification_date": null
+      },
+      "columns_gui": [],
+      "validation_rules": {
+        "quantity_calculation": "unknown",
+        "tolerance_percent": 5.0,
+        "auto_validate": true
+      },
+      "legacy_fields": {
+        "display_name": "תנובה",
+        "parse_count": 1,
+        "last_seen": "2026-04-23",
+        "confirmed_by_user": false,
+        "confidence": 0.33,
+        "row_format": "multiline",
+        "quantity_pattern": "weight_based",
+        "has_discount_lines": false,
+        "discount_keywords": [],
+        "barcode_position": "unknown",
+        "column_assignments": {
+          "סכום": "line_net_total",
+          "מחיר": "unit_price",
+          "כמות": "quantity"
+        },
+        "detected_columns": [
+          {
+            "hebrew_text": "סכום",
+            "assigned_field": "line_net_total"
+          },
+          {
+            "hebrew_text": "מחיר",
+            "assigned_field": "unit_price"
+          },
+          {
+            "hebrew_text": "כמות",
+            "assigned_field": "quantity"
+          }
+        ]
+      }
+    }
+  }
+}

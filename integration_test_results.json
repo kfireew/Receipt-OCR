@@ -1,0 +1,2943 @@
+{
+  "summary": {
+    "total_tests": 3,
+    "successful_tests": 3,
+    "failed_tests": 0,
+    "success_rate": 100.0,
+    "average_accuracy": {
+      "item_count_accuracy": 100.0,
+      "item_matching_accuracy": 20.405982905982906,
+      "price_accuracy": 16.23931623931624,
+      "quantity_accuracy": 0.0,
+      "catalog_no_accuracy": 4.166666666666667,
+      "line_total_accuracy": 0.0
+    },
+    "failed_files": [],
+    "failed_errors": []
+  },
+  "results": [
+    {
+      "test_file": "Globrands_23.03.2025_Globrands 24-03-25.pdf",
+      "pdf_path": "C:\\Users\\Kfir Ezer\\Desktop\\tests\\1\\Globrands_23.03.2025_Globrands 24-03-25.pdf",
+      "json_path": "C:\\Users\\Kfir Ezer\\Desktop\\tests\\1\\Globrands_23.03.2025_Globrands 24-03-25.JSON",
+      "success": true,
+      "error": null,
+      "comparison": {
+        "item_count_match": true,
+        "actual_count": 12,
+        "expected_count": 12,
+        "per_item_comparisons": [
+          {
+            "index": 0,
+            "price_match": true,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 1,
+            "price_match": true,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 2,
+            "price_match": true,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 3,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 4,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 5,
+            "price_match": true,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 6,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 7,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 8,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 9,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 10,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 11,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          }
+        ],
+        "matched_items": 4,
+        "price_matches": 4,
+        "quantity_matches": 0,
+        "catalog_no_matches": 0,
+        "line_total_matches": 0
+      },
+      "accuracy": {
+        "item_count_accuracy": 100.0,
+        "item_matching_accuracy": 33.33333333333333,
+        "price_accuracy": 33.33333333333333,
+        "quantity_accuracy": 0.0,
+        "catalog_no_accuracy": 0.0,
+        "line_total_accuracy": 0.0
+      },
+      "pipeline_output": {
+        "GDocument": {
+          "id": "1",
+          "documentDefinition": "InnoventoryTech",
+          "batchId": 2340,
+          "isAssembled": true,
+          "isVerified": true,
+          "processingErrors": "",
+          "processingWarnings": "",
+          "totalSymbolsCount": 120,
+          "recognizedSymbolsCount": 120,
+          "uncertainSymbolsCount": "0",
+          "name": "Globrands_23.03.25_Globrands 23-03-25",
+          "caption": "Globrands_23.03.25_Globrands 23-03-25",
+          "path": "",
+          "groups": [
+            {
+              "name": "Table",
+              "caption": "Table",
+              "path": "InnovatoryTech\\Table",
+              "groups": [
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[0]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 8,
+                      "name": "Price",
+                      "value": "302.71"
+                    },
+                    {
+                      "id": 9,
+                      "name": "Quantity",
+                      "value": "9.0"
+                    },
+                    {
+                      "id": 10,
+                      "name": "CatalogNo",
+                      "value": "123593"
+                    },
+                    {
+                      "id": 11,
+                      "name": "LineTotal",
+                      "value": "2724.39"
+                    },
+                    {
+                      "id": 12,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 13,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[1]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 14,
+                      "name": "Price",
+                      "value": "286.78"
+                    },
+                    {
+                      "id": 15,
+                      "name": "Quantity",
+                      "value": "9.0"
+                    },
+                    {
+                      "id": 16,
+                      "name": "CatalogNo",
+                      "value": "4033100024146"
+                    },
+                    {
+                      "id": 17,
+                      "name": "LineTotal",
+                      "value": "2581.02"
+                    },
+                    {
+                      "id": 18,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 19,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[2]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 20,
+                      "name": "Price",
+                      "value": "270.85"
+                    },
+                    {
+                      "id": 21,
+                      "name": "Quantity",
+                      "value": "9.0"
+                    },
+                    {
+                      "id": 22,
+                      "name": "CatalogNo",
+                      "value": "4032900124254"
+                    },
+                    {
+                      "id": 23,
+                      "name": "LineTotal",
+                      "value": "2437.65"
+                    },
+                    {
+                      "id": 24,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 25,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[3]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 26,
+                      "name": "Price",
+                      "value": "247.5"
+                    },
+                    {
+                      "id": 27,
+                      "name": "Quantity",
+                      "value": "9.0"
+                    },
+                    {
+                      "id": 28,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 29,
+                      "name": "LineTotal",
+                      "value": "2227.5"
+                    },
+                    {
+                      "id": 30,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 31,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[4]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 32,
+                      "name": "Price",
+                      "value": "278.8"
+                    },
+                    {
+                      "id": 33,
+                      "name": "Quantity",
+                      "value": "9.0"
+                    },
+                    {
+                      "id": 34,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 35,
+                      "name": "LineTotal",
+                      "value": "2509.2"
+                    },
+                    {
+                      "id": 36,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 37,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[5]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 38,
+                      "name": "Price",
+                      "value": "286.78"
+                    },
+                    {
+                      "id": 39,
+                      "name": "Quantity",
+                      "value": "9.0"
+                    },
+                    {
+                      "id": 40,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 41,
+                      "name": "LineTotal",
+                      "value": "2581.02"
+                    },
+                    {
+                      "id": 42,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 43,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[6]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 44,
+                      "name": "Price",
+                      "value": "343.0"
+                    },
+                    {
+                      "id": 45,
+                      "name": "Quantity",
+                      "value": "9.0"
+                    },
+                    {
+                      "id": 46,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 47,
+                      "name": "LineTotal",
+                      "value": "3087.0"
+                    },
+                    {
+                      "id": 48,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 49,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[7]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 50,
+                      "name": "Price",
+                      "value": "343.0"
+                    },
+                    {
+                      "id": 51,
+                      "name": "Quantity",
+                      "value": "9.0"
+                    },
+                    {
+                      "id": 52,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 53,
+                      "name": "LineTotal",
+                      "value": "3087.0"
+                    },
+                    {
+                      "id": 54,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 55,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[8]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 56,
+                      "name": "Price",
+                      "value": "14.99"
+                    },
+                    {
+                      "id": 57,
+                      "name": "Quantity",
+                      "value": "9.0"
+                    },
+                    {
+                      "id": 58,
+                      "name": "CatalogNo",
+                      "value": "30107014"
+                    },
+                    {
+                      "id": 59,
+                      "name": "LineTotal",
+                      "value": "134.91"
+                    },
+                    {
+                      "id": 60,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 61,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[9]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 62,
+                      "name": "Price",
+                      "value": "17.54"
+                    },
+                    {
+                      "id": 63,
+                      "name": "Quantity",
+                      "value": "9.0"
+                    },
+                    {
+                      "id": 64,
+                      "name": "CatalogNo",
+                      "value": "716165174578"
+                    },
+                    {
+                      "id": 65,
+                      "name": "LineTotal",
+                      "value": "157.86"
+                    },
+                    {
+                      "id": 66,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 67,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[10]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 68,
+                      "name": "Price",
+                      "value": "17.54"
+                    },
+                    {
+                      "id": 69,
+                      "name": "Quantity",
+                      "value": "9.0"
+                    },
+                    {
+                      "id": 70,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 71,
+                      "name": "LineTotal",
+                      "value": "157.86"
+                    },
+                    {
+                      "id": 72,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 73,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[11]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 74,
+                      "name": "Price",
+                      "value": "78.0"
+                    },
+                    {
+                      "id": 75,
+                      "name": "Quantity",
+                      "value": "9.0"
+                    },
+                    {
+                      "id": 76,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 77,
+                      "name": "LineTotal",
+                      "value": "702.0"
+                    },
+                    {
+                      "id": 78,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 79,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                }
+              ],
+              "fields": []
+            }
+          ],
+          "fields": [
+            {
+              "name": "InvoiceNo",
+              "value": ""
+            },
+            {
+              "name": "Field1",
+              "value": ""
+            },
+            {
+              "name": "VendorName",
+              "value": "Globrands"
+            },
+            {
+              "name": "Field3",
+              "value": ""
+            },
+            {
+              "name": "Date",
+              "value": "2025-03-23"
+            },
+            {
+              "name": "Field5",
+              "value": ""
+            },
+            {
+              "name": "Total",
+              "value": "22387.41"
+            },
+            {
+              "name": "Field7",
+              "value": ""
+            }
+          ],
+          "errors": ""
+        }
+      }
+    },
+    {
+      "test_file": "Hamefitz_27.12.2024_Hamefitz 15-01-25 A.pdf",
+      "pdf_path": "C:\\Users\\Kfir Ezer\\Desktop\\tests\\2\\Hamefitz_27.12.2024_Hamefitz 15-01-25 A.pdf",
+      "json_path": "C:\\Users\\Kfir Ezer\\Desktop\\tests\\2\\Hamefitz_27.12.2024_Hamefitz 15-01-25 A.JSON",
+      "success": true,
+      "error": null,
+      "comparison": {
+        "item_count_match": true,
+        "actual_count": 8,
+        "expected_count": 8,
+        "per_item_comparisons": [
+          {
+            "index": 0,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 1,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 2,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 3,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": true,
+            "line_total_match": false
+          },
+          {
+            "index": 4,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 5,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 6,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 7,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          }
+        ],
+        "matched_items": 1,
+        "price_matches": 0,
+        "quantity_matches": 0,
+        "catalog_no_matches": 1,
+        "line_total_matches": 0
+      },
+      "accuracy": {
+        "item_count_accuracy": 100.0,
+        "item_matching_accuracy": 12.5,
+        "price_accuracy": 0.0,
+        "quantity_accuracy": 0.0,
+        "catalog_no_accuracy": 12.5,
+        "line_total_accuracy": 0.0
+      },
+      "pipeline_output": {
+        "GDocument": {
+          "id": "1",
+          "documentDefinition": "InnoventoryTech",
+          "batchId": 2340,
+          "isAssembled": true,
+          "isVerified": true,
+          "processingErrors": "",
+          "processingWarnings": "",
+          "totalSymbolsCount": 80,
+          "recognizedSymbolsCount": 80,
+          "uncertainSymbolsCount": "0",
+          "name": "Hamefitz_27.12.24_Hamefitz 27-12-24",
+          "caption": "Hamefitz_27.12.24_Hamefitz 27-12-24",
+          "path": "",
+          "groups": [
+            {
+              "name": "Table",
+              "caption": "Table",
+              "path": "InnovatoryTech\\Table",
+              "groups": [
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[0]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 8,
+                      "name": "Price",
+                      "value": "4.5"
+                    },
+                    {
+                      "id": 9,
+                      "name": "Quantity",
+                      "value": "25"
+                    },
+                    {
+                      "id": 10,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 11,
+                      "name": "LineTotal",
+                      "value": "112.5"
+                    },
+                    {
+                      "id": 12,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 13,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[1]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 14,
+                      "name": "Price",
+                      "value": "1.1"
+                    },
+                    {
+                      "id": 15,
+                      "name": "Quantity",
+                      "value": "264.0"
+                    },
+                    {
+                      "id": 16,
+                      "name": "CatalogNo",
+                      "value": "7290016087604"
+                    },
+                    {
+                      "id": 17,
+                      "name": "LineTotal",
+                      "value": "290.4"
+                    },
+                    {
+                      "id": 18,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 19,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[2]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 20,
+                      "name": "Price",
+                      "value": "1.9"
+                    },
+                    {
+                      "id": 21,
+                      "name": "Quantity",
+                      "value": "24.0"
+                    },
+                    {
+                      "id": 22,
+                      "name": "CatalogNo",
+                      "value": "5000159460880"
+                    },
+                    {
+                      "id": 23,
+                      "name": "LineTotal",
+                      "value": "45.6"
+                    },
+                    {
+                      "id": 24,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 25,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[3]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 26,
+                      "name": "Price",
+                      "value": "4.3"
+                    },
+                    {
+                      "id": 27,
+                      "name": "Quantity",
+                      "value": "16.0"
+                    },
+                    {
+                      "id": 28,
+                      "name": "CatalogNo",
+                      "value": "7290112494221"
+                    },
+                    {
+                      "id": 29,
+                      "name": "LineTotal",
+                      "value": "68.8"
+                    },
+                    {
+                      "id": 30,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 31,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[4]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 32,
+                      "name": "Price",
+                      "value": "4.3"
+                    },
+                    {
+                      "id": 33,
+                      "name": "Quantity",
+                      "value": "264.0"
+                    },
+                    {
+                      "id": 34,
+                      "name": "CatalogNo",
+                      "value": "7290112494214"
+                    },
+                    {
+                      "id": 35,
+                      "name": "LineTotal",
+                      "value": "1135.2"
+                    },
+                    {
+                      "id": 36,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 37,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[5]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 38,
+                      "name": "Price",
+                      "value": "8.7"
+                    },
+                    {
+                      "id": 39,
+                      "name": "Quantity",
+                      "value": "2.0"
+                    },
+                    {
+                      "id": 40,
+                      "name": "CatalogNo",
+                      "value": "189192"
+                    },
+                    {
+                      "id": 41,
+                      "name": "LineTotal",
+                      "value": "17.4"
+                    },
+                    {
+                      "id": 42,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 43,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[6]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 44,
+                      "name": "Price",
+                      "value": "11.5"
+                    },
+                    {
+                      "id": 45,
+                      "name": "Quantity",
+                      "value": "264.0"
+                    },
+                    {
+                      "id": 46,
+                      "name": "CatalogNo",
+                      "value": "8000500359358"
+                    },
+                    {
+                      "id": 47,
+                      "name": "LineTotal",
+                      "value": "3036.0"
+                    },
+                    {
+                      "id": 48,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 49,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[7]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 50,
+                      "name": "Price",
+                      "value": "0.6"
+                    },
+                    {
+                      "id": 51,
+                      "name": "Quantity",
+                      "value": "120.0"
+                    },
+                    {
+                      "id": 52,
+                      "name": "CatalogNo",
+                      "value": "4008400409627"
+                    },
+                    {
+                      "id": 53,
+                      "name": "LineTotal",
+                      "value": "72.0"
+                    },
+                    {
+                      "id": 54,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 55,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                }
+              ],
+              "fields": []
+            }
+          ],
+          "fields": [
+            {
+              "name": "InvoiceNo",
+              "value": ""
+            },
+            {
+              "name": "Field1",
+              "value": ""
+            },
+            {
+              "name": "VendorName",
+              "value": "Hamefitz"
+            },
+            {
+              "name": "Field3",
+              "value": ""
+            },
+            {
+              "name": "Date",
+              "value": "2024-12-27"
+            },
+            {
+              "name": "Field5",
+              "value": ""
+            },
+            {
+              "name": "Total",
+              "value": "4777.9"
+            },
+            {
+              "name": "Field7",
+              "value": ""
+            }
+          ],
+          "errors": ""
+        }
+      }
+    },
+    {
+      "test_file": "Shufersal_13.04.2026_Shufersal 13-04-26.pdf",
+      "pdf_path": "C:\\Users\\Kfir Ezer\\Desktop\\tests\\3\\Shufersal_13.04.2026_Shufersal 13-04-26.pdf",
+      "json_path": "C:\\Users\\Kfir Ezer\\Desktop\\tests\\3\\Shufersal_13.04.2026_Shufersal 13-04-26.JSON",
+      "success": true,
+      "error": null,
+      "comparison": {
+        "item_count_match": true,
+        "actual_count": 39,
+        "expected_count": 39,
+        "per_item_comparisons": [
+          {
+            "index": 0,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 1,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 2,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 3,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 4,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 5,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 6,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 7,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 8,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 9,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 10,
+            "price_match": true,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 11,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 12,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 13,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 14,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 15,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 16,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 17,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 18,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 19,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 20,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 21,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 22,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 23,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 24,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 25,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 26,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 27,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 28,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 29,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 30,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 31,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 32,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 33,
+            "price_match": false,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 34,
+            "price_match": true,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 35,
+            "price_match": true,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 36,
+            "price_match": true,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 37,
+            "price_match": true,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          },
+          {
+            "index": 38,
+            "price_match": true,
+            "quantity_match": false,
+            "catalog_no_match": false,
+            "line_total_match": false
+          }
+        ],
+        "matched_items": 6,
+        "price_matches": 6,
+        "quantity_matches": 0,
+        "catalog_no_matches": 0,
+        "line_total_matches": 0
+      },
+      "accuracy": {
+        "item_count_accuracy": 100.0,
+        "item_matching_accuracy": 15.384615384615385,
+        "price_accuracy": 15.384615384615385,
+        "quantity_accuracy": 0.0,
+        "catalog_no_accuracy": 0.0,
+        "line_total_accuracy": 0.0
+      },
+      "pipeline_output": {
+        "GDocument": {
+          "id": "1",
+          "documentDefinition": "InnoventoryTech",
+          "batchId": 2340,
+          "isAssembled": true,
+          "isVerified": true,
+          "processingErrors": "",
+          "processingWarnings": "",
+          "totalSymbolsCount": 390,
+          "recognizedSymbolsCount": 390,
+          "uncertainSymbolsCount": "0",
+          "name": "Shufersal_13.04.26_Shufersal 13-04-26",
+          "caption": "Shufersal_13.04.26_Shufersal 13-04-26",
+          "path": "",
+          "groups": [
+            {
+              "name": "Table",
+              "caption": "Table",
+              "path": "InnovatoryTech\\Table",
+              "groups": [
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[0]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 8,
+                      "name": "Price",
+                      "value": "5.2"
+                    },
+                    {
+                      "id": 9,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 10,
+                      "name": "CatalogNo",
+                      "value": "60965"
+                    },
+                    {
+                      "id": 11,
+                      "name": "LineTotal",
+                      "value": "62.4"
+                    },
+                    {
+                      "id": 12,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 13,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[1]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 14,
+                      "name": "Price",
+                      "value": "5.2"
+                    },
+                    {
+                      "id": 15,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 16,
+                      "name": "CatalogNo",
+                      "value": "60163"
+                    },
+                    {
+                      "id": 17,
+                      "name": "LineTotal",
+                      "value": "62.4"
+                    },
+                    {
+                      "id": 18,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 19,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[2]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 20,
+                      "name": "Price",
+                      "value": "9.3"
+                    },
+                    {
+                      "id": 21,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 22,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 23,
+                      "name": "LineTotal",
+                      "value": "111.6"
+                    },
+                    {
+                      "id": 24,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 25,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[3]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 26,
+                      "name": "Price",
+                      "value": "5.9"
+                    },
+                    {
+                      "id": 27,
+                      "name": "Quantity",
+                      "value": "1"
+                    },
+                    {
+                      "id": 28,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 29,
+                      "name": "LineTotal",
+                      "value": "5.9"
+                    },
+                    {
+                      "id": 30,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 31,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[4]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 32,
+                      "name": "Price",
+                      "value": "4.2"
+                    },
+                    {
+                      "id": 33,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 34,
+                      "name": "CatalogNo",
+                      "value": "7290100685068"
+                    },
+                    {
+                      "id": 35,
+                      "name": "LineTotal",
+                      "value": "50.4"
+                    },
+                    {
+                      "id": 36,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 37,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[5]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 38,
+                      "name": "Price",
+                      "value": "14.7"
+                    },
+                    {
+                      "id": 39,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 40,
+                      "name": "CatalogNo",
+                      "value": "75693"
+                    },
+                    {
+                      "id": 41,
+                      "name": "LineTotal",
+                      "value": "176.4"
+                    },
+                    {
+                      "id": 42,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 43,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[6]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 44,
+                      "name": "Price",
+                      "value": "13.9"
+                    },
+                    {
+                      "id": 45,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 46,
+                      "name": "CatalogNo",
+                      "value": "112619"
+                    },
+                    {
+                      "id": 47,
+                      "name": "LineTotal",
+                      "value": "166.8"
+                    },
+                    {
+                      "id": 48,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 49,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[7]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 50,
+                      "name": "Price",
+                      "value": "10.3"
+                    },
+                    {
+                      "id": 51,
+                      "name": "Quantity",
+                      "value": "1"
+                    },
+                    {
+                      "id": 52,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 53,
+                      "name": "LineTotal",
+                      "value": "10.3"
+                    },
+                    {
+                      "id": 54,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 55,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[8]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 56,
+                      "name": "Price",
+                      "value": "10.3"
+                    },
+                    {
+                      "id": 57,
+                      "name": "Quantity",
+                      "value": "47.0"
+                    },
+                    {
+                      "id": 58,
+                      "name": "CatalogNo",
+                      "value": "8683130052952"
+                    },
+                    {
+                      "id": 59,
+                      "name": "LineTotal",
+                      "value": "484.1"
+                    },
+                    {
+                      "id": 60,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 61,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[9]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 62,
+                      "name": "Price",
+                      "value": "9.4"
+                    },
+                    {
+                      "id": 63,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 64,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 65,
+                      "name": "LineTotal",
+                      "value": "112.8"
+                    },
+                    {
+                      "id": 66,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 67,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[10]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 68,
+                      "name": "Price",
+                      "value": "14.18"
+                    },
+                    {
+                      "id": 69,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 70,
+                      "name": "CatalogNo",
+                      "value": "7290010429684"
+                    },
+                    {
+                      "id": 71,
+                      "name": "LineTotal",
+                      "value": "170.16"
+                    },
+                    {
+                      "id": 72,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 73,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[11]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 74,
+                      "name": "Price",
+                      "value": "7.5"
+                    },
+                    {
+                      "id": 75,
+                      "name": "Quantity",
+                      "value": "1"
+                    },
+                    {
+                      "id": 76,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 77,
+                      "name": "LineTotal",
+                      "value": "7.5"
+                    },
+                    {
+                      "id": 78,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 79,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[12]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 80,
+                      "name": "Price",
+                      "value": "5.9"
+                    },
+                    {
+                      "id": 81,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 82,
+                      "name": "CatalogNo",
+                      "value": "6567048"
+                    },
+                    {
+                      "id": 83,
+                      "name": "LineTotal",
+                      "value": "70.8"
+                    },
+                    {
+                      "id": 84,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 85,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[13]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 86,
+                      "name": "Price",
+                      "value": "5.9"
+                    },
+                    {
+                      "id": 87,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 88,
+                      "name": "CatalogNo",
+                      "value": "6111094000242"
+                    },
+                    {
+                      "id": 89,
+                      "name": "LineTotal",
+                      "value": "70.8"
+                    },
+                    {
+                      "id": 90,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 91,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[14]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 92,
+                      "name": "Price",
+                      "value": "10.9"
+                    },
+                    {
+                      "id": 93,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 94,
+                      "name": "CatalogNo",
+                      "value": "6983794"
+                    },
+                    {
+                      "id": 95,
+                      "name": "LineTotal",
+                      "value": "130.8"
+                    },
+                    {
+                      "id": 96,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 97,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[15]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 98,
+                      "name": "Price",
+                      "value": "6.9"
+                    },
+                    {
+                      "id": 99,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 100,
+                      "name": "CatalogNo",
+                      "value": "8775823"
+                    },
+                    {
+                      "id": 101,
+                      "name": "LineTotal",
+                      "value": "82.8"
+                    },
+                    {
+                      "id": 102,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 103,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[16]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 104,
+                      "name": "Price",
+                      "value": "10.9"
+                    },
+                    {
+                      "id": 105,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 106,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 107,
+                      "name": "LineTotal",
+                      "value": "130.8"
+                    },
+                    {
+                      "id": 108,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 109,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[17]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 110,
+                      "name": "Price",
+                      "value": "6.5"
+                    },
+                    {
+                      "id": 111,
+                      "name": "Quantity",
+                      "value": "1"
+                    },
+                    {
+                      "id": 112,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 113,
+                      "name": "LineTotal",
+                      "value": "6.5"
+                    },
+                    {
+                      "id": 114,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 115,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[18]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 116,
+                      "name": "Price",
+                      "value": "7.9"
+                    },
+                    {
+                      "id": 117,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 118,
+                      "name": "CatalogNo",
+                      "value": "7290107943369"
+                    },
+                    {
+                      "id": 119,
+                      "name": "LineTotal",
+                      "value": "94.8"
+                    },
+                    {
+                      "id": 120,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 121,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[19]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 122,
+                      "name": "Price",
+                      "value": "3.1"
+                    },
+                    {
+                      "id": 123,
+                      "name": "Quantity",
+                      "value": "1"
+                    },
+                    {
+                      "id": 124,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 125,
+                      "name": "LineTotal",
+                      "value": "3.1"
+                    },
+                    {
+                      "id": 126,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 127,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[20]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 128,
+                      "name": "Price",
+                      "value": "5.9"
+                    },
+                    {
+                      "id": 129,
+                      "name": "Quantity",
+                      "value": "2"
+                    },
+                    {
+                      "id": 130,
+                      "name": "CatalogNo",
+                      "value": "7290100680771"
+                    },
+                    {
+                      "id": 131,
+                      "name": "LineTotal",
+                      "value": "11.8"
+                    },
+                    {
+                      "id": 132,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 133,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[21]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 134,
+                      "name": "Price",
+                      "value": "22.5"
+                    },
+                    {
+                      "id": 135,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 136,
+                      "name": "CatalogNo",
+                      "value": "70308"
+                    },
+                    {
+                      "id": 137,
+                      "name": "LineTotal",
+                      "value": "270.0"
+                    },
+                    {
+                      "id": 138,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 139,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[22]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 140,
+                      "name": "Price",
+                      "value": "11.5"
+                    },
+                    {
+                      "id": 141,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 142,
+                      "name": "CatalogNo",
+                      "value": "7290100685136"
+                    },
+                    {
+                      "id": 143,
+                      "name": "LineTotal",
+                      "value": "138.0"
+                    },
+                    {
+                      "id": 144,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 145,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[23]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 146,
+                      "name": "Price",
+                      "value": "4.2"
+                    },
+                    {
+                      "id": 147,
+                      "name": "Quantity",
+                      "value": "1"
+                    },
+                    {
+                      "id": 148,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 149,
+                      "name": "LineTotal",
+                      "value": "4.2"
+                    },
+                    {
+                      "id": 150,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 151,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[24]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 152,
+                      "name": "Price",
+                      "value": "7.7"
+                    },
+                    {
+                      "id": 153,
+                      "name": "Quantity",
+                      "value": "1"
+                    },
+                    {
+                      "id": 154,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 155,
+                      "name": "LineTotal",
+                      "value": "7.7"
+                    },
+                    {
+                      "id": 156,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 157,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[25]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 158,
+                      "name": "Price",
+                      "value": "7.7"
+                    },
+                    {
+                      "id": 159,
+                      "name": "Quantity",
+                      "value": "47.0"
+                    },
+                    {
+                      "id": 160,
+                      "name": "CatalogNo",
+                      "value": "3335121614933"
+                    },
+                    {
+                      "id": 161,
+                      "name": "LineTotal",
+                      "value": "361.9"
+                    },
+                    {
+                      "id": 162,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 163,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[26]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 164,
+                      "name": "Price",
+                      "value": "17.5"
+                    },
+                    {
+                      "id": 165,
+                      "name": "Quantity",
+                      "value": "1"
+                    },
+                    {
+                      "id": 166,
+                      "name": "CatalogNo",
+                      "value": "70353"
+                    },
+                    {
+                      "id": 167,
+                      "name": "LineTotal",
+                      "value": "17.5"
+                    },
+                    {
+                      "id": 168,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 169,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[27]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 170,
+                      "name": "Price",
+                      "value": "20.3"
+                    },
+                    {
+                      "id": 171,
+                      "name": "Quantity",
+                      "value": "1"
+                    },
+                    {
+                      "id": 172,
+                      "name": "CatalogNo",
+                      "value": "7290111355547"
+                    },
+                    {
+                      "id": 173,
+                      "name": "LineTotal",
+                      "value": "20.3"
+                    },
+                    {
+                      "id": 174,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 175,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[28]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 176,
+                      "name": "Price",
+                      "value": "17.5"
+                    },
+                    {
+                      "id": 177,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 178,
+                      "name": "CatalogNo",
+                      "value": "7290112491497"
+                    },
+                    {
+                      "id": 179,
+                      "name": "LineTotal",
+                      "value": "210.0"
+                    },
+                    {
+                      "id": 180,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 181,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[29]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 182,
+                      "name": "Price",
+                      "value": "12.5"
+                    },
+                    {
+                      "id": 183,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 184,
+                      "name": "CatalogNo",
+                      "value": "7290107645591"
+                    },
+                    {
+                      "id": 185,
+                      "name": "LineTotal",
+                      "value": "150.0"
+                    },
+                    {
+                      "id": 186,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 187,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[30]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 188,
+                      "name": "Price",
+                      "value": "8.9"
+                    },
+                    {
+                      "id": 189,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 190,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 191,
+                      "name": "LineTotal",
+                      "value": "106.8"
+                    },
+                    {
+                      "id": 192,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 193,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[31]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 194,
+                      "name": "Price",
+                      "value": "9.9"
+                    },
+                    {
+                      "id": 195,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 196,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 197,
+                      "name": "LineTotal",
+                      "value": "118.8"
+                    },
+                    {
+                      "id": 198,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 199,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[32]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 200,
+                      "name": "Price",
+                      "value": "9.9"
+                    },
+                    {
+                      "id": 201,
+                      "name": "Quantity",
+                      "value": "1"
+                    },
+                    {
+                      "id": 202,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 203,
+                      "name": "LineTotal",
+                      "value": "9.9"
+                    },
+                    {
+                      "id": 204,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 205,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[33]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 206,
+                      "name": "Price",
+                      "value": "9.9"
+                    },
+                    {
+                      "id": 207,
+                      "name": "Quantity",
+                      "value": "1"
+                    },
+                    {
+                      "id": 208,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 209,
+                      "name": "LineTotal",
+                      "value": "9.9"
+                    },
+                    {
+                      "id": 210,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 211,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[34]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 212,
+                      "name": "Price",
+                      "value": "5.75"
+                    },
+                    {
+                      "id": 213,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 214,
+                      "name": "CatalogNo",
+                      "value": "41190069453"
+                    },
+                    {
+                      "id": 215,
+                      "name": "LineTotal",
+                      "value": "69.0"
+                    },
+                    {
+                      "id": 216,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 217,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[35]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 218,
+                      "name": "Price",
+                      "value": "2.15"
+                    },
+                    {
+                      "id": 219,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 220,
+                      "name": "CatalogNo",
+                      "value": "7290019056584"
+                    },
+                    {
+                      "id": 221,
+                      "name": "LineTotal",
+                      "value": "25.8"
+                    },
+                    {
+                      "id": 222,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 223,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[36]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 224,
+                      "name": "Price",
+                      "value": "5.75"
+                    },
+                    {
+                      "id": 225,
+                      "name": "Quantity",
+                      "value": "47.0"
+                    },
+                    {
+                      "id": 226,
+                      "name": "CatalogNo",
+                      "value": ""
+                    },
+                    {
+                      "id": 227,
+                      "name": "LineTotal",
+                      "value": "270.25"
+                    },
+                    {
+                      "id": 228,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 229,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[37]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 230,
+                      "name": "Price",
+                      "value": "37.83"
+                    },
+                    {
+                      "id": 231,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 232,
+                      "name": "CatalogNo",
+                      "value": "2871491"
+                    },
+                    {
+                      "id": 233,
+                      "name": "LineTotal",
+                      "value": "453.96"
+                    },
+                    {
+                      "id": 234,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 235,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "Table",
+                  "caption": "Table",
+                  "path": "InnovatoryTech\\Table[38]",
+                  "groups": [],
+                  "fields": [
+                    {
+                      "id": 236,
+                      "name": "Price",
+                      "value": "6.15"
+                    },
+                    {
+                      "id": 237,
+                      "name": "Quantity",
+                      "value": "12.0"
+                    },
+                    {
+                      "id": 238,
+                      "name": "CatalogNo",
+                      "value": "7290110115272"
+                    },
+                    {
+                      "id": 239,
+                      "name": "LineTotal",
+                      "value": "73.8"
+                    },
+                    {
+                      "id": 240,
+                      "name": "Discount1",
+                      "value": ""
+                    },
+                    {
+                      "id": 241,
+                      "name": "Discount2",
+                      "value": ""
+                    }
+                  ]
+                }
+              ],
+              "fields": []
+            }
+          ],
+          "fields": [
+            {
+              "name": "InvoiceNo",
+              "value": ""
+            },
+            {
+              "name": "Field1",
+              "value": ""
+            },
+            {
+              "name": "VendorName",
+              "value": "Shufersal"
+            },
+            {
+              "name": "Field3",
+              "value": ""
+            },
+            {
+              "name": "Date",
+              "value": "2026-04-13"
+            },
+            {
+              "name": "Field5",
+              "value": ""
+            },
+            {
+              "name": "Total",
+              "value": "4340.77"
+            },
+            {
+              "name": "Field7",
+              "value": ""
+            }
+          ],
+          "errors": ""
+        }
+      }
+    }
+  ],
+  "timestamp": "2026-04-21T14:20:28.817800"
+}

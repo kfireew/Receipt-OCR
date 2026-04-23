@@ -1,0 +1,15 @@
+{
+  "confusion_map": {
+    "ב": "כ",
+    "כ": "ב",
+    "ס": "ם",
+    "ם": "ס",
+    "ו": "ן",
+    "ן": "ו",
+    "ד": "ס",
+    "ר": "נ"
+  },
+  "common_suffixes": ["ים", "ות", "ס", "ם", "ן"],
+  "common_prefixes": ["ה", "ב", "כ", "ל", "מ"],
+  "description": "Simple Hebrew OCR confusion map for generating vendor name variations"
+}

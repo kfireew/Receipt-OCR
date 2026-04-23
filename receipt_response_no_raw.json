@@ -1,0 +1,500 @@
+{
+  "inference": {
+    "id": "2166bf31-67f9-41ea-abd6-0c26b05daf74",
+    "job": {
+      "id": "2166bf31-67f9-41ea-abd6-0c26b05daf74"
+    },
+    "model": {
+      "id": "2794301c-25bd-402a-bebe-5295a67416e6"
+    },
+    "file": {
+      "name": "Globrands_23.03.2025_Globrands 24-03-25.pdf",
+      "alias": null,
+      "page_count": 1,
+      "mime_type": "application/pdf"
+    },
+    "result": {
+      "fields": {
+        "supplier_name": {
+          "locations": [],
+          "confidence": null,
+          "value": "גלוברנדס בע\"מ"
+        },
+        "supplier_address": {
+          "locations": [],
+          "confidence": null,
+          "value": "שד' ההשכלה 9 ת\"א"
+        },
+        "supplier_phone_number": {
+          "locations": [],
+          "confidence": null,
+          "value": "054-4401394"
+        },
+        "supplier_company_registration": {
+          "items": [
+            {
+              "locations": [],
+              "confidence": null,
+              "fields": {
+                "number": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": "513036434"
+                },
+                "type": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": "NIF"
+                }
+              }
+            },
+            {
+              "locations": [],
+              "confidence": null,
+              "fields": {
+                "number": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": "557904679"
+                },
+                "type": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": "UID"
+                }
+              }
+            }
+          ],
+          "confidence": null
+        },
+        "receipt_number": {
+          "locations": [],
+          "confidence": null,
+          "value": "1340014295"
+        },
+        "date": {
+          "locations": [],
+          "confidence": null,
+          "value": "2025-03-23"
+        },
+        "time": {
+          "locations": [],
+          "confidence": null,
+          "value": "08:11"
+        },
+        "total_amount": {
+          "locations": [],
+          "confidence": null,
+          "value": 4879.9
+        },
+        "total_net": {
+          "locations": [],
+          "confidence": null,
+          "value": 4135.51
+        },
+        "total_tax": {
+          "locations": [],
+          "confidence": null,
+          "value": 744.39
+        },
+        "taxes": {
+          "items": [
+            {
+              "locations": [],
+              "confidence": null,
+              "fields": {
+                "rate": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 0.18
+                },
+                "base": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 4135.51
+                },
+                "amount": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 744.39
+                }
+              }
+            }
+          ],
+          "confidence": null
+        },
+        "tips_gratuity": {
+          "locations": [],
+          "confidence": null,
+          "value": null
+        },
+        "line_items": {
+          "items": [
+            {
+              "locations": [],
+              "confidence": null,
+              "fields": {
+                "description": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": "וינסטון כחול בוקס*"
+                },
+                "quantity": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 1.0
+                },
+                "unit_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 302.71
+                },
+                "total_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 302.71
+                }
+              }
+            },
+            {
+              "locations": [],
+              "confidence": null,
+              "fields": {
+                "description": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": "וינסטון קוד*"
+                },
+                "quantity": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 2.0
+                },
+                "unit_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 286.78
+                },
+                "total_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 573.56
+                }
+              }
+            },
+            {
+              "locations": [],
+              "confidence": null,
+              "fields": {
+                "description": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": "וינסטון קומפקט ברי*"
+                },
+                "quantity": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 2.0
+                },
+                "unit_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 270.85
+                },
+                "total_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 541.7
+                }
+              }
+            },
+            {
+              "locations": [],
+              "confidence": null,
+              "fields": {
+                "description": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": "פאל מאל כחול דמי סלימס"
+                },
+                "quantity": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 2.0
+                },
+                "unit_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 247.5
+                },
+                "total_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 495.0
+                }
+              }
+            },
+            {
+              "locations": [],
+              "confidence": null,
+              "fields": {
+                "description": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": "פאל מאל ס.ס כחול טיוב"
+                },
+                "quantity": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 2.0
+                },
+                "unit_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 278.8
+                },
+                "total_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 557.6
+                }
+              }
+            },
+            {
+              "locations": [],
+              "confidence": null,
+              "fields": {
+                "description": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": "כאמל צהוב בוקס*"
+                },
+                "quantity": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 1.0
+                },
+                "unit_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 286.78
+                },
+                "total_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 286.78
+                }
+              }
+            },
+            {
+              "locations": [],
+              "confidence": null,
+              "fields": {
+                "description": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": "וג מנטה"
+                },
+                "quantity": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 2.0
+                },
+                "unit_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 343.0
+                },
+                "total_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 686.0
+                }
+              }
+            },
+            {
+              "locations": [],
+              "confidence": null,
+              "fields": {
+                "description": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": "וג לילך"
+                },
+                "quantity": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 1.0
+                },
+                "unit_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 343.0
+                },
+                "total_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 343.0
+                }
+              }
+            },
+            {
+              "locations": [],
+              "confidence": null,
+              "fields": {
+                "description": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": "נייר גלגול+פילטר RAW נייר גדול ופילטר"
+                },
+                "quantity": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 1.0
+                },
+                "unit_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 14.99
+                },
+                "total_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 62.02
+                }
+              }
+            },
+            {
+              "locations": [],
+              "confidence": null,
+              "fields": {
+                "description": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": "קונוס 32 גדול RAW קונוס 32 גדול"
+                },
+                "quantity": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 5.0
+                },
+                "unit_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 17.54
+                },
+                "total_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 65.55
+                }
+              }
+            },
+            {
+              "locations": [],
+              "confidence": null,
+              "fields": {
+                "description": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": "קונוס 32 בינוני RAW קונוס 32 בינוני"
+                },
+                "quantity": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 5.0
+                },
+                "unit_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 17.54
+                },
+                "total_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 65.55
+                }
+              }
+            },
+            {
+              "locations": [],
+              "confidence": null,
+              "fields": {
+                "description": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": "מצח מעוצב BIC J23"
+                },
+                "quantity": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 2.0
+                },
+                "unit_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 78.0
+                },
+                "total_price": {
+                  "locations": [],
+                  "confidence": null,
+                  "value": 156.0
+                }
+              }
+            }
+          ],
+          "confidence": null
+        },
+        "document_type": {
+          "locations": [],
+          "confidence": null,
+          "value": "expense_receipt"
+        },
+        "purchase_category": {
+          "locations": [],
+          "confidence": null,
+          "value": "food"
+        },
+        "purchase_subcategory": {
+          "locations": [],
+          "confidence": null,
+          "value": "restaurant"
+        },
+        "locale": {
+          "locations": [],
+          "confidence": null,
+          "fields": {
+            "language": {
+              "locations": [],
+              "confidence": null,
+              "value": "he"
+            },
+            "country": {
+              "locations": [],
+              "confidence": null,
+              "value": "IL"
+            },
+            "currency": {
+              "locations": [],
+              "confidence": null,
+              "value": "ILS"
+            }
+          }
+        }
+      },
+      "raw_text": null,
+      "rag": null
+    },
+    "active_options": {
+      "raw_text": false,
+      "polygon": false,
+      "confidence": false,
+      "rag": false,
+      "multipage_context": false,
+      "text_context": false,
+      "data_schema": {
+        "replace": false
+      }
+    }
+  }
+}

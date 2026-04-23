@@ -1,0 +1,496 @@
+"""
+PHASE 6: VENDOR CACHE
+
+Implements Phase 6 from AGENT_GUIDE.md:
+
+CACHE FILE: data/vendor_cache.json
+STRUCTURE:
+{
+  "tnuva": {
+    "display_name": "תנובה",
+    "last_seen": "2025-04-19",
+    "parse_count": 7,
+    "confirmed_by_user": false,
+    "confidence": 0.92,
+    "row_format": "multiline",
+    "quantity_pattern": 3,
+    "has_discount_lines": true,
+    "discount_keywords": ["החנה", "תחנה"],
+    "barcode_position": "same_line",
+    "column_assignments": {
+      "ברקוד": "product_code",
+      "תאור": "description",
+      "תומכ": "quantity",
+      "ריחמ": "unit_price",
+      "נטו שורה": "line_net_total"
+    }
+  }
+}
+
+VENDOR DETECTION:
+1. Scan first 10 lines of raw text
+2. Look for store names using merchants_mapping.json
+3. Convert to English key: "תנובה" → "tnuva" (from merchants_mapping.json)
+4. Fuzzy match against existing cache (threshold 80)
+
+CACHE USAGE:
+- If vendor in cache AND (confirmed_by_user=true OR confidence ≥0.75):
+  - Skip column detection loop
+  - Apply cached column_assignments directly
+  - Apply cached quantity_pattern directly
+- Else: Run full detection, update cache after successful parse
+
+CACHE IS OPTIONAL OPTIMIZATION:
+- Pipeline MUST work without cache
+- If cache missing/corrupted, fall back to full detection
+- Cache updates: confidence = min(0.95, parse_count/(parse_count+2))
+"""
+
+import json
+import os
+import re
+from typing import Dict, Any, Optional, List
+from datetime import datetime
+from rapidfuzz import fuzz
+
+
+class Phase6VendorCache:
+    """
+    Phase 6: Vendor cache for storing and reusing receipt layout patterns.
+
+    Caches vendor-specific layout information to avoid re-detection
+    on subsequent receipts from the same vendor.
+    """
+
+    def __init__(self, cache_path: str = None):
+        """
+        Args:
+            cache_path: Path to cache file. Default: data/vendor_cache.json
+        """
+        if cache_path:
+            self.cache_path = cache_path
+        else:
+            # Default path: data/vendor_cache.json
+            project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            data_dir = os.path.join(project_root, "data")
+            os.makedirs(data_dir, exist_ok=True)
+            self.cache_path = os.path.join(data_dir, "vendor_cache.json")
+
+        self.cache = self._load_cache()
+        self.merchants_mapping = self._load_merchants_mapping()
+        self.vendor_keywords = self._get_vendor_keywords()
+
+    def _load_cache(self) -> Dict[str, Any]:
+        """Load cache from file or return empty dict."""
+        if os.path.exists(self.cache_path):
+            try:
+                with open(self.cache_path, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except (json.JSONDecodeError, IOError) as e:
+                print(f"Phase 6: Failed to load cache: {e}, starting fresh")
+                return {}
+        else:
+            print(f"Phase 6: Cache file not found, will create: {self.cache_path}")
+            return {}
+
+    def _load_merchants_mapping(self) -> Dict[str, List[str]]:
+        """Load merchants mapping from JSON file."""
+        mapping_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "merchants_mapping.json"
+        )
+
+        if os.path.exists(mapping_path):
+            try:
+                with open(mapping_path, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except (json.JSONDecodeError, IOError):
+                return {}
+        return {}
+
+    def _get_vendor_keywords(self) -> List[str]:
+        """Get vendor keywords from merchants_mapping ONLY."""
+        if not self.merchants_mapping:
+            print("WARNING: merchants_mapping.json not loaded or empty")
+            return []
+
+        keywords = []
+        for hebrew_names in self.merchants_mapping.values():
+            keywords.extend(hebrew_names)
+        return keywords
+
+    def _save_cache(self):
+        """Save cache to file."""
+        try:
+            with open(self.cache_path, 'w', encoding='utf-8') as f:
+                json.dump(self.cache, f, ensure_ascii=False, indent=2)
+        except IOError as e:
+            print(f"Phase 6: Failed to save cache: {e}")
+
+    def detect_vendor_from_text(self, raw_text: str) -> Dict[str, Any]:
+        """
+        Extract vendor from raw text.
+
+        Args:
+            raw_text: Raw text from scan B
+
+        Returns:
+            Dictionary with vendor detection results
+        """
+        lines = raw_text.splitlines()[:10]  # First 10 lines
+        text_to_search = ' '.join(lines)
+
+        print(f"Phase 6: Detecting vendor in first {len(lines)} lines")
+
+        best_vendor = None
+        best_score = 0
+        matched_keyword = None
+
+        for keyword in self.vendor_keywords:
+            # Search for keyword in text
+            score = fuzz.partial_ratio(keyword.lower(), text_to_search.lower())
+            if score > best_score and score >= 60:  # Reasonable match threshold
+                best_score = score
+                best_vendor = keyword
+                matched_keyword = keyword
+
+        # Get English key for vendor
+        vendor_english_key = None
+        if best_vendor and self.merchants_mapping:
+            for english_key, hebrew_names in self.merchants_mapping.items():
+                if best_vendor in hebrew_names:
+                    vendor_english_key = english_key
+                    break
+
+        result = {
+            'success': best_vendor is not None,
+            'vendor_name': best_vendor,
+            'vendor_english_key': vendor_english_key,
+            'match_score': best_score,
+            'matched_keyword': matched_keyword,
+            'text_searched': text_to_search[:100] + '...' if len(text_to_search) > 100 else text_to_search
+        }
+
+        if result['success']:
+            print(f"  ✓ Vendor detected: {best_vendor} (score: {best_score})")
+        else:
+            print(f"  ✗ No vendor detected in first {len(lines)} lines")
+
+        return result
+
+    def find_vendor(self, vendor_name: str, vendor_english_key: str = None) -> Optional[Dict[str, Any]]:
+        """
+        Fuzzy match vendor name against cache.
+
+        Args:
+            vendor_name: Detected vendor name
+            vendor_english_key: English vendor key from merchants_mapping (optional)
+
+        Returns:
+            Cache entry if found and meets confidence threshold, else None
+        """
+        if not vendor_name or not self.cache:
+            return None
+
+        # Use English key if available
+        if vendor_english_key:
+            vendor_slug = vendor_english_key.lower()
+        else:
+            vendor_slug = self._hebrew_to_english_key(vendor_name)
+
+        print(f"Phase 6: Looking for vendor '{vendor_name}' (key: '{vendor_slug}') in cache")
+
+        # First try exact key match
+        if vendor_slug in self.cache:
+            entry = self.cache[vendor_slug]
+            if self._is_cache_entry_valid(entry):
+                print(f"  ✓ Exact cache match found: {vendor_slug}")
+                return entry
+
+        # Try fuzzy match against display names
+        best_match = None
+        best_score = 0
+
+        for slug, entry in self.cache.items():
+            display_name = entry.get('display_name', '')
+            if display_name:
+                score = fuzz.token_sort_ratio(vendor_name.lower(), display_name.lower())
+                if score > best_score and score >= 80:  # Threshold from AGENT_GUIDE
+                    best_score = score
+                    best_match = entry
+                    best_match['matched_slug'] = slug
+
+        if best_match and self._is_cache_entry_valid(best_match):
+            print(f"  ✓ Fuzzy cache match found: {best_match.get('display_name')} (score: {best_score})")
+            return best_match
+
+        print(f"  ✗ No cache match found for '{vendor_name}'")
+        return None
+
+    def _hebrew_to_english_key(self, text: str) -> str:
+        """
+        Convert Hebrew text to English key using merchants_mapping.json ONLY.
+
+        Example: "תנובה" → "tnuva" (from merchants_mapping.json)
+
+        If not found in mapping: TODO - GUI should ask user to add merchant.
+        For now, returns text with '_todo_no_mapping_' prefix.
+        """
+        if not text:
+            return ""
+
+        if not self.merchants_mapping:
+            print(f"ERROR: merchants_mapping.json not loaded for text: {text}")
+            # TODO: GUI should handle this case
+            return f"_todo_no_mapping_{text}"
+
+        # Search for Hebrew text in merchants_mapping - find LONGEST match
+        matches = []
+        for english_key, hebrew_names in self.merchants_mapping.items():
+            for hebrew_name in hebrew_names:
+                if hebrew_name in text:
+                    matches.append((len(hebrew_name), english_key.lower(), hebrew_name))
+
+        # Return longest match (most specific)
+        if matches:
+            matches.sort(reverse=True)  # Sort by length descending
+            longest_len, english_key, matched_hebrew = matches[0]
+            print(f"Phase 6: Matched '{matched_hebrew}' (length: {longest_len}) → '{english_key}'")
+            return english_key
+
+        # Hebrew text not found in merchants_mapping
+        # TODO: GUI should ask user to add this merchant to merchants_mapping.json
+        print(f"TODO: Hebrew text '{text}' not found in merchants_mapping.json")
+        print(f"  → GUI should ask user to add this merchant")
+
+        # Create simple key for cache (remove non-alphanumeric Hebrew chars)
+        # This is temporary until GUI adds merchant to mapping
+        simple_text = re.sub(r'[^\u0590-\u05FF]', '', text)  # Keep only Hebrew letters
+        if not simple_text:
+            simple_text = text[:20]  # Fallback to first 20 chars
+
+        return f"_todo_no_mapping_{simple_text}"
+
+    def _is_cache_entry_valid(self, entry: Dict[str, Any]) -> bool:
+        """
+        Check if cache entry is valid for use.
+
+        According to AGENT_GUIDE:
+        - confirmed_by_user=true OR confidence ≥0.75
+        """
+        confirmed = entry.get('confirmed_by_user', False)
+        confidence = entry.get('confidence', 0.0)
+
+        if confirmed:
+            return True
+
+        if confidence >= 0.75:
+            return True
+
+        return False
+
+    def add_or_update_vendor(
+        self,
+        vendor_name: str,
+        column_info: Dict[str, Any] = None,
+        quantity_pattern: str = None,
+        row_format: str = None,
+        vendor_english_key: str = None,
+        **kwargs
+    ) -> Dict[str, Any]:
+        """
+        Add or update vendor in cache.
+
+        Args:
+            vendor_name: Vendor name
+            column_info: Column detection results
+            quantity_pattern: Detected quantity pattern
+            row_format: 'multiline' or 'single_line'
+            vendor_english_key: English vendor key from merchants_mapping
+            **kwargs: Additional vendor properties
+
+        Returns:
+            Updated cache entry
+        """
+        # Use English key if available
+        if vendor_english_key:
+            vendor_slug = vendor_english_key.lower()
+        else:
+            vendor_slug = self._hebrew_to_english_key(vendor_name)
+
+        if vendor_slug in self.cache:
+            # Update existing entry
+            entry = self.cache[vendor_slug]
+            entry['parse_count'] = entry.get('parse_count', 0) + 1
+            entry['last_seen'] = datetime.now().strftime('%Y-%m-%d')
+
+            # TODO: GUI should ask user before updating cache if confidence increased
+            new_confidence = self.update_confidence(entry)
+            old_confidence = entry.get('confidence', 0.0)
+
+            if new_confidence > old_confidence:
+                # TODO: GUI should ask user: "Update cache with improved confidence?"
+                entry['confidence'] = new_confidence
+                print(f"Phase 6: Updated confidence for {vendor_slug} ({old_confidence:.2f} → {new_confidence:.2f})")
+
+                # Update properties only if confidence improved
+                if column_info and column_info.get('success'):
+                    entry['column_assignments'] = column_info.get('column_assignments', {})
+                    entry['detected_columns'] = column_info.get('detected_columns', [])
+
+                if quantity_pattern:
+                    entry['quantity_pattern'] = quantity_pattern
+
+                if row_format:
+                    entry['row_format'] = row_format
+            else:
+                print(f"Phase 6: Confidence not improved for {vendor_slug} (remains {old_confidence:.2f})")
+                # Don't update other fields if confidence didn't improve
+
+            print(f"Phase 6: Updated cache entry for {vendor_slug} (parse_count: {entry['parse_count']})")
+        else:
+            # Create new entry
+            entry = {
+                'display_name': vendor_name,
+                'parse_count': 1,
+                'last_seen': datetime.now().strftime('%Y-%m-%d'),
+                'confirmed_by_user': False,
+                'confidence': 0.5,  # Starting confidence
+                'row_format': row_format or 'unknown',
+                'quantity_pattern': quantity_pattern or 'unknown',
+                'has_discount_lines': kwargs.get('has_discount_lines', False),
+                'discount_keywords': kwargs.get('discount_keywords', []),
+                'barcode_position': kwargs.get('barcode_position', 'unknown')
+            }
+            # TODO: If confidence low (e.g., < 0.75), GUI should ask user to fill cache
+
+            if column_info and column_info.get('success'):
+                entry['column_assignments'] = column_info.get('column_assignments', {})
+                entry['detected_columns'] = column_info.get('detected_columns', [])
+
+            self.cache[vendor_slug] = entry
+            print(f"Phase 6: Created new cache entry for {vendor_slug}")
+
+        # Save cache
+        self._save_cache()
+
+        return entry
+
+    def update_confidence(self, entry: Dict[str, Any]) -> float:
+        """
+        Update confidence based on parse count.
+
+        Formula: confidence = min(0.95, parse_count/(parse_count+2))
+        """
+        parse_count = entry.get('parse_count', 1)
+        confidence = min(0.95, parse_count / (parse_count + 2))
+        return round(confidence, 2)
+
+    def apply_cached_column_assignments(
+        self,
+        items: List[Dict[str, Any]],
+        cache_entry: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
+        """
+        Apply cached column assignments to items.
+
+        Args:
+            items: List of items
+            cache_entry: Cache entry with column_assignments
+
+        Returns:
+            Items with cached column info applied
+        """
+        column_assignments = cache_entry.get('column_assignments', {})
+        if not column_assignments:
+            return items
+
+        print(f"Phase 6: Applying cached column assignments: {list(column_assignments.keys())}")
+
+        for item in items:
+            item['cached_columns'] = {
+                'assignments': column_assignments,
+                'detected_columns': cache_entry.get('detected_columns', []),
+                'net_total_column': next((eng for heb, eng in column_assignments.items()
+                                        if eng == 'line_net_total'), None)
+            }
+
+        return items
+
+    def should_skip_column_detection(self, cache_entry: Dict[str, Any]) -> bool:
+        """
+        Determine if column detection should be skipped based on cache.
+
+        According to AGENT_GUIDE:
+        - If vendor in cache AND (confirmed_by_user=true OR confidence ≥0.75)
+        """
+        if not cache_entry:
+            return False
+
+        confirmed = cache_entry.get('confirmed_by_user', False)
+        confidence = cache_entry.get('confidence', 0.0)
+
+        if confirmed or confidence >= 0.75:
+            print(f"Phase 6: Skipping column detection (confirmed: {confirmed}, confidence: {confidence})")
+            return True
+
+        return False
+
+    def get_column_info_from_cache(
+        self,
+        cache_entry: Dict[str, Any],
+        raw_text: str
+    ) -> tuple:
+        """
+        Get column info from cache entry (for pipeline compatibility).
+
+        Args:
+            cache_entry: Cache entry
+            raw_text: Raw OCR text
+
+        Returns:
+            Tuple of (column_info_dict, success_bool)
+        """
+        if not cache_entry or not raw_text:
+            return None, False
+
+        column_assignments = cache_entry.get('column_assignments', {})
+        if not column_assignments:
+            print("Phase 6: No column assignments in cache entry")
+            return None, False
+
+        # Convert to column_info format expected by pipeline
+        detected_columns = []
+        for hebrew_text, assigned_field in column_assignments.items():
+            detected_columns.append({
+                'hebrew_text': hebrew_text,
+                'assigned_field': assigned_field,
+                'confidence': cache_entry.get('confidence', 0.5)
+            })
+
+        # Try to find header lines in raw text
+        lines = raw_text.splitlines()
+        lines_range = None
+
+        # Search for header lines containing column headers
+        for i in range(min(20, len(lines))):  # Check first 20 lines
+            line_text = lines[i]
+            # Count how many column headers appear in this line
+            headers_found = sum(1 for header in column_assignments.keys()
+                              if header and header in line_text)
+
+            if headers_found >= 2:  # At least 2 headers found
+                lines_range = (i, i + 1)
+                break
+
+        column_info = {
+            'success': True,
+            'detected_columns': detected_columns,
+            'column_assignments': column_assignments,
+            'lines_range': lines_range,
+            'source': 'vendor_cache',
+            'vendor_slug': next((k for k, v in self.cache.items()
+                               if v == cache_entry), None)
+        }
+
+        return column_info, True

@@ -1,4 +1,6 @@
 """
+OBSOLETE TEST FILE - NOT USED BY MAIN PIPELINE
+===============================================
 Tests for Mindee pipeline refactoring.
 """
 import pytest

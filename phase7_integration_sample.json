@@ -1,0 +1,252 @@
+{
+  "GDocument": {
+    "id": "1",
+    "documentDefinition": "InnoventoryTech",
+    "batchId": 2340,
+    "isAssembled": true,
+    "isVerified": true,
+    "processingErrors": "",
+    "processingWarnings": "",
+    "totalSymbolsCount": 50,
+    "recognizedSymbolsCount": 50,
+    "uncertainSymbolsCount": "0",
+    "name": "Integration_Test_Receipt",
+    "caption": "Integration_Test_Receipt",
+    "path": "",
+    "groups": [
+      {
+        "name": "Table",
+        "caption": "Table",
+        "path": "InnovatoryTech\\Table",
+        "groups": [
+          {
+            "name": "Table",
+            "caption": "Table",
+            "path": "InnovatoryTech\\Table[0]",
+            "groups": [],
+            "fields": [
+              {
+                "id": 8,
+                "name": "Price",
+                "value": "4.97"
+              },
+              {
+                "id": 9,
+                "name": "Quantity",
+                "value": "60.0"
+              },
+              {
+                "id": 10,
+                "name": "CatalogNo",
+                "value": "7290121290043"
+              },
+              {
+                "id": 11,
+                "name": "LineTotal",
+                "value": "298.2"
+              },
+              {
+                "id": 12,
+                "name": "Discount1",
+                "value": ""
+              },
+              {
+                "id": 13,
+                "name": "Discount2",
+                "value": ""
+              }
+            ]
+          },
+          {
+            "name": "Table",
+            "caption": "Table",
+            "path": "InnovatoryTech\\Table[1]",
+            "groups": [],
+            "fields": [
+              {
+                "id": 14,
+                "name": "Price",
+                "value": "5.25"
+              },
+              {
+                "id": 15,
+                "name": "Quantity",
+                "value": "24.0"
+              },
+              {
+                "id": 16,
+                "name": "CatalogNo",
+                "value": "7290121290371"
+              },
+              {
+                "id": 17,
+                "name": "LineTotal",
+                "value": "126.0"
+              },
+              {
+                "id": 18,
+                "name": "Discount1",
+                "value": ""
+              },
+              {
+                "id": 19,
+                "name": "Discount2",
+                "value": ""
+              }
+            ]
+          },
+          {
+            "name": "Table",
+            "caption": "Table",
+            "path": "InnovatoryTech\\Table[2]",
+            "groups": [],
+            "fields": [
+              {
+                "id": 20,
+                "name": "Price",
+                "value": "12.9"
+              },
+              {
+                "id": 21,
+                "name": "Quantity",
+                "value": "12.0"
+              },
+              {
+                "id": 22,
+                "name": "CatalogNo",
+                "value": "208428"
+              },
+              {
+                "id": 23,
+                "name": "LineTotal",
+                "value": "154.8"
+              },
+              {
+                "id": 24,
+                "name": "Discount1",
+                "value": ""
+              },
+              {
+                "id": 25,
+                "name": "Discount2",
+                "value": ""
+              }
+            ]
+          },
+          {
+            "name": "Table",
+            "caption": "Table",
+            "path": "InnovatoryTech\\Table[3]",
+            "groups": [],
+            "fields": [
+              {
+                "id": 26,
+                "name": "Price",
+                "value": "7.85"
+              },
+              {
+                "id": 27,
+                "name": "Quantity",
+                "value": "24.0"
+              },
+              {
+                "id": 28,
+                "name": "CatalogNo",
+                "value": "7290011194253"
+              },
+              {
+                "id": 29,
+                "name": "LineTotal",
+                "value": "188.4"
+              },
+              {
+                "id": 30,
+                "name": "Discount1",
+                "value": ""
+              },
+              {
+                "id": 31,
+                "name": "Discount2",
+                "value": ""
+              }
+            ]
+          },
+          {
+            "name": "Table",
+            "caption": "Table",
+            "path": "InnovatoryTech\\Table[4]",
+            "groups": [],
+            "fields": [
+              {
+                "id": 32,
+                "name": "Price",
+                "value": "2.5"
+              },
+              {
+                "id": 33,
+                "name": "Quantity",
+                "value": "30.0"
+              },
+              {
+                "id": 34,
+                "name": "CatalogNo",
+                "value": "7290011194260"
+              },
+              {
+                "id": 35,
+                "name": "LineTotal",
+                "value": "75.0"
+              },
+              {
+                "id": 36,
+                "name": "Discount1",
+                "value": ""
+              },
+              {
+                "id": 37,
+                "name": "Discount2",
+                "value": ""
+              }
+            ]
+          }
+        ],
+        "fields": []
+      }
+    ],
+    "fields": [
+      {
+        "name": "InvoiceNo",
+        "value": ""
+      },
+      {
+        "name": "Field1",
+        "value": ""
+      },
+      {
+        "name": "VendorName",
+        "value": "Globrands"
+      },
+      {
+        "name": "Field3",
+        "value": ""
+      },
+      {
+        "name": "Date",
+        "value": "2025-03-23"
+      },
+      {
+        "name": "Field5",
+        "value": ""
+      },
+      {
+        "name": "Total",
+        "value": "842.4"
+      },
+      {
+        "name": "Field7",
+        "value": ""
+      }
+    ],
+    "errors": ""
+  }
+}

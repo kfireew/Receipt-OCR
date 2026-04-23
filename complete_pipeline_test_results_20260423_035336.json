@@ -1,0 +1,84 @@
+{
+  "summary": {
+    "total_tests": 3,
+    "successful_tests": 3,
+    "failed_tests": 0,
+    "total_duration_seconds": 50.0003023147583,
+    "timestamp": "2026-04-23T03:53:36.132783"
+  },
+  "test_results": [
+    {
+      "test_number": 1,
+      "name": "Tnuva Receipt",
+      "file": "sample_images/Tnuva_16.04.2025_Tnuva 21-04-25.pdf",
+      "expected_vendor": "תנובה",
+      "total_duration_seconds": 19.04356336593628,
+      "items_extracted": 27,
+      "valid_items": 0,
+      "items_with_description": 0,
+      "items_with_quantity": 0,
+      "items_with_price": 0,
+      "items_with_catalog": 0,
+      "cache_entry_exists": true,
+      "cache_trust_score": 0.33,
+      "cache_user_verified": false,
+      "cache_parse_count": 1,
+      "timestamp": "2026-04-23T03:53:05.201413"
+    },
+    {
+      "test_number": 2,
+      "name": "Globrands Invoice",
+      "file": "sample_images/Globrands_23.03.2025_Globrands 24-03-25.pdf",
+      "expected_vendor": "גלוברנדס",
+      "total_duration_seconds": 14.502475500106812,
+      "items_extracted": 11,
+      "valid_items": 0,
+      "items_with_description": 0,
+      "items_with_quantity": 0,
+      "items_with_price": 0,
+      "items_with_catalog": 0,
+      "cache_entry_exists": true,
+      "cache_trust_score": 0.95,
+      "cache_user_verified": true,
+      "cache_parse_count": 6,
+      "timestamp": "2026-04-23T03:53:19.713283"
+    },
+    {
+      "test_number": 3,
+      "name": "Avikam Receipt",
+      "file": "sample_images/Avikam_10.03.2025_Avikam 11-03-25.pdf",
+      "expected_vendor": "אביקם",
+      "total_duration_seconds": 16.417001008987427,
+      "items_extracted": 9,
+      "valid_items": 0,
+      "items_with_description": 0,
+      "items_with_quantity": 0,
+      "items_with_price": 0,
+      "items_with_catalog": 0,
+      "cache_entry_exists": false,
+      "cache_trust_score": 0,
+      "cache_user_verified": false,
+      "cache_parse_count": 0,
+      "timestamp": "2026-04-23T03:53:36.131777"
+    }
+  ],
+  "cache_state": {
+    "total_vendors": 4,
+    "vendors": [
+      "shufersal",
+      "tnvbh",
+      "globrands",
+      "tnuva"
+    ],
+    "high_trust_count": 1,
+    "user_verified_count": 1
+  },
+  "quality_metrics": {
+    "total_items_extracted": 47,
+    "description_completeness": 0.0,
+    "quantity_completeness": 0.0,
+    "price_completeness": 0.0,
+    "catalogno_completeness": 0.0,
+    "fully_valid_rate": 0.0
+  }
+}

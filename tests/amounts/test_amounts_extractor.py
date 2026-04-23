@@ -1,4 +1,6 @@
-"""TDD tests for the header amounts extractor service.
+"""OBSOLETE TEST FILE - NOT USED BY MAIN PIPELINE
+===============================================
+TDD tests for the header amounts extractor service.
 
 Tests compare against ground truth amounts from sample_images/*.JSON files.
 """

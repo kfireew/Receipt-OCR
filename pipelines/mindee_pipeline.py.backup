@@ -1,0 +1,308 @@
+"""
+Mindee Pipeline - Receipt extraction using Mindee API.
+
+Usage:
+    from pipelines.mindee_pipeline import process_receipt
+    result = process_receipt("receipt.pdf")
+"""
+from dataclasses import dataclass
+from typing import List, Optional
+import os
+import sys
+
+# Fix Windows console encoding for Hebrew text
+if sys.platform == 'win32':
+    try:
+        # Python 3.7+ - reconfigure stdout/stderr
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except AttributeError:
+        # Older Python - use codecs
+        import codecs
+        sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer)
+        sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer)
+
+# Load .env for API keys
+from dotenv import load_dotenv
+load_dotenv()
+
+# API Configuration - support both env var names
+if not os.environ.get("MINDEE_V2_API_KEY") and os.environ.get("MINDEE_API_KEY"):
+    os.environ["MINDEE_V2_API_KEY"] = os.environ["MINDEE_API_KEY"]
+
+API_KEY = os.environ.get("MINDEE_API_KEY", "")
+MODEL_ID = os.environ.get("MINDEE_MODEL_ID", "2794301c-25bd-402a-bebe-5295a67416e6")
+
+
+@dataclass
+class MindeeItem:
+    """Item extracted from receipt."""
+    description: str
+    quantity: float
+    unit_price: float
+    total: float
+
+
+def process_receipt(
+    image_path: str,
+    api_key: str = None,
+    model_id: str = None,
+    save_to_output: bool = True,
+) -> dict:
+    """
+    Process receipt using Mindee 2-scan method with 8-phase pipeline.
+
+    Args:
+        image_path: Path to receipt file (PDF, PNG, JPG)
+        api_key: Mindee API key
+        model_id: Mindee model ID
+        save_to_output: Save result to output/ folder
+
+    Returns:
+        GDocument dict with items
+    """
+    from pipelines._mindee import MindeeClient, MindeeParser, MindeeFormatter
+    from utils.post_processor import process_items
+
+    # Import phase implementations
+    from phases.phase2_raw_text_segmentation import Phase2RawTextSegmentation
+    from phases.phase3_column_detection import Phase3ColumnDetection
+    from phases.phase4_quantity_pattern import Phase4QuantityPattern
+    from phases.phase5_product_list import Phase5ProductList
+    from phases.phase6_vendor_cache import Phase6VendorCache
+
+    key = api_key or API_KEY
+    mid = model_id or MODEL_ID
+
+    print(f"\n{'='*80}")
+    print(f"Processing receipt: {os.path.basename(image_path)}")
+    print(f"{'='*80}")
+
+    # Initialize components
+    client = MindeeClient(key, mid)
+    parser = MindeeParser()
+    formatter = MindeeFormatter()
+
+    # ========== PHASE 1: TWO SCANS ==========
+    print("\nPHASE 1: Performing two scans...")
+
+    # SCAN A: JSON scan
+    print("  Scan A: JSON scan for structured data")
+    json_response = client.scan_receipt_model(image_path)
+    fields = parser.parse_fields(json_response.inference.result.fields)
+
+    header = parser.extract_header(fields)
+    items = parser.extract_items(fields)
+
+    print(f"    Extracted {len(items)} items from JSON scan")
+
+    # SCAN B: Raw text scan
+    print("  Scan B: Raw text scan with raw_text=True")
+    raw_text_response = client.get_raw_text(image_path)
+    raw_text = ""
+
+    if raw_text_response:
+        # Use client's built-in text extraction method that tries multiple approaches
+        raw_text = client.extract_text_from_response(raw_text_response)
+
+        print(f"    Extracted {len(raw_text)} characters of raw text")
+        if raw_text and len(raw_text) > 0:
+            print(f"    Preview (first 300 chars): {raw_text[:300]}...")
+    else:
+        print("    WARNING: Raw text scan failed or returned None")
+        # Fallback
+        try:
+            raw_text_response = client.scan_raw_ocr(image_path)
+            if raw_text_response and hasattr(raw_text_response, 'ocr') and raw_text_response.ocr:
+                # Try to parse with existing parser
+                raw_items = parser.parse_raw_ocr(raw_text_response.ocr)
+                if raw_items:
+                    items = raw_items
+                    print(f"    Fallback: Using {len(items)} items from raw OCR")
+        except Exception as e:
+            print(f"    Fallback also failed: {e}")
+
+    if not items:
+        print("ERROR: No items extracted from receipt")
+        return {"error": "No items extracted"}
+
+    # ========== PHASE 2: RAW TEXT SEGMENTATION ==========
+    print("\nPHASE 2: Raw text segmentation using JSON anchors...")
+    if raw_text and len(raw_text) > 0:
+        segmenter = Phase2RawTextSegmentation()
+        items = segmenter.segment_raw_text_by_prices(items, raw_text)
+        print(f"  Enhanced {len([i for i in items if i.get('segmentation_success', False)])}/{len(items)} items")
+    else:
+        print("  SKIPPED: No raw text available")
+
+    # ========== PHASE 3: COLUMN DETECTION ==========
+    print("\nPHASE 3: Column detection...")
+    column_detector = Phase3ColumnDetection()
+    column_info = None
+
+    if raw_text and len(raw_text) > 0:
+        column_info = column_detector.detect_columns(raw_text)
+        if column_info.get('success'):
+            print(f"  Detected columns: {column_info.get('detected_columns', [])}")
+            items = column_detector.apply_column_mapping(items, column_info)
+        else:
+            print(f"  Column detection failed: {column_info.get('error', 'Unknown error')}")
+    else:
+        print("  SKIPPED: No raw text for column detection")
+
+    # ========== PHASE 4: QUANTITY PATTERN DETECTION ==========
+    print("\nPHASE 4: Quantity pattern detection...")
+    quantity_detector = Phase4QuantityPattern()
+    pattern_info = quantity_detector.detect_quantity_pattern(items)
+
+    if pattern_info.get('success'):
+        print(f"  Detected pattern: {pattern_info.get('pattern')}")
+
+        # Apply pattern to extract quantities
+        for i, item in enumerate(items):
+            new_qty = quantity_detector.extract_quantity_from_block(item, pattern_info)
+            if new_qty != item.get('quantity'):
+                items[i]['quantity'] = new_qty
+                items[i]['quantity_source'] = 'pattern_detection'
+    else:
+        print(f"  No pattern detected: {pattern_info.get('reason', 'Unknown')}")
+
+    # ========== PHASE 5: PRODUCT LIST INTEGRATION ==========
+    print("\nPHASE 5: Product list integration...")
+    product_list = Phase5ProductList()
+
+    # Extract vendor name for filtering
+    vendor_name = header.get('vendor', '')
+    if vendor_name:
+        try:
+            print(f"  Using vendor for filtering: {vendor_name}")
+        except UnicodeEncodeError:
+            print(f"  Using vendor for filtering: [Hebrew vendor name]")
+
+    items = product_list.enrich_items(items, vendor_name)
+
+    # Count items with CatalogNo
+    items_with_catalog = sum(1 for item in items if item.get('catalog_no'))
+    print(f"  Found CatalogNo for {items_with_catalog}/{len(items)} items")
+
+    # ========== PHASE 6: VENDOR CACHE ==========
+    print("\nPHASE 6: Vendor cache...")
+    vendor_cache = Phase6VendorCache()
+
+    # Detect vendor from raw text
+    if raw_text and len(raw_text) > 0:
+        vendor_detection = vendor_cache.detect_vendor_from_text(raw_text)
+
+        if vendor_detection.get('success'):
+            vendor_name = vendor_detection['vendor_name']
+            print(f"  Detected vendor: {vendor_name}")
+
+            # Check cache
+            cache_entry = vendor_cache.find_vendor(vendor_name)
+
+            if cache_entry and vendor_cache.should_skip_column_detection(cache_entry):
+                # Use cached column assignments
+                items = vendor_cache.apply_cached_column_assignments(items, cache_entry)
+                print(f"  Using cached layout for {vendor_name}")
+
+                # Apply cached quantity pattern if available
+                cached_pattern = cache_entry.get('quantity_pattern')
+                if cached_pattern and cached_pattern != 'unknown':
+                    print(f"  Using cached quantity pattern: {cached_pattern}")
+            else:
+                # Add/update cache with current detection
+                if column_info and column_info.get('success'):
+                    cache_entry = vendor_cache.add_or_update_vendor(
+                        vendor_name,
+                        column_info=column_info,
+                        quantity_pattern=pattern_info.get('pattern'),
+                        row_format='unknown'  # Could be determined from Phase 2
+                    )
+                    print(f"  Updated cache for {vendor_name}")
+        else:
+            print(f"  No vendor detected in text")
+    else:
+        print(f"  SKIPPED: No raw text for vendor detection")
+
+    # ========== PHASE 7: ABBYY JSON OUTPUT ==========
+    print("\nPHASE 7: Formatting ABBYY JSON output...")
+
+    # Convert items to format expected by formatter
+    formatted_items = []
+    for item in items:
+        formatted_item = {
+            'description': item.get('description', ''),
+            'quantity': item.get('quantity', 1.0),
+            'unit_price': item.get('unit_price', 0.0),
+            'line_total': item.get('line_total', 0.0)
+        }
+
+        # Add CatalogNo if available
+        if item.get('catalog_no'):
+            formatted_item['catalog_no'] = item['catalog_no']
+
+        formatted_items.append(formatted_item)
+
+    # Apply post-processing
+    try:
+        fixed_items = process_items(formatted_items)
+    except Exception as e:
+        print(f"  Post-processing failed: {e}")
+        fixed_items = formatted_items
+
+    # Format output
+    receipt_name = formatter.generate_receipt_name(
+        header['vendor'], header['date'], image_path
+    )
+
+    print(f"  Creating ABBYY format for {len(fixed_items)} items")
+    gdoc = formatter.format(fixed_items, header['vendor'], header['date'], receipt_name)
+
+    if save_to_output:
+        formatter.save_to_output(gdoc, receipt_name)
+        print(f"  Saved to output/{receipt_name}.json")
+
+    print(f"\n{'='*80}")
+    print("Processing complete!")
+    print(f"{'='*80}")
+
+    return gdoc
+
+
+def extract_items(image_path: str) -> List[MindeeItem]:
+    """Extract just the items list from a receipt."""
+    result = process_receipt(image_path)
+    groups = result.get("GDocument", {}).get("groups", [])
+    if groups and len(groups) > 0:
+        table_items = groups[0].get("groups", [])
+        return [
+            MindeeItem(
+                description=self._get_field_value(item, "description"),
+                quantity=self._get_field_value(item, "quantity"),
+                unit_price=self._get_field_value(item, "price"),
+                total=self._get_field_value(item, "linetotal"),
+            )
+            for item in table_items
+        ]
+    return []
+
+def _get_field_value(item: dict, field_name: str) -> float:
+    """Get numeric value from item fields."""
+    fields = item.get("fields", [])
+    for f in fields:
+        if f.get("name") == field_name:
+            try:
+                return float(f.get("value", 0))
+            except ValueError:
+                return 0
+    return 0
+
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) < 2:
+        print("Usage: python mindee_pipeline.py <receipt_file>")
+        sys.exit(1)
+
+    result = process_receipt(sys.argv[1])
+    print("Extracted successfully!")
