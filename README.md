@@ -113,6 +113,41 @@ IMAGE → Step 1 (Two Scans)
                                      ↓ RESTART PIPELINE FROM STEP 2
 ```
 
+## 🖥️ GUI Features
+
+### **Main Window (`gui/main_window.py`)**
+- **Drag & Drop Support**: Process receipts by dragging files onto the window
+- **Visual Pipeline Progress**: Real-time display of 8-step pipeline execution
+- **Thread-Safe Callbacks**: Background pipeline with safe GUI updates
+- **Vendor Cache Management**: View and edit vendor-specific layout templates
+- **Result Visualization**: Color-coded display of extracted items with confidence scores
+
+### **Interactive Components**
+- **Schema Editor**: Edit vendor-specific column mappings and quantity patterns
+- **Cache Manager**: Browse, edit, and delete cached vendor templates with trust scores
+- **Layout Review**: Visualize column detection results with Hebrew text alignment
+- **Confidence Feedback**: Color-coded indicators for item extraction quality
+
+### **Thread-Safe Dialog System**
+The GUI provides callbacks that the pipeline can invoke from background threads:
+```python
+self.pipeline_callbacks = {
+    'ask_replace_schema': self._wrap_gui_callback(self._show_replace_schema_dialog),
+    'on_mapping_missing': self._wrap_gui_callback(self._add_merchant_mapping)
+}
+```
+
+### **User Decision Points**
+1. **Schema Replacement**: When pipeline detects better layout (higher trust score)
+2. **Merchant Mapping**: Add new Hebrew → English vendor name mappings
+3. **Cache Review**: Manual verification of auto-detected vendor templates
+
+### **Visual Features**
+- **Cute Theme**: Modern UI with emojis and consistent color palette
+- **Processing Animation**: Live spinner during OCR processing
+- **Drop Zone**: Visual file drop area with feedback
+- **Result Grid**: Tabular display with scrollable item list
+
 ## 📊 Test Results Summary
 
 ### **Performance Metrics (3 Real Receipts)**

@@ -60,6 +60,18 @@ class MainWindow:
             'on_mapping_missing': self._wrap_gui_callback(self._add_merchant_mapping)
         }
 
+        # Check if tkinterdnd2 is available for drag and drop
+        try:
+            from tkinterdnd2 import TkinterDnD, DND_FILES
+            self.has_dnd = True
+            print("Drag & drop enabled (tkinterdnd2 available)")
+        except ImportError:
+            self.has_dnd = False
+            print("Note: Drag & drop disabled - tkinterdnd2 not installed")
+
+        # Build UI
+        self._build_ui()
+
     def _add_merchant_mapping(self, hebrew_text):
         """
         Add merchant mapping for Hebrew text.
@@ -112,18 +124,6 @@ class MainWindow:
                 raise TimeoutError("GUI callback timed out after 30 seconds")
 
         return wrapped
-
-        # Check if tkinterdnd2 is available for drag and drop
-        try:
-            from tkinterdnd2 import TkinterDnD, DND_FILES
-            self.has_dnd = True
-            print("Drag & drop enabled (tkinterdnd2 available)")
-        except ImportError:
-            self.has_dnd = False
-            print("Note: Drag & drop disabled - tkinterdnd2 not installed")
-
-        # Build UI
-        self._build_ui()
 
     def _build_ui(self):
         """Build the main UI."""
