@@ -49,7 +49,7 @@ CACHE IS OPTIONAL OPTIMIZATION:
 import json
 import os
 import re
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Tuple
 from datetime import datetime
 from rapidfuzz import fuzz
 
@@ -78,7 +78,7 @@ class Phase6VendorCache:
             self.cache_path = os.path.join(data_dir, "vendor_cache.json")
 
         self.cache = self._load_cache()
-        self.merchants_mapping = self._load_merchants_mapping()
+        self.merchants_mapping, self.blacklist = self._load_merchants_mapping_with_blacklist()
         self.vendor_keywords = self._get_vendor_keywords()
 
         # GUI callbacks for user interaction
@@ -93,11 +93,19 @@ class Phase6VendorCache:
             callback_name: Name of the callback function
             *args, **kwargs: Arguments to pass to callback
         """
+        print(f"Phase 6: Triggering GUI callback '{callback_name}'")
+        print(f"  Available callbacks: {list(self.gui_callbacks.keys()) if self.gui_callbacks else 'None'}")
+
         if callback_name in self.gui_callbacks:
+            print(f"  Callback found, executing...")
             try:
-                return self.gui_callbacks[callback_name](*args, **kwargs)
+                result = self.gui_callbacks[callback_name](*args, **kwargs)
+                print(f"  Callback returned: {result}")
+                return result
             except Exception as e:
                 print(f"GUI callback '{callback_name}' failed: {e}")
+                import traceback
+                traceback.print_exc()
         else:
             print(f"TODO: GUI callback '{callback_name}' not available")
 
@@ -114,6 +122,12 @@ class Phase6VendorCache:
                 print(f"  Would ask user to add merchant mapping for: {hebrew_text}")
                 # Return a default key for now
                 return f"_gui_todo_{hebrew_text}"
+
+            elif callback_name == 'create_cache_entry':
+                vendor_name, trust_score, column_info, quantity_pattern = args[:4]
+                print(f"  Would ask user: Create cache entry for {vendor_name}? (trust_score: {trust_score:.2f})")
+                # By default, create cache for now (will be changed when GUI is integrated)
+                return True
 
         return None
 
@@ -163,15 +177,66 @@ class Phase6VendorCache:
                 return {}
         return {}
 
+    def _load_merchants_mapping_with_blacklist(self) -> Tuple[Dict[str, List[str]], List[str]]:
+        """
+        Load merchants mapping and extract blacklist.
+
+        Returns:
+            Tuple of (merchants_mapping_dict, blacklist_list)
+        """
+        mapping_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "merchants_mapping.json"
+        )
+
+        if os.path.exists(mapping_path):
+            try:
+                with open(mapping_path, 'r', encoding='utf-8') as f:
+                    all_data = json.load(f)
+
+                # Extract blacklist (if exists) and remove it from mappings
+                blacklist = []
+                merchants_mapping = {}
+
+                for key, value in all_data.items():
+                    if key == "__blacklist__":
+                        blacklist = value if isinstance(value, list) else []
+                    else:
+                        merchants_mapping[key] = value
+
+                print(f"Phase 6: Loaded merchants mapping with {len(merchants_mapping)} vendors")
+                if blacklist:
+                    print(f"Phase 6: Loaded blacklist with {len(blacklist)} entries: {blacklist}")
+
+                return merchants_mapping, blacklist
+
+            except (json.JSONDecodeError, IOError) as e:
+                print(f"Phase 6: Failed to load merchants mapping: {e}")
+                return {}, []
+
+        print("Phase 6: merchants_mapping.json not found")
+        return {}, []
+
     def _get_vendor_keywords(self) -> List[str]:
-        """Get vendor keywords from merchants_mapping ONLY."""
+        """Get vendor keywords from merchants_mapping, excluding blacklisted words."""
         if not self.merchants_mapping:
             print("WARNING: merchants_mapping.json not loaded or empty")
             return []
 
         keywords = []
         for hebrew_names in self.merchants_mapping.values():
-            keywords.extend(hebrew_names)
+            for name in hebrew_names:
+                # Skip if this name is in blacklist
+                if hasattr(self, 'blacklist') and self.blacklist and name in self.blacklist:
+                    print(f"  Skipping blacklisted keyword: '{name}'")
+                    continue
+                keywords.append(name)
+
+        if hasattr(self, 'blacklist') and self.blacklist:
+            print(f"Phase 6: Vendor keywords filtered, {len(keywords)} keywords (blacklisted {len(self.blacklist)} words)")
+        else:
+            print(f"Phase 6: Vendor keywords: {len(keywords)} keywords")
+
         return keywords
 
     def _save_cache(self):
@@ -241,6 +306,7 @@ class Phase6VendorCache:
         text_to_search = ' '.join(lines)
 
         print(f"Phase 6: Detecting vendor in first {len(lines)} lines")
+        print(f"Phase 6: First 10 lines preview: {text_to_search[:200]}...")
 
         best_vendor = None
         best_score = 0
@@ -253,6 +319,53 @@ class Phase6VendorCache:
                 best_score = score
                 best_vendor = keyword
                 matched_keyword = keyword
+                print(f"  Potential match: '{keyword}' score: {score}")
+
+        if best_vendor:
+            print(f"  Best vendor match: '{best_vendor}' score: {best_score}")
+
+        # BLACKLIST CHECK: If we have a match, check if it might be a false positive due to blacklisted words
+        if best_vendor and hasattr(self, 'blacklist') and self.blacklist:
+            text_lower = text_to_search.lower()
+            for blacklisted_word in self.blacklist:
+                blacklisted_lower = blacklisted_word.lower()
+                if blacklisted_lower in text_lower:
+                    # Text contains blacklisted word
+                    print(f"  Text contains blacklisted word: '{blacklisted_word}'")
+
+                    # Check if the matched vendor is similar to the blacklisted word
+                    # Example: "אסם" (Osem) is similar to "קסם" (part of Kfar Qasem)
+                    similarity = fuzz.ratio(best_vendor.lower(), blacklisted_lower)
+                    if similarity >= 70:  # If vendor name is similar to blacklisted word
+                        print(f"  WARNING: Potential false positive! Matched '{best_vendor}' is {similarity}% similar to blacklisted '{blacklisted_word}'")
+                        print(f"  Original match score: {best_score}, rejecting match")
+
+                        # Check if there's a better match (second best)
+                        second_best_vendor = None
+                        second_best_score = 0
+                        second_matched_keyword = None
+
+                        for keyword in self.vendor_keywords:
+                            if keyword == best_vendor:
+                                continue  # Skip the already matched one
+                            score = fuzz.partial_ratio(keyword.lower(), text_lower)
+                            if score > second_best_score and score >= 60:
+                                second_best_score = score
+                                second_best_vendor = keyword
+                                second_matched_keyword = keyword
+
+                        if second_best_vendor:
+                            print(f"  Using second best match: '{second_best_vendor}' (score: {second_best_score})")
+                            best_vendor = second_best_vendor
+                            best_score = second_best_score
+                            matched_keyword = second_matched_keyword
+                        else:
+                            print(f"  No alternative match found, rejecting completely")
+                            best_vendor = None
+                            best_score = 0
+                            matched_keyword = None
+
+                    break  # Only check first blacklisted word found
 
         # Get English key for vendor
         vendor_english_key = None
@@ -473,11 +586,14 @@ class Phase6VendorCache:
         Handles v1.0 and v2.0 structures.
 
         Args:
-            entry: Vendor cache entry
+            entry: Vendor cache entry (can be None if no cache was created)
 
         Returns:
             Current trust score (0.0 to 1.0)
         """
+        if not entry:
+            return 0.5  # Default if no cache entry
+
         # Check for v2.0 structure first
         if "confidence" in entry and isinstance(entry["confidence"], dict):
             # v2.0: confidence is a dict with trust_score
@@ -586,9 +702,13 @@ class Phase6VendorCache:
                 print(f"  Current trust score: {current_trust_score:.2f}")
                 print(f"  New trust score: {trust_score:.2f}")
 
+                # Check if both scores are low confidence (<0.6)
+                both_low_confidence = (current_trust_score < 0.6 and trust_score < 0.6)
+
                 if trust_score > current_trust_score:
                     # Better schema detected - ask user via GUI
-                    print(f"  Asking user via GUI: 'Better schema detected for {vendor_name}. Replace?' (Score: {current_trust_score:.2f} → {trust_score:.2f})")
+                    print(f"  Better schema detected ({current_trust_score:.2f} → {trust_score:.2f})")
+                    print(f"  Asking user via GUI: 'Better schema detected for {vendor_name}. Replace?'")
 
                     # Ask user via GUI callback
                     should_replace = self._trigger_gui_callback('ask_replace_schema', vendor_name, current_trust_score, trust_score)
@@ -613,7 +733,39 @@ class Phase6VendorCache:
                         # User declined - keep existing schema
                         print(f"  ✗ User declined: Keeping existing schema (score: {current_trust_score:.2f})")
                         entry['confidence']['trust_score'] = current_trust_score
+
+                elif both_low_confidence:
+                    # BOTH scores are low - ask user what to do
+                    print(f"  Both scores are low (current: {current_trust_score:.2f}, new: {trust_score:.2f})")
+                    print(f"  Asking user via GUI: 'Both scores are low (<0.6). Update cache for {vendor_name} anyway?'")
+
+                    # Use same callback but the dialog will show "Both scores low" context
+                    should_replace = self._trigger_gui_callback('ask_replace_schema',
+                        vendor_name, current_trust_score, trust_score)
+
+                    if should_replace:
+                        # User approved - update even though both are low
+                        entry['confidence']['trust_score'] = trust_score
+
+                        # Update with current schema (might have different column detection, etc.)
+                        if column_info and column_info.get('success'):
+                            entry['legacy_fields']['column_assignments'] = column_info.get('column_assignments', {})
+                            entry['legacy_fields']['detected_columns'] = column_info.get('detected_columns', [])
+
+                        if quantity_pattern:
+                            entry['legacy_fields']['quantity_pattern'] = quantity_pattern
+
+                        if row_format:
+                            entry['legacy_fields']['row_format'] = row_format
+
+                        print(f"  ✓ User approved: Updated cache despite low scores (new: {trust_score:.2f})")
+                    else:
+                        # User declined - keep existing
+                        print(f"  ✗ User declined: Keeping existing low-confidence schema (score: {current_trust_score:.2f})")
+                        entry['confidence']['trust_score'] = current_trust_score
+
                 else:
+                    # No improvement and not both low
                     print(f"  No improvement (current: {current_trust_score:.2f}, new: {trust_score:.2f}) - keeping existing schema")
                     # Keep existing confidence
                     entry['confidence']['trust_score'] = current_trust_score
@@ -684,8 +836,37 @@ class Phase6VendorCache:
                       f"pattern_consistency={validation_metrics.get('pattern_consistency', 0.5):.2f}, "
                       f"user_verification={validation_metrics.get('user_verification', 0.5):.2f}")
 
-            self._set_vendor_entry(vendor_slug, entry)
-            print(f"Phase 6: Created new v2.0 cache entry for {vendor_slug}")
+            # NEW LOGIC: Ask user to create cache for low-confidence new vendors
+            # Threshold: trust_score < 0.6 (low confidence)
+            should_create_cache = True  # Default: create cache
+
+            print(f"Phase 6: New vendor '{vendor_name}', trust_score: {trust_score:.2f}")
+
+            if trust_score < 0.6:
+                print(f"Phase 6: LOW confidence ({trust_score:.2f} < 0.6) - Should show cache creation dialog")
+                print(f"  Asking user via GUI: 'Create cache entry for {vendor_name}?'")
+
+                # Ask user via GUI callback
+                should_create_cache = self._trigger_gui_callback(
+                    'create_cache_entry',
+                    vendor_name,
+                    trust_score,
+                    column_info,
+                    quantity_pattern or 'unknown'
+                )
+                print(f"Phase 6: GUI callback returned: {should_create_cache}")
+            else:
+                print(f"Phase 6: HIGH confidence ({trust_score:.2f} ≥ 0.6) - Auto-creating cache")
+
+            # Only create cache entry if user approved or score is high enough
+            if should_create_cache:
+                self._set_vendor_entry(vendor_slug, entry)
+                print(f"Phase 6: Created new v2.0 cache entry for {vendor_slug}")
+                return entry
+            else:
+                print(f"Phase 6: Not creating cache entry for {vendor_name} (user declined or error)")
+                # Return None to indicate no cache was created
+                return None
 
         # Save cache
         self._save_cache()

@@ -47,9 +47,14 @@ class MindeeFormatter:
 
     def generate_receipt_name(self, vendor: str, date: str, image_path: str) -> str:
         """Generate receipt filename from OCR vendor + date."""
+        # Debug logging
+        print(f"Formatter: Generating receipt name with vendor='{vendor}', date='{date}'")
+
         # Get English vendor using the same mapping as format_converter
         from utils.format_converter import _get_english_vendor
         safe_vendor = _get_english_vendor(vendor)
+
+        print(f"Formatter: _get_english_vendor('{vendor}') returned '{safe_vendor}'")
 
         # Fallback: sanitize vendor
         if not safe_vendor:
@@ -61,4 +66,6 @@ class MindeeFormatter:
             safe_vendor = "Unknown"
 
         normalized_date = _normalize_date(date)
-        return f"{safe_vendor}_{normalized_date}_{safe_vendor} {normalized_date.replace('.', '-')}"
+        receipt_name = f"{safe_vendor}_{normalized_date}_{safe_vendor} {normalized_date.replace('.', '-')}"
+        print(f"Formatter: Generated receipt name: '{receipt_name}'")
+        return receipt_name

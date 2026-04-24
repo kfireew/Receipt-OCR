@@ -39,7 +39,10 @@ def _get_english_vendor(ocr_vendor: str) -> str:
     3. Fuzzy match -> return merchant name
     """
     if not ocr_vendor:
+        print(f"_get_english_vendor: Empty vendor, returning empty string")
         return ocr_vendor
+
+    print(f"_get_english_vendor: Looking for vendor '{ocr_vendor}'")
 
     mapping_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "merchants_mapping.json")
     try:
@@ -57,12 +60,15 @@ def _get_english_vendor(ocr_vendor: str) -> str:
 
     # 1. Exact match
     if ocr_vendor in kw_to_merchant:
-        return kw_to_merchant[ocr_vendor]
+        result = kw_to_merchant[ocr_vendor]
+        print(f"_get_english_vendor: Exact match found: '{ocr_vendor}' -> '{result}'")
+        return result
 
     # 2. Partial match (keyword in OCR vendor - case insensitive)
     ocr_lower = ocr_vendor.lower()
     for keyword, merchant_name in kw_to_merchant.items():
         if keyword.lower() in ocr_lower:
+            print(f"_get_english_vendor: Partial match: keyword '{keyword}' in '{ocr_vendor}' -> '{merchant_name}'")
             return merchant_name
 
     # 3. Fuzzy match
@@ -75,8 +81,10 @@ def _get_english_vendor(ocr_vendor: str) -> str:
             best_match = merchant_name
 
     if best_match:
+        print(f"_get_english_vendor: Fuzzy match: '{ocr_vendor}' -> '{best_match}' (score: {best_score:.2f})")
         return best_match
 
+    print(f"_get_english_vendor: No match found for '{ocr_vendor}', returning original")
     return ocr_vendor
 
 

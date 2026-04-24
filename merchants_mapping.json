@@ -1,5 +1,12 @@
 {
-  "StraussCool": ["שטראוס קול", "שטראוס", "שטראום", "strauss", "סטראוס קול", "strausscool"],
+  "StraussCool": [
+    "שטראוס קול",
+    "שטראוס",
+    "שטראום",
+    "strauss",
+    "סטראוס קול",
+    "strausscool"
+  ],
   "Avikam": ["אביקם", "אביקם בע\"מ", "זינגר", "avikam"],
   "Tnuva": ["תנובה", "tnuva"],
   "Angel": ["עידה", "angel"],
@@ -64,5 +71,6 @@
   "BetterChoice": ["בטר צויס", "betterchoice"],
   "Shipka": ["שפקה", "shipka"],
   "Dantes": ["דנטס", "dantes"],
-  "Shamir": ["סלטי שמיר", "shamir"]
+  "Shamir": ["סלטי שמיר", "shamir"],
+  "__blacklist__": ["קאסם", "כפר קאסם", "kfar qasem"]
 }

@@ -15,8 +15,11 @@ class CuteTheme:
         self.CLR_SURFACE = '#ffffff'  # White surface
         self.CLR_ACCENT = '#3b82f6'  # Blue accent
         self.CLR_SUCCESS = '#10b981'  # Green success
+        self.CLR_SUCCESS_LIGHT = '#d1fae5'  # Light green
         self.CLR_WARNING = '#f59e0b'  # Amber warning
+        self.CLR_WARNING_LIGHT = '#fef3c7'  # Light amber
         self.CLR_ERROR = '#ef4444'  # Red error
+        self.CLR_ERROR_LIGHT = '#fee2e2'  # Light red
         self.CLR_TEXT = '#1e293b'  # Dark text
         self.CLR_SUBTEXT = '#64748b'  # Gray subtext
         self.CLR_BORDER = '#e2e8f0'  # Light border

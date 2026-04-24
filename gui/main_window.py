@@ -57,7 +57,8 @@ class MainWindow:
         # Pipeline callback registry for user decisions
         self.pipeline_callbacks = {
             'ask_replace_schema': self._wrap_gui_callback(self._show_replace_schema_dialog),
-            'on_mapping_missing': self._wrap_gui_callback(self._add_merchant_mapping)
+            'on_mapping_missing': self._wrap_gui_callback(self._add_merchant_mapping),
+            'create_cache_entry': self._wrap_gui_callback(self._show_create_cache_dialog)  # NEW: for low-confidence new vendors
         }
 
         # Check if tkinterdnd2 is available for drag and drop
@@ -311,26 +312,23 @@ class MainWindow:
             self.last_raw_text = None
             self.last_confidence_score = 0.0
 
-            # Use main pipeline with cache option
+            # Use main pipeline directly (modified to return metadata)
             use_cache = self.cache_var.get()
             try:
-                from pipelines.mindee_pipeline_with_metadata import process_receipt_with_metadata
-                result = process_receipt_with_metadata(
+                from pipelines.mindee_pipeline import process_receipt
+                result = process_receipt(
                     file_path,
-                    use_cache=use_cache,
+                    api_key=None,
+                    model_id=None,
+                    save_to_output=True,
                     gui_callbacks=self.pipeline_callbacks
                 )
-            except ImportError as e:
-                # Fallback to basic pipeline
-                self.result_display.log(f"Warning: Main pipeline not available ({e}), using basic")
-                try:
-                    from pipelines.mindee_pipeline import process_receipt
-                    basic_result = process_receipt(
-                        file_path,
-                        gui_callbacks=self.pipeline_callbacks
-                    )
+
+                # If pipeline returns just GDocument (backward compatibility), wrap it
+                if 'GDocument' not in result:
+                    self.result_display.log("Pipeline returned old format, wrapping with metadata")
                     result = {
-                        'GDocument': basic_result,
+                        'GDocument': result,
                         'vendor_info': {},
                         'column_info': {},
                         'quantity_pattern': 1,
@@ -338,8 +336,9 @@ class MainWindow:
                         'cache_hit': False,
                         'raw_text': ""
                     }
-                except ImportError as e2:
-                    raise ImportError(f"Neither pipeline available: {e2}")
+
+            except ImportError as e:
+                raise ImportError(f"Pipeline not available: {e}")
 
             self.last_result = result
             self.last_input_path = file_path
@@ -378,13 +377,43 @@ class MainWindow:
                                 confidence_score, cache_hit):
         """Update UI after processing completes."""
         self.result_display.log(f"Extracted {items_count} items")
-        self.result_display.log(json.dumps(result, indent=2, ensure_ascii=False))
+
+        # Try to log result as JSON, but don't fail if serialization fails
+        try:
+            # Show clean ABBYY GDocument instead of entire result dict with metadata
+            gdoc_wrapper = result.get("GDocument", {})
+            if "GDocument" in gdoc_wrapper:
+                # Double nested: {"GDocument": {"GDocument": {...}}}
+                clean_gdoc = gdoc_wrapper.get("GDocument", {})
+            else:
+                # Single nested: {"GDocument": {...}}
+                clean_gdoc = gdoc_wrapper
+
+            result_json = json.dumps(clean_gdoc, indent=2, ensure_ascii=False)
+            self.result_display.log(result_json)
+
+            # Also log metadata summary for debugging
+            self.result_display.log(f"\n=== Processing Metadata ===")
+            self.result_display.log(f"Confidence Score: {confidence_score:.2f}")
+            self.result_display.log(f"Cache Hit: {cache_hit}")
+            if vendor_info and vendor_info.get('name'):
+                self.result_display.log(f"Vendor: {vendor_info.get('name')}")
+            if vendor_info and vendor_info.get('trust_score'):
+                self.result_display.log(f"Trust Score: {vendor_info.get('trust_score'):.2f}")
+
+        except (TypeError, ValueError) as e:
+            self.result_display.log(f"Note: Could not serialize result to JSON: {e}")
+            # Log at least the keys we have
+            self.result_display.log(f"Result keys: {list(result.keys()) if isinstance(result, dict) else 'Not a dict'}")
 
         # Update vendor cache state
         self.last_vendor_info = vendor_info
         self.last_column_info = column_info
         self.last_quantity_pattern = quantity_pattern
         self.last_confidence_score = confidence_score
+
+        # Debug: log confidence score
+        print(f"GUI updating confidence meter with score: {confidence_score} (type: {type(confidence_score)})")
 
         # Update confidence meter
         self.confidence_meter.update(confidence_score)
@@ -431,7 +460,15 @@ class MainWindow:
             return
 
         # Get vendor and date from result
-        gdoc = self.last_result.get("GDocument", {})
+        # Handle double GDocument nesting: {'GDocument': {'GDocument': {...}}}
+        gdoc_wrapper = self.last_result.get("GDocument", {})
+        if "GDocument" in gdoc_wrapper:
+            # Double nested: {"GDocument": {"GDocument": {...}}}
+            gdoc = gdoc_wrapper.get("GDocument", {})
+        else:
+            # Single nested: {"GDocument": {...}}
+            gdoc = gdoc_wrapper
+
         vendor = ""
         date = ""
 
@@ -471,16 +508,25 @@ class MainWindow:
         dst_file = output / f"{receipt_name}{ext}"
         shutil.copy2(self.last_input_path, dst_file)
 
-        # Save JSON
+        # Save JSON (save clean GDocument, not entire result dict)
         json_path = output / f"{receipt_name}.JSON"
+        # Get clean GDocument for saving
+        gdoc_wrapper = self.last_result.get("GDocument", {})
+        if "GDocument" in gdoc_wrapper:
+            # Double nested: {"GDocument": {"GDocument": {...}}}
+            clean_gdoc = gdoc_wrapper.get("GDocument", {})
+        else:
+            # Single nested: {"GDocument": {...}}
+            clean_gdoc = gdoc_wrapper
+
         json_path.write_text(
-            json.dumps(self.last_result, indent=2, ensure_ascii=False),
+            json.dumps(clean_gdoc, indent=2, ensure_ascii=False),
             encoding="utf-8",
         )
 
-        # Copy to clipboard
+        # Copy to clipboard (copy clean GDocument)
         self.root.clipboard_clear()
-        self.root.clipboard_append(json.dumps(self.last_result, ensure_ascii=False))
+        self.root.clipboard_append(json.dumps(clean_gdoc, ensure_ascii=False))
 
         messagebox.showinfo("Saved", f"Folder created:\n{output}\n\nJSON copied to clipboard!")
         self.result_display.log(f"\nSaved to folder: {output}")
@@ -1072,6 +1118,112 @@ class MainWindow:
             style="secondary"
         )
         btn_keep.pack(side=tk.LEFT)
+
+        # Wait for user choice
+        dialog.wait_window()  # This blocks until dialog is destroyed
+        choice_event.wait()   # Ensure choice is set
+
+        return user_choice
+
+    def _show_create_cache_dialog(self, vendor_name, trust_score, column_info, quantity_pattern):
+        """
+        Show dialog asking if user wants to create cache entry for new vendor.
+
+        Args:
+            vendor_name: Vendor name
+            trust_score: Calculated trust score (0.0-1.0)
+            column_info: Column detection results
+            quantity_pattern: Detected quantity pattern
+
+        Returns:
+            True if user wants to create cache, False if not
+        """
+        # Create dialog
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Create Cache Entry")
+        dialog.geometry("550x300")
+        dialog.transient(self.root)
+        dialog.grab_set()
+
+        theme.configure_styles(dialog)
+
+        # Content frame
+        content = theme.create_frame(dialog, padx=20, pady=20)
+        content.pack(fill=tk.BOTH, expand=True)
+
+        # Title
+        title = theme.create_label(
+            content,
+            text="📋 Create Cache Entry for New Vendor",
+            font=theme.FONT_TITLE
+        )
+        title.pack(anchor=tk.W, pady=(0, 15))
+
+        # Message
+        score_color = "🟢" if trust_score >= 0.6 else "🟡" if trust_score >= 0.4 else "🔴"
+        message = f"New vendor detected: '{vendor_name}'\n\n"
+        message += f"Trust score: {trust_score:.2f} {score_color} ("
+        if trust_score >= 0.6:
+            message += "Good"
+        elif trust_score >= 0.4:
+            message += "Low"
+        else:
+            message += "Very Low"
+        message += ")\n\n"
+
+        # Add column info if available
+        if column_info and column_info.get('success'):
+            detected_cols = column_info.get('detected_columns', [])
+            if detected_cols:
+                message += f"Detected {len(detected_cols)} columns:\n"
+                for col in detected_cols[:3]:  # Show first 3 columns
+                    message += f"  • {col.get('hebrew_text', '?')} → {col.get('assigned_field', '?')}\n"
+                if len(detected_cols) > 3:
+                    message += f"  • ... and {len(detected_cols) - 3} more\n"
+
+        message += f"\nQuantity pattern: {quantity_pattern}\n\n"
+        message += "Create cache entry for future receipts?"
+
+        msg_label = theme.create_label(
+            content,
+            text=message,
+            font=theme.FONT_BODY,
+            fg=theme.CLR_TEXT,
+            justify=tk.LEFT
+        )
+        msg_label.pack(anchor=tk.W, pady=(0, 20), fill=tk.X)
+
+        # Button frame
+        button_frame = theme.create_frame(content)
+        button_frame.pack(fill=tk.X)
+
+        # Variable to store user's choice
+        user_choice = None
+        choice_event = threading.Event()
+
+        def on_create():
+            nonlocal user_choice
+            user_choice = True
+            dialog.destroy()
+            choice_event.set()
+
+        def on_skip():
+            nonlocal user_choice
+            user_choice = False
+            dialog.destroy()
+            choice_event.set()
+
+        btn_create = theme.create_button(
+            button_frame, "Create Cache Entry", command=on_create,
+            style="primary", emoji="💾"
+        )
+        btn_create.pack(side=tk.LEFT, padx=(0, 10))
+
+        btn_skip = theme.create_button(
+            button_frame, "Skip (Don't Create)", command=on_skip,
+            style="secondary"
+        )
+        btn_skip.pack(side=tk.LEFT)
 
         # Wait for user choice
         dialog.wait_window()  # This blocks until dialog is destroyed

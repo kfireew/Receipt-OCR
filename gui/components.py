@@ -275,6 +275,16 @@ class ConfidenceMeter:
 
     def update(self, score):
         """Update the confidence score display."""
+        # Validate score input
+        try:
+            score = float(score)
+        except (ValueError, TypeError):
+            print(f"WARNING: Invalid confidence score: {score}, defaulting to 0.0")
+            score = 0.0
+
+        # Clamp score between 0.0 and 1.0
+        score = max(0.0, min(1.0, score))
+
         self.score = score
         self.meter['value'] = score * 100
 

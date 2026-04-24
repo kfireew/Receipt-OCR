@@ -6,11 +6,11 @@
         "display_name": "שופרסל טסט",
         "user_created": false,
         "creation_date": "2026-04-23",
-        "last_modified": "2026-04-23",
+        "last_modified": "2026-04-24",
         "modified_by": "auto_update"
       },
       "confidence": {
-        "trust_score": 0.3333333333333333,
+        "trust_score": 0.91,
         "source": "auto_detected",
         "parses_since_verification": 2,
         "user_verified": false,
@@ -24,8 +24,8 @@
       },
       "legacy_fields": {
         "display_name": "שופרסל טסט",
-        "parse_count": 2,
-        "last_seen": "2026-04-23",
+        "parse_count": 3,
+        "last_seen": "2026-04-24",
         "confirmed_by_user": false,
         "row_format": "multiline",
         "quantity_pattern": "pattern1",
@@ -230,6 +230,63 @@
           }
         ]
       }
+    },
+    "ridan": {
+      "basics": {
+        "display_name": "ריד",
+        "user_created": false,
+        "creation_date": "2026-04-24",
+        "last_modified": "2026-04-24",
+        "modified_by": "auto_update",
+        "document_type": "receipt"
+      },
+      "confidence": {
+        "trust_score": 0.46,
+        "source": "auto_detected",
+        "parses_since_verification": 0,
+        "user_verified": false,
+        "verification_date": null,
+        "verification_method": null
+      },
+      "columns_gui": [],
+      "validation_rules": {
+        "quantity_calculation": "unknown",
+        "tolerance_percent": 5.0,
+        "auto_validate": true,
+        "barcode_format": null,
+        "invoice_specific": false
+      },
+      "parsing_rules": {
+        "document_type": "receipt",
+        "skip_lines": []
+      },
+      "legacy_fields": {
+        "parse_count": 7,
+        "last_seen": "2026-04-24",
+        "confirmed_by_user": false,
+        "row_format": "multiline",
+        "quantity_pattern": "pattern1",
+        "has_discount_lines": false,
+        "discount_keywords": [],
+        "barcode_position": "unknown",
+        "column_assignments": {},
+        "detected_columns": [
+          {
+            "hebrew_text": "פריט",
+            "assigned_field": "description"
+          },
+          {
+            "hebrew_text": "ברקוד",
+            "assigned_field": "product_code"
+          },
+          {
+            "hebrew_text": "יח",
+            "assigned_field": "quantity"
+          }
+        ],
+        "confidence": 0.44
+      },
+      "matched_slug": "ridan"
     }
   }
 }

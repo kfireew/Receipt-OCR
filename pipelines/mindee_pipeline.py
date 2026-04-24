@@ -358,8 +358,11 @@ def process_receipt(
             vendor_english_key=vendor_info.get('english_key'),
             validation_metrics=validation_metrics
         )
-        confidence = vendor_cache._get_current_trust_score(cache_entry)
-        print(f"  Updated cache for {vendor_name} (trust_score: {confidence:.2f})")
+        if cache_entry:  # Only if cache was actually created/updated
+            confidence = vendor_cache._get_current_trust_score(cache_entry)
+            print(f"  Updated cache for {vendor_name} (trust_score: {confidence:.2f})")
+        else:
+            print(f"  No cache created for {vendor_name} (user declined or error)")
     else:
         print(f"  No cache update (vendor detection: {vendor_info.get('detected', False)}, column success: {column_info.get('success', False) if column_info else False})")
 
@@ -405,7 +408,53 @@ def process_receipt(
     print("Processing complete!")
     print(f"{'='*80}")
 
-    return gdoc
+    # Build metadata result for GUI
+    # Initialize variables with defaults to avoid NameError
+    confidence_score = 0.5  # Default confidence
+    cache_hit = False
+    cache_entry_exists = False
+    confidence_exists = False
+
+    # Check if cache_entry variable exists and has a value
+    try:
+        if cache_entry:  # This will raise NameError if cache_entry doesn't exist
+            cache_entry_exists = True
+    except NameError:
+        cache_entry_exists = False
+
+    # Check if confidence variable exists
+    try:
+        confidence  # This will raise NameError if confidence doesn't exist
+        confidence_exists = True
+    except NameError:
+        confidence_exists = False
+
+    # Get confidence score
+    if cache_entry_exists:
+        confidence_score = vendor_cache._get_current_trust_score(cache_entry)
+    elif confidence_exists:
+        confidence_score = confidence
+
+    # Determine if cache was hit
+    cache_hit = vendor_info.get('detected', False) and vendor_info.get('cache_entry') is not None
+
+    # Build result with metadata
+    result = {
+        'GDocument': gdoc,
+        'vendor_info': {
+            'vendor_slug': vendor_info.get('slug'),
+            'vendor_name': vendor_info.get('name'),
+            'trust_score': confidence_score,
+            'match_score': vendor_info.get('detection_result', {}).get('match_score', 0.0) if vendor_info.get('detected') else 0.0
+        },
+        'column_info': column_info if 'column_info' in locals() else {},
+        'quantity_pattern': pattern_info.get('pattern', 1) if 'pattern_info' in locals() else 1,
+        'confidence_score': confidence_score,
+        'cache_hit': cache_hit,
+        'raw_text': raw_text if 'raw_text' in locals() else ""
+    }
+
+    return result
 
 
 def _find_header_lines_for_cached_columns(raw_text: str, column_mapping: Dict[str, str]) -> Optional[Tuple[int, int]]:
