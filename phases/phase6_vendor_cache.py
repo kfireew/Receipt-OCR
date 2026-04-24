@@ -602,6 +602,123 @@ class Phase6VendorCache:
             # v1.0: direct confidence field
             return entry.get("confidence", 0.5)
 
+    def _reload_cache_from_file(self):
+        """Reload cache from file (e.g., after SchemaEditorWindow saves)."""
+        print(f"Phase 6: Reloading cache from file")
+        try:
+            new_cache = self._load_cache()
+            self.cache = new_cache
+            print(f"  Cache reloaded successfully")
+        except Exception as e:
+            print(f"  WARNING: Failed to reload cache: {e}")
+
+    def _get_english_vendor_name(self, vendor_slug: str) -> str:
+        """Get English vendor name from merchants_mapping.json using vendor_slug."""
+        if not hasattr(self, 'merchants_mapping') or not self.merchants_mapping:
+            return vendor_slug.replace("_", " ").title()
+
+        vendor_slug_lower = vendor_slug.lower()
+        for english_key, hebrew_names in self.merchants_mapping.items():
+            if english_key.lower() == vendor_slug_lower:
+                return english_key  # Return proper English name (e.g., "Ridan")
+
+        return vendor_slug.replace("_", " ").title()
+
+    def _prepare_schema_editor_data(self, vendor_slug: str, entry: Dict[str, Any] = None,
+                                    column_info: Dict[str, Any] = None,
+                                    quantity_pattern: str = None,
+                                    row_format: str = None) -> Dict[str, Any]:
+        """
+        Prepare schema data for SchemaEditorWindow pre-filling.
+
+        Args:
+            vendor_slug: Vendor slug/identifier
+            entry: Existing cache entry (None for new detection)
+            column_info: Column detection results (if entry is None)
+            quantity_pattern: Detected quantity pattern (if entry is None)
+            row_format: Row format (if entry is None)
+
+        Returns:
+            Normalized schema data for SchemaEditorWindow
+        """
+        # Start with basic structure
+        schema_data = {
+            "display_name": self._get_english_vendor_name(vendor_slug),
+            "trust_score": 0.5,
+            "user_verified": False,
+            "column_mapping": {},
+            "validation_rules": {
+                "tolerance_percent": 5.0,
+                "quantity_calculation": "auto"
+            },
+            "parsing_rules": {
+                "skip_lines": []
+            }
+        }
+
+        if entry:
+            # Use existing cache entry
+            # Keep English display_name from _get_english_vendor_name()
+            # (Cache stores Hebrew, we want English for SchemaEditorWindow)
+
+            # Get trust score
+            if "confidence" in entry and isinstance(entry["confidence"], dict):
+                schema_data["trust_score"] = entry["confidence"].get("trust_score", 0.5)
+            else:
+                schema_data["trust_score"] = entry.get("confidence", 0.5)
+
+            # Get column mappings from legacy_fields
+            if "legacy_fields" in entry:
+                legacy = entry["legacy_fields"]
+
+                # Priority 1: column_assignments dict (if has data)
+                if "column_assignments" in legacy and legacy["column_assignments"]:
+                    schema_data["column_mapping"] = legacy.get("column_assignments", {})
+                # Priority 2: detected_columns array (convert to dict)
+                elif "detected_columns" in legacy and legacy["detected_columns"]:
+                    column_mapping = {}
+                    for col in legacy["detected_columns"]:
+                        hebrew = col.get("hebrew_text", "").strip()
+                        assigned = col.get("assigned_field", "").strip()
+                        if hebrew and assigned:  # Skip empty hebrew_text entries
+                            column_mapping[hebrew] = assigned
+                    if column_mapping:
+                        schema_data["column_mapping"] = column_mapping
+            elif "column_assignments" in entry and entry["column_assignments"]:
+                schema_data["column_mapping"] = entry.get("column_assignments", {})
+
+            # Merge existing validation rules
+            if "validation_rules" in entry:
+                existing_validation = entry["validation_rules"]
+                # Preserve existing quantity_calculation if not default "unknown"
+                if existing_validation.get("quantity_calculation") and existing_validation["quantity_calculation"] != "unknown":
+                    schema_data["validation_rules"]["quantity_calculation"] = existing_validation["quantity_calculation"]
+                # Merge other validation rules
+                schema_data["validation_rules"].update(existing_validation)
+
+            # Include parsing rules (skip_lines, etc.)
+            if "parsing_rules" in entry:
+                schema_data["parsing_rules"] = entry.get("parsing_rules", schema_data["parsing_rules"])
+        else:
+            # Use new detection data
+            # Trust score will be calculated separately, use default for now
+            schema_data["trust_score"] = 0.5  # Default, will be updated by caller
+
+            # Get column mappings from column_info
+            if column_info and column_info.get('success'):
+                # Phase3 returns column_mapping, Phase6 expects column_assignments
+                # Try column_mapping first, then column_assignments
+                column_mapping_data = column_info.get('column_mapping', column_info.get('column_assignments', {}))
+                schema_data["column_mapping"] = column_mapping_data
+
+            # Add quantity pattern and row format to parsing rules if available
+            if quantity_pattern:
+                schema_data["parsing_rules"]["quantity_pattern"] = quantity_pattern
+            if row_format:
+                schema_data["parsing_rules"]["row_format"] = row_format
+
+        return schema_data
+
     def add_or_update_vendor(
         self,
         vendor_name: str,
@@ -663,7 +780,7 @@ class Phase6VendorCache:
                     },
                     'columns_gui': [],
                     'validation_rules': {
-                        'quantity_calculation': 'unknown',
+                        'quantity_calculation': 'auto',
                         'tolerance_percent': 5.0,
                         'auto_validate': True
                     },
@@ -698,6 +815,7 @@ class Phase6VendorCache:
             # User-made cache → Always use (no questions)
             # Auto-made cache exists + New auto-made has better score → Ask user if they want to switch
             if not is_user_made:  # Only for auto-made caches
+                skip_save_cache = False  # Flag to skip _save_cache if editor already saved
                 print(f"Phase 6: Auto-made schema for {vendor_slug}")
                 print(f"  Current trust score: {current_trust_score:.2f}")
                 print(f"  New trust score: {trust_score:.2f}")
@@ -719,7 +837,18 @@ class Phase6VendorCache:
 
                         # Update properties with better schema
                         if column_info and column_info.get('success'):
-                            entry['legacy_fields']['column_assignments'] = column_info.get('column_assignments', {})
+                            # Try column_mapping first (Phase3), then column_assignments
+                            column_assignments = column_info.get('column_mapping', column_info.get('column_assignments', {}))
+                            if not column_assignments and 'detected_columns' in column_info:
+                                # Convert detected_columns to column_assignments for cache
+                                column_assignments = {}
+                                for col in column_info['detected_columns']:
+                                    hebrew = col.get('hebrew_text', '')
+                                    assigned = col.get('assigned_field', '')
+                                    if hebrew and assigned:
+                                        column_assignments[hebrew] = assigned
+
+                            entry['legacy_fields']['column_assignments'] = column_assignments
                             entry['legacy_fields']['detected_columns'] = column_info.get('detected_columns', [])
 
                         if quantity_pattern:
@@ -737,19 +866,49 @@ class Phase6VendorCache:
                 elif both_low_confidence:
                     # BOTH scores are low - ask user what to do
                     print(f"  Both scores are low (current: {current_trust_score:.2f}, new: {trust_score:.2f})")
-                    print(f"  Asking user via GUI: 'Both scores are low (<0.6). Update cache for {vendor_name} anyway?'")
+                    print(f"  Asking user via GUI: 'Edit cache for {vendor_name}?'")
 
-                    # Use same callback but the dialog will show "Both scores low" context
-                    should_replace = self._trigger_gui_callback('ask_replace_schema',
-                        vendor_name, current_trust_score, trust_score)
+                    # Determine which schema is better (higher score)
+                    better_score = max(current_trust_score, trust_score)
 
-                    if should_replace:
-                        # User approved - update even though both are low
+                    # Prepare schema data for editor
+                    if better_score == current_trust_score:
+                        # Current cache is better
+                        better_schema_data = self._prepare_schema_editor_data(vendor_slug, entry)
+                    else:
+                        # New detection is better
+                        better_schema_data = self._prepare_schema_editor_data(vendor_slug, None,
+                            column_info, quantity_pattern, row_format)
+                        # Update trust score in schema data
+                        better_schema_data["trust_score"] = trust_score
+
+                    # Call new callback with three options: Edit, Replace, Keep
+                    user_choice = self._trigger_gui_callback('edit_schema_low_confidence',
+                        vendor_name, current_trust_score, trust_score, better_schema_data)
+
+                    # Handle three return types
+                    if user_choice is None or user_choice is False:
+                        # "Keep Current" - do nothing
+                        print(f"  ✗ User chose to keep current schema (score: {current_trust_score:.2f})")
+                        entry['confidence']['trust_score'] = current_trust_score
+                    elif user_choice is True:
+                        # "Replace Anyway" - update cache with better schema
                         entry['confidence']['trust_score'] = trust_score
 
                         # Update with current schema (might have different column detection, etc.)
                         if column_info and column_info.get('success'):
-                            entry['legacy_fields']['column_assignments'] = column_info.get('column_assignments', {})
+                            # Try column_mapping first (Phase3), then column_assignments
+                            column_assignments = column_info.get('column_mapping', column_info.get('column_assignments', {}))
+                            if not column_assignments and 'detected_columns' in column_info:
+                                # Convert detected_columns to column_assignments for cache
+                                column_assignments = {}
+                                for col in column_info['detected_columns']:
+                                    hebrew = col.get('hebrew_text', '')
+                                    assigned = col.get('assigned_field', '')
+                                    if hebrew and assigned:
+                                        column_assignments[hebrew] = assigned
+
+                            entry['legacy_fields']['column_assignments'] = column_assignments
                             entry['legacy_fields']['detected_columns'] = column_info.get('detected_columns', [])
 
                         if quantity_pattern:
@@ -758,10 +917,29 @@ class Phase6VendorCache:
                         if row_format:
                             entry['legacy_fields']['row_format'] = row_format
 
-                        print(f"  ✓ User approved: Updated cache despite low scores (new: {trust_score:.2f})")
+                        print(f"  ✓ User chose to replace anyway (new: {trust_score:.2f})")
+                    elif isinstance(user_choice, dict) and user_choice.get("edited"):
+                        # "Edit Cache" - user edited schema in SchemaEditorWindow
+                        # SchemaEditorWindow already saved with user_created: true
+                        print(f"  ✓ User edited schema - saved with user_created: true")
+
+                        # Reload cache from file to get updated schema
+                        self._reload_cache_from_file()
+
+                        # Get the updated entry
+                        updated_entry = self._get_vendor_entry(vendor_slug)
+                        if updated_entry:
+                            entry = updated_entry
+                            print(f"  Reloaded updated schema from file")
+                        else:
+                            print(f"  WARNING: Could not find updated schema for {vendor_slug}")
+
+                        # Skip saving cache (already saved by editor)
+                        # Set a flag to skip _save_cache() at the end
+                        skip_save_cache = True
                     else:
-                        # User declined - keep existing
-                        print(f"  ✗ User declined: Keeping existing low-confidence schema (score: {current_trust_score:.2f})")
+                        # Fallback: keep current
+                        print(f"  ✗ Unknown choice, keeping current schema (score: {current_trust_score:.2f})")
                         entry['confidence']['trust_score'] = current_trust_score
 
                 else:
@@ -799,7 +977,7 @@ class Phase6VendorCache:
                 },
                 'columns_gui': [],
                 'validation_rules': {
-                    'quantity_calculation': 'unknown',
+                    'quantity_calculation': 'auto',
                     'tolerance_percent': 5.0,
                     'auto_validate': True,
                     'barcode_format': None,
@@ -818,7 +996,7 @@ class Phase6VendorCache:
                     'has_discount_lines': kwargs.get('has_discount_lines', False),
                     'discount_keywords': kwargs.get('discount_keywords', []),
                     'barcode_position': kwargs.get('barcode_position', 'unknown'),
-                    'column_assignments': column_info.get('column_assignments', {}) if column_info and column_info.get('success') else {},
+                    'column_assignments': column_info.get('column_mapping', column_info.get('column_assignments', {})) if column_info and column_info.get('success') else {},
                     'detected_columns': column_info.get('detected_columns', []) if column_info and column_info.get('success') else []
                 }
             }
@@ -944,6 +1122,17 @@ class Phase6VendorCache:
             # v2.0: get column data from legacy_fields, confidence from proper v2.0 field
             legacy = cache_entry.get("legacy_fields", {})
             column_assignments = legacy.get('column_assignments', {})
+            detected_columns = legacy.get('detected_columns', [])
+
+            # If column_assignments is empty but detected_columns has data, convert it
+            if not column_assignments and detected_columns:
+                column_assignments = {}
+                for col in detected_columns:
+                    hebrew = col.get('hebrew_text', '').strip()
+                    assigned = col.get('assigned_field', '').strip()
+                    if hebrew and assigned:
+                        column_assignments[hebrew] = assigned
+
             # Get confidence from proper v2.0 field if available
             if 'confidence' in cache_entry and isinstance(cache_entry['confidence'], dict):
                 confidence = cache_entry['confidence'].get('trust_score', 0.5)

@@ -450,12 +450,8 @@ class SchemaEditorWindow:
                 vendor_slug_lower = self.vendor_slug.lower()
                 for slug, names in mapping.items():
                     if slug.lower() == vendor_slug_lower:
-                        if isinstance(names, list):
-                            # Find English name (non-Hebrew)
-                            for name in names:
-                                if name and not any('\u0590' <= c <= '\u05FF' for c in str(name)):
-                                    english_name = name
-                                    break
+                        # Use the mapping key as English name (e.g., "Ridan")
+                        english_name = slug
                         break
 
             # If not found in mapping, try cache structure

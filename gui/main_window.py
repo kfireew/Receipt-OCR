@@ -58,7 +58,8 @@ class MainWindow:
         self.pipeline_callbacks = {
             'ask_replace_schema': self._wrap_gui_callback(self._show_replace_schema_dialog),
             'on_mapping_missing': self._wrap_gui_callback(self._add_merchant_mapping),
-            'create_cache_entry': self._wrap_gui_callback(self._show_create_cache_dialog)  # NEW: for low-confidence new vendors
+            'create_cache_entry': self._wrap_gui_callback(self._show_create_cache_dialog),  # NEW: for low-confidence new vendors
+            'edit_schema_low_confidence': self._wrap_gui_callback(self._show_edit_schema_low_confidence_dialog)  # NEW: for low-confidence existing cache
         }
 
         # Check if tkinterdnd2 is available for drag and drop
@@ -1122,6 +1123,125 @@ class MainWindow:
         # Wait for user choice
         dialog.wait_window()  # This blocks until dialog is destroyed
         choice_event.wait()   # Ensure choice is set
+
+        return user_choice
+
+    def _show_edit_schema_low_confidence_dialog(self, vendor_name, current_score, new_score, schema_data):
+        """
+        Show dialog for low-confidence schema with three options: Edit, Replace, Keep.
+
+        Args:
+            vendor_name: Vendor name
+            current_score: Current trust score
+            new_score: New trust score
+            schema_data: Pre-filled schema data for editor (dict)
+
+        Returns:
+            None/False: Keep current schema
+            True: Replace with better schema
+            dict: Edited schema data (when user chooses Edit)
+        """
+        # Create dialog
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Low Confidence Schema")
+        dialog.geometry("550x250")
+        dialog.transient(self.root)
+        dialog.grab_set()
+
+        theme.configure_styles(dialog)
+
+        # Content frame
+        content = theme.create_frame(dialog, padx=20, pady=20)
+        content.pack(fill=tk.BOTH, expand=True)
+
+        # Title
+        title = theme.create_label(
+            content,
+            text="⚠️ Low Confidence Schema Detected",
+            font=theme.FONT_TITLE
+        )
+        title.pack(anchor=tk.W, pady=(0, 15))
+
+        # Message
+        message = f"Both schemas for '{vendor_name}' have low confidence.\n\n"
+        message += f"Current trust score: {current_score:.2f}\n"
+        message += f"New trust score: {new_score:.2f}\n\n"
+        message += "What would you like to do?"
+
+        msg_label = theme.create_label(
+            content,
+            text=message,
+            font=theme.FONT_BODY,
+            fg=theme.CLR_TEXT
+        )
+        msg_label.pack(anchor=tk.W, pady=(0, 20))
+
+        # Button frame
+        button_frame = theme.create_frame(content)
+        button_frame.pack(fill=tk.X)
+
+        # Variable to store user's choice
+        user_choice = None
+        choice_event = threading.Event()
+
+        def on_edit():
+            nonlocal user_choice
+            # Open SchemaEditorWindow with pre-filled data
+            from .schema_editor_window import SchemaEditorWindow
+
+            # Generate vendor slug from name (similar to phase6_vendor_cache)
+            vendor_slug = vendor_name.lower().replace(" ", "_").replace("/", "_").replace("\\", "_")
+
+            # Open editor
+            editor = SchemaEditorWindow(self.root, vendor_slug, schema_data)
+
+            # Wait for editor to close (editor handles its own window)
+            # The editor saves directly to cache when user clicks Save
+            dialog.destroy()
+            choice_event.set()
+
+            # Return special value to indicate "edited"
+            user_choice = {"action": "edited", "vendor_slug": vendor_slug}
+
+        def on_replace():
+            nonlocal user_choice
+            user_choice = True  # Replace
+            dialog.destroy()
+            choice_event.set()
+
+        def on_keep():
+            nonlocal user_choice
+            user_choice = False  # Keep (False or None)
+            dialog.destroy()
+            choice_event.set()
+
+        # Three buttons
+        btn_edit = theme.create_button(
+            button_frame, "Edit Cache", command=on_edit,
+            style="primary", emoji="✏️"
+        )
+        btn_edit.pack(side=tk.LEFT, padx=(0, 10))
+
+        btn_replace = theme.create_button(
+            button_frame, f"Replace Anyway ({new_score:.2f})", command=on_replace,
+            style="secondary"
+        )
+        btn_replace.pack(side=tk.LEFT, padx=(0, 10))
+
+        btn_keep = theme.create_button(
+            button_frame, f"Keep Current ({current_score:.2f})", command=on_keep,
+            style="tertiary"
+        )
+        btn_keep.pack(side=tk.LEFT)
+
+        # Wait for user choice
+        dialog.wait_window()
+        choice_event.wait()
+
+        # If user chose "Edit", we need to indicate that schema was edited
+        # The SchemaEditorWindow already saved it, so just return a dict
+        if user_choice and isinstance(user_choice, dict) and user_choice.get("action") == "edited":
+            return {"edited": True, "vendor_slug": user_choice.get("vendor_slug")}
 
         return user_choice
 
