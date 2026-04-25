@@ -24,7 +24,7 @@
       },
       "legacy_fields": {
         "display_name": "שופרסל טסט",
-        "parse_count": 3,
+        "parse_count": 5,
         "last_seen": "2026-04-24",
         "confirmed_by_user": false,
         "row_format": "multiline",
@@ -67,7 +67,7 @@
         "display_name": "גלוברנדס",
         "user_created": true,
         "creation_date": "2026-04-23",
-        "last_modified": "2026-04-23",
+        "last_modified": "2026-04-24",
         "modified_by": "auto_update",
         "document_type": "invoice"
       },
@@ -117,8 +117,8 @@
       },
       "legacy_fields": {
         "display_name": "גלוברנדס",
-        "parse_count": 8,
-        "last_seen": "2026-04-23",
+        "parse_count": 10,
+        "last_seen": "2026-04-24",
         "confirmed_by_user": true,
         "confidence": 0.95,
         "row_format": "multiline",
@@ -182,29 +182,35 @@
       "basics": {
         "display_name": "תנובה",
         "user_created": false,
-        "creation_date": "2026-04-23",
-        "last_modified": "2026-04-23",
-        "modified_by": "auto_create"
+        "creation_date": "2026-04-25",
+        "last_modified": "2026-04-25",
+        "modified_by": "auto_update",
+        "document_type": "receipt"
       },
       "confidence": {
-        "trust_score": 0.33,
+        "trust_score": 0.9,
         "source": "auto_detected",
-        "parses_since_verification": 1,
+        "parses_since_verification": 0,
         "user_verified": false,
-        "verification_date": null
+        "verification_date": null,
+        "verification_method": null
       },
       "columns_gui": [],
       "validation_rules": {
-        "quantity_calculation": "unknown",
+        "quantity_calculation": "auto",
         "tolerance_percent": 5.0,
-        "auto_validate": true
+        "auto_validate": true,
+        "barcode_format": null,
+        "invoice_specific": false
+      },
+      "parsing_rules": {
+        "document_type": "receipt",
+        "skip_lines": []
       },
       "legacy_fields": {
-        "display_name": "תנובה",
-        "parse_count": 1,
-        "last_seen": "2026-04-23",
+        "parse_count": 2,
+        "last_seen": "2026-04-25",
         "confirmed_by_user": false,
-        "confidence": 0.33,
         "row_format": "multiline",
         "quantity_pattern": "weight_based",
         "has_discount_lines": false,
@@ -217,76 +223,20 @@
         },
         "detected_columns": [
           {
+            "hebrew_text": "כמות",
+            "assigned_field": "quantity"
+          },
+          {
             "hebrew_text": "סכום",
             "assigned_field": "line_net_total"
           },
           {
             "hebrew_text": "מחיר",
             "assigned_field": "unit_price"
-          },
-          {
-            "hebrew_text": "כמות",
-            "assigned_field": "quantity"
-          }
-        ]
-      }
-    },
-    "ridan": {
-      "basics": {
-        "display_name": "ריד",
-        "user_created": false,
-        "creation_date": "2026-04-24",
-        "last_modified": "2026-04-24",
-        "modified_by": "auto_update",
-        "document_type": "receipt"
-      },
-      "confidence": {
-        "trust_score": 0.46,
-        "source": "auto_detected",
-        "parses_since_verification": 0,
-        "user_verified": false,
-        "verification_date": null,
-        "verification_method": null
-      },
-      "columns_gui": [],
-      "validation_rules": {
-        "quantity_calculation": "unknown",
-        "tolerance_percent": 5.0,
-        "auto_validate": true,
-        "barcode_format": null,
-        "invoice_specific": false
-      },
-      "parsing_rules": {
-        "document_type": "receipt",
-        "skip_lines": []
-      },
-      "legacy_fields": {
-        "parse_count": 7,
-        "last_seen": "2026-04-24",
-        "confirmed_by_user": false,
-        "row_format": "multiline",
-        "quantity_pattern": "pattern1",
-        "has_discount_lines": false,
-        "discount_keywords": [],
-        "barcode_position": "unknown",
-        "column_assignments": {},
-        "detected_columns": [
-          {
-            "hebrew_text": "פריט",
-            "assigned_field": "description"
-          },
-          {
-            "hebrew_text": "ברקוד",
-            "assigned_field": "product_code"
-          },
-          {
-            "hebrew_text": "יח",
-            "assigned_field": "quantity"
           }
         ],
-        "confidence": 0.44
-      },
-      "matched_slug": "ridan"
+        "confidence": 0.9
+      }
     }
   }
 }

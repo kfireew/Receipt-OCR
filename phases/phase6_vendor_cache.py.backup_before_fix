@@ -84,7 +84,6 @@ class Phase6VendorCache:
         # GUI callbacks for user interaction
         self.gui_callbacks = gui_callbacks or {}
         self.pending_actions = []  # Actions to be handled by GUI
-        self.skip_save_cache = False  # Flag to skip save when editor already saved
 
     def _trigger_gui_callback(self, callback_name: str, *args, **kwargs):
         """
@@ -508,7 +507,7 @@ class Phase6VendorCache:
 
         # Return best match if found
         if best_match:
-            print(f"Phase 6: Fuzzy matched '{matched_hebrew}' (score: {best_score}, length: {best_length}) -> '{best_match}'")
+            print(f"Phase 6: Fuzzy matched '{matched_hebrew}' (score: {best_score}, length: {best_length}) → '{best_match}'")
             return best_match
 
         # Hebrew text not found in merchants_mapping
@@ -774,9 +773,6 @@ class Phase6VendorCache:
 
         print(f"DEBUG Phase 6: vendor_slug='{vendor_slug}'")
 
-        # Reset skip_save_cache flag at start of each call
-        self.skip_save_cache = False
-
         entry = self._get_vendor_entry(vendor_slug)
 
         print(f"DEBUG Phase 6: existing entry found={entry is not None}")
@@ -840,7 +836,7 @@ class Phase6VendorCache:
             # User-made cache → Always use (no questions)
             # Auto-made cache exists + New auto-made has better score → Ask user if they want to switch
             if not is_user_made:  # Only for auto-made caches
-                self.skip_save_cache = False  # Flag to skip _save_cache if editor already saved
+                skip_save_cache = False  # Flag to skip _save_cache if editor already saved
                 print(f"Phase 6: Auto-made schema for {vendor_slug}")
                 print(f"  Current trust score: {current_trust_score:.2f}")
                 print(f"  New trust score: {trust_score:.2f}")
@@ -961,7 +957,7 @@ class Phase6VendorCache:
 
                         # Skip saving cache (already saved by editor)
                         # Set a flag to skip _save_cache() at the end
-                        self.skip_save_cache = True
+                        skip_save_cache = True
                     else:
                         # Fallback: keep current
                         print(f"  ✗ Unknown choice, keeping current schema (score: {current_trust_score:.2f})")
@@ -1083,32 +1079,17 @@ class Phase6VendorCache:
             elif isinstance(should_create_cache, dict) and should_create_cache.get("action") == "edited":
                 # Schema editor already saved hand-made cache
                 print(f"Phase 6: User created hand-made cache via schema editor")
-                # Reload cache from file to get saved schema
-                self._reload_cache_from_file()
-                saved_entry = self._get_vendor_entry(vendor_slug)
-                if saved_entry:
-                    print(f"  Reloaded hand-made schema from file")
-                    return saved_entry
-                else:
-                    print(f"  WARNING: Could not find saved schema for {vendor_slug}, saving auto-made as fallback")
-                    # Fallback: save and return auto-made entry
-                    self._set_vendor_entry(vendor_slug, entry)
-                    self._save_cache()
-                    return entry
+                # Return the auto-made entry (editor saved hand-made version)
+                return entry
             else:
                 # should_create_cache is True, None, or other truthy value
                 # Create auto-made cache (default/legacy behavior)
                 self._set_vendor_entry(vendor_slug, entry)
                 print(f"Phase 6: Created new v2.0 cache entry for {vendor_slug}")
-                self._save_cache()  # Save new auto-made cache to disk
                 return entry
 
-        # Save cache (unless editor already saved)
-        if not self.skip_save_cache:
-            self._save_cache()
-        else:
-            print(f"Phase 6: Skipping save (editor already saved cache)")
-            self.skip_save_cache = False  # Reset for next call
+        # Save cache
+        self._save_cache()
 
         return entry
 

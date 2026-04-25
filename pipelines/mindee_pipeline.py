@@ -117,6 +117,7 @@ def process_receipt(
     # ========== PHASE 6: EARLY VENDOR DETECTION (for cache) ==========
     print("\nPHASE 6: Early vendor detection for cache...")
     vendor_cache = Phase6VendorCache(gui_callbacks=gui_callbacks)
+    print(f"DEBUG Pipeline: Phase6VendorCache initialized with gui_callbacks: {gui_callbacks is not None}")
     vendor_info = {
         'name': header.get('vendor', ''),
         'slug': None,
@@ -254,8 +255,16 @@ def process_receipt(
     # ========== PHASE 6: CACHE UPDATE (after successful parse) ==========
     print("\nPHASE 6: Cache update...")
 
+    # DEBUG: Check Phase 6 conditions
+    print(f"DEBUG Pipeline: Checking Phase 6 conditions")
+    print(f"  vendor_info.get('detected') = {vendor_info.get('detected')}")
+    print(f"  column_info exists = {column_info is not None}")
+    print(f"  column_info.get('success') = {column_info.get('success') if column_info else 'N/A'}")
+    print(f"  vendor_info keys = {list(vendor_info.keys()) if vendor_info else 'None'}")
+
     # Update cache if vendor was detected and column detection was successful
     if vendor_info.get('detected') and column_info and column_info.get('success'):
+        print(f"DEBUG Pipeline: ALL conditions met, calling add_or_update_vendor")
         vendor_name = vendor_info['name']
 
         # Get row format from Phase 2 segmentation if available
@@ -349,6 +358,13 @@ def process_receipt(
             items, column_info, pattern_info, vendor_info.get('cache_entry')
         )
 
+        # DEBUG: Log validation metrics
+        print(f"DEBUG Pipeline: Collected validation metrics:")
+        print(f"  column_confidence = {validation_metrics.get('column_confidence', 'N/A')}")
+        print(f"  validation_rate = {validation_metrics.get('validation_rate', 'N/A')}")
+        print(f"  pattern_consistency = {validation_metrics.get('pattern_consistency', 'N/A')}")
+        print(f"  user_verification = {validation_metrics.get('user_verification', 'N/A')}")
+
         # Update cache with successful parse results and validation metrics
         cache_entry = vendor_cache.add_or_update_vendor(
             vendor_name,
@@ -392,13 +408,13 @@ def process_receipt(
         print(f"  Post-processing failed: {e}")
         fixed_items = formatted_items
 
-    # Format output
+    # Format output - use detected vendor name (from raw text), not empty header vendor
     receipt_name = formatter.generate_receipt_name(
-        header['vendor'], header['date'], image_path
+        vendor_name, header['date'], image_path
     )
 
     print(f"  Creating ABBYY format for {len(fixed_items)} items")
-    gdoc = formatter.format(fixed_items, header['vendor'], header['date'], receipt_name)
+    gdoc = formatter.format(fixed_items, vendor_name, header['date'], receipt_name)
 
     if save_to_output:
         formatter.save_to_output(gdoc, receipt_name)

@@ -156,7 +156,7 @@ class CuteTheme:
 
         return btn
 
-    def create_label(self, parent, text, font=None, fg=None, bg=None, emoji=None):
+    def create_label(self, parent, text, font=None, fg=None, bg=None, emoji=None, justify=None):
         """Create a label with optional emoji."""
         if emoji:
             text = f"{emoji} {text}"
@@ -168,7 +168,7 @@ class CuteTheme:
         if bg is None:
             bg = self.CLR_BG
 
-        return tk.Label(parent, text=text, font=font, fg=fg, bg=bg)
+        return tk.Label(parent, text=text, font=font, fg=fg, bg=bg, justify=justify)
 
     def create_frame(self, parent, bg=None, padx=0, pady=0):
         """Create a frame."""

@@ -133,18 +133,21 @@ def _extract_vendor_info(gdoc_result: Dict[str, Any]) -> Dict[str, Any]:
     gdoc = gdoc_result.get('GDocument', {})
     fields = gdoc.get('fields', [])
 
+    # Check for VendorNameS (correct field name)
+    vendor_name = ''
     for field in fields:
-        if field.get('name') == 'VendorName':
+        if field.get('name') == 'VendorNameS':  # Correct field name
             vendor_name = field.get('value', '')
-            if vendor_name:
-                vendor_info['vendor_name'] = vendor_name
-                # Create simple slug from vendor name
-                vendor_slug = vendor_name.lower().replace(' ', '_').replace('-', '_')
-                vendor_info['vendor_slug'] = vendor_slug
-                # Default trust score for known vendors
-                vendor_info['trust_score'] = 0.7
-                vendor_info['match_score'] = 0.8
             break
+
+    if vendor_name:
+        vendor_info['vendor_name'] = vendor_name
+        # Create simple slug from vendor name
+        vendor_slug = vendor_name.lower().replace(' ', '_').replace('-', '_')
+        vendor_info['vendor_slug'] = vendor_slug
+        # Default trust score for known vendors
+        vendor_info['trust_score'] = 0.7
+        vendor_info['match_score'] = 0.8
 
     return vendor_info
 

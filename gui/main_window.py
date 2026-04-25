@@ -390,7 +390,8 @@ class MainWindow:
                 # Single nested: {"GDocument": {...}}
                 clean_gdoc = gdoc_wrapper
 
-            result_json = json.dumps(clean_gdoc, indent=2, ensure_ascii=False)
+            # Show GDocument with wrapper (same as saved format)
+            result_json = json.dumps({"GDocument": clean_gdoc}, indent=2, ensure_ascii=False)
             self.result_display.log(result_json)
 
             # Also log metadata summary for debugging
@@ -473,11 +474,22 @@ class MainWindow:
         vendor = ""
         date = ""
 
+        # 1. First try: Use self.last_vendor_info (most reliable - already has correct vendor)
+        if self.last_vendor_info and self.last_vendor_info.get('vendor_slug'):
+            vendor = self.last_vendor_info.get('vendor_slug')
+
+        # 2. Fallback: Check GDocument for VendorNameS (correct field name)
+        if not vendor:
+            for f in gdoc.get("fields", []):
+                if f.get("name") == "VendorNameS":  # Correct field name
+                    vendor = f.get("value", "")
+                    break
+
+        # 3. Extract date from GDocument
         for f in gdoc.get("fields", []):
-            if f.get("name") == "VendorName":
-                vendor = f.get("value", "")
-            elif f.get("name") == "Date":
+            if f.get("name") == "Date":
                 date = f.get("value", "")
+                break
 
         if not vendor:
             vendor = "Unknown"
@@ -487,14 +499,21 @@ class MainWindow:
         # Format date
         if date and date != "Unknown" and '-' in date and len(date.split('-')[0]) == 4:
             parts = date.split('-')
-            date = f"{parts[2]}.{parts[1]}.{parts[0][-2:]}"
+            date = f"{parts[2]}.{parts[1]}.{parts[0]}"  # 4-digit year
 
-        # Generate filename
+        # Generate folder name (simple: vendor_date)
         receipt_name = None
         if vendor and date and date != "Unknown":
             receipt_name = f"{vendor}_{date}"
         else:
             receipt_name = f"{vendor}_{date}" if vendor else "Unknown"
+
+        # Generate file name (long pattern: vendor_date_vendor date-with-dashes)
+        file_name = None
+        if vendor and date and date != "Unknown":
+            file_name = f"{vendor}_{date}_{vendor} {date.replace('.', '-')}"
+        else:
+            file_name = receipt_name  # fallback
 
         # Get save location
         folder_path = filedialog.askdirectory(title="Choose where to save the folder")
@@ -506,11 +525,11 @@ class MainWindow:
 
         # Copy original file
         ext = Path(self.last_input_path).suffix
-        dst_file = output / f"{receipt_name}{ext}"
+        dst_file = output / f"{file_name}{ext}"
         shutil.copy2(self.last_input_path, dst_file)
 
         # Save JSON (save clean GDocument, not entire result dict)
-        json_path = output / f"{receipt_name}.JSON"
+        json_path = output / f"{file_name}.JSON"
         # Get clean GDocument for saving
         gdoc_wrapper = self.last_result.get("GDocument", {})
         if "GDocument" in gdoc_wrapper:
@@ -521,13 +540,14 @@ class MainWindow:
             clean_gdoc = gdoc_wrapper
 
         json_path.write_text(
-            json.dumps(clean_gdoc, indent=2, ensure_ascii=False),
+            # Save WITH GDocument wrapper for PHP compatibility
+            json.dumps({"GDocument": clean_gdoc}, indent=2, ensure_ascii=False),
             encoding="utf-8",
         )
 
-        # Copy to clipboard (copy clean GDocument)
+        # Copy to clipboard (copy GDocument with wrapper for consistency)
         self.root.clipboard_clear()
-        self.root.clipboard_append(json.dumps(clean_gdoc, ensure_ascii=False))
+        self.root.clipboard_append(json.dumps({"GDocument": clean_gdoc}, ensure_ascii=False))
 
         messagebox.showinfo("Saved", f"Folder created:\n{output}\n\nJSON copied to clipboard!")
         self.result_display.log(f"\nSaved to folder: {output}")
@@ -1194,9 +1214,8 @@ class MainWindow:
 
             # Open editor
             editor = SchemaEditorWindow(self.root, vendor_slug, schema_data)
-
-            # Wait for editor to close (editor handles its own window)
-            # The editor saves directly to cache when user clicks Save
+            # Wait for editor window to close (editor saves directly to cache when user clicks Save)
+            editor.window.wait_window()
             dialog.destroy()
             choice_event.set()
 
@@ -1245,18 +1264,17 @@ class MainWindow:
 
         return user_choice
 
-    def _show_create_cache_dialog(self, vendor_name, trust_score, column_info, quantity_pattern):
+    def _show_create_cache_dialog(self, vendor_name, trust_score, schema_data):
         """
-        Show dialog asking if user wants to create cache entry for new vendor.
+        Show dialog asking if user wants to create hand-made cache for new vendor.
 
         Args:
             vendor_name: Vendor name
             trust_score: Calculated trust score (0.0-1.0)
-            column_info: Column detection results
-            quantity_pattern: Detected quantity pattern
+            schema_data: Pre-filled schema data for editor (dict)
 
         Returns:
-            True if user wants to create cache, False if not
+            True if user wants to create cache (via editor), False if not
         """
         # Create dialog
         dialog = tk.Toplevel(self.root)
@@ -1274,7 +1292,7 @@ class MainWindow:
         # Title
         title = theme.create_label(
             content,
-            text="📋 Create Cache Entry for New Vendor",
+            text="📋 Create Hand-Made Cache for New Vendor",
             font=theme.FONT_TITLE
         )
         title.pack(anchor=tk.W, pady=(0, 15))
@@ -1291,18 +1309,19 @@ class MainWindow:
             message += "Very Low"
         message += ")\n\n"
 
-        # Add column info if available
-        if column_info and column_info.get('success'):
-            detected_cols = column_info.get('detected_columns', [])
-            if detected_cols:
-                message += f"Detected {len(detected_cols)} columns:\n"
-                for col in detected_cols[:3]:  # Show first 3 columns
-                    message += f"  • {col.get('hebrew_text', '?')} → {col.get('assigned_field', '?')}\n"
-                if len(detected_cols) > 3:
-                    message += f"  • ... and {len(detected_cols) - 3} more\n"
+        # Add column info from schema_data if available
+        column_mapping = schema_data.get('column_mapping', {})
+        if column_mapping:
+            message += f"Detected {len(column_mapping)} columns:\n"
+            for i, (hebrew_text, assigned_field) in enumerate(list(column_mapping.items())[:3]):
+                message += f"  • {hebrew_text} → {assigned_field}\n"
+            if len(column_mapping) > 3:
+                message += f"  • ... and {len(column_mapping) - 3} more\n"
 
+        # Add quantity pattern from parsing_rules
+        quantity_pattern = schema_data.get('parsing_rules', {}).get('quantity_pattern', 'unknown')
         message += f"\nQuantity pattern: {quantity_pattern}\n\n"
-        message += "Create cache entry for future receipts?"
+        message += "Create hand-made cache entry for future receipts?"
 
         msg_label = theme.create_label(
             content,
@@ -1321,9 +1340,16 @@ class MainWindow:
         user_choice = None
         choice_event = threading.Event()
 
-        def on_create():
+        def on_edit():
             nonlocal user_choice
-            user_choice = True
+            # Open SchemaEditorWindow with pre-filled schema_data
+            from .schema_editor_window import SchemaEditorWindow
+            vendor_slug = vendor_name.lower().replace(" ", "_").replace("/", "_").replace("\\", "_")
+            editor = SchemaEditorWindow(self.root, vendor_slug, schema_data)
+            # Wait for editor window to close (editor saves cache when user clicks Save)
+            editor.window.wait_window()
+            # Return special dict to indicate edited (similar to edit_schema_low_confidence_dialog)
+            user_choice = {"action": "edited", "vendor_slug": vendor_slug}
             dialog.destroy()
             choice_event.set()
 
@@ -1333,14 +1359,15 @@ class MainWindow:
             dialog.destroy()
             choice_event.set()
 
-        btn_create = theme.create_button(
-            button_frame, "Create Cache Entry", command=on_create,
-            style="primary", emoji="💾"
+        # Create buttons
+        btn_edit = theme.create_button(
+            button_frame, "Edit Cache", command=on_edit,
+            style="primary", emoji="✏️"
         )
-        btn_create.pack(side=tk.LEFT, padx=(0, 10))
+        btn_edit.pack(side=tk.LEFT, padx=(0, 10))
 
         btn_skip = theme.create_button(
-            button_frame, "Skip (Don't Create)", command=on_skip,
+            button_frame, "Skip", command=on_skip,
             style="secondary"
         )
         btn_skip.pack(side=tk.LEFT)

@@ -12,20 +12,20 @@ OUTPUT_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "output")
 
 
 def _normalize_date(date: str) -> str:
-    """Convert date to DD.MM.YY format."""
+    """Convert date to DD.MM.YYYY format."""
     if not date:
         return "Unknown"
 
-    # YYYY-MM-DD -> DD.MM.YY
+    # YYYY-MM-DD -> DD.MM.YYYY
     if '-' in date and len(date.split('-')[0]) == 4:
         parts = date.split('-')
-        return f"{parts[2]}.{parts[1]}.{parts[0][-2:]}"
+        return f"{parts[2]}.{parts[1]}.{parts[0]}"  # 4-digit year
 
-    # DD.MM.YYYY -> DD.MM.YY
+    # DD.MM.YYYY -> DD.MM.YYYY (already full year)
     if '.' in date:
         parts = date.split('.')
         if len(parts) == 3:
-            return f"{parts[0]}.{parts[1]}.{parts[2][-2:]}"
+            return f"{parts[0]}.{parts[1]}.{parts[2]}"  # 4-digit year
 
     return date
 
@@ -40,6 +40,10 @@ class MindeeFormatter:
 
     def save_to_output(self, gdoc: Dict, receipt_name: str):
         """Save output to output/ folder."""
+        # ENSURE GDocument wrapper exists before saving
+        if "GDocument" not in gdoc:
+            gdoc = {"GDocument": gdoc}
+
         os.makedirs(OUTPUT_DIR, exist_ok=True)
         json_path = os.path.join(OUTPUT_DIR, f"{receipt_name}.JSON")
         with open(json_path, 'w', encoding='utf-8') as f:
@@ -58,12 +62,20 @@ class MindeeFormatter:
 
         # Fallback: sanitize vendor
         if not safe_vendor:
-            is_ascii = vendor.encode('ascii', 'ignore').decode('ascii') == vendor
-            if is_ascii:
-                safe_vendor = re.sub(r'[^a-zA-Z0-9]', '', vendor)
+            print(f"Formatter WARNING: _get_english_vendor returned empty for '{vendor}'")
+            # Use original vendor if available
+            safe_vendor = vendor if vendor else "Unknown"
 
         if not safe_vendor:
             safe_vendor = "Unknown"
+
+        # Ensure vendor name is safe for filename
+        # _get_english_vendor already maps Hebrew to English (e.g., "תנובה" → "Tnuva")
+        # Just remove truly unsafe filename characters
+        if safe_vendor and safe_vendor != "Unknown":
+            safe_vendor = re.sub(r'[<>:"/\\|?*\x00-\x1F]', '', safe_vendor)
+            if not safe_vendor:  # If cleaning made it empty
+                safe_vendor = "Vendor"
 
         normalized_date = _normalize_date(date)
         receipt_name = f"{safe_vendor}_{normalized_date}_{safe_vendor} {normalized_date.replace('.', '-')}"
